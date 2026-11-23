@@ -8,6 +8,7 @@
     <string name="home_slot_empty_description">Empty slot. Tap to choose an app.</string>
     <string name="home_pick_app_title">Choose an app</string>
     <string name="home_pick_app_clear">Leave empty</string>
+    <string name="home_numbers">Vault %1$d min · Unlock %2$d</string>
     <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
 
     <!-- Search -->
@@ -47,6 +48,14 @@
     <string name="budget_save">Save</string>
     <string name="budget_applied">Saved. It applies now.</string>
     <string name="budget_scheduled">Saved. A bigger budget applies in 24 hours; see Pending changes.</string>
+
+    <!-- Today -->
+    <string name="today_title">Today</string>
+    <string name="today_question">What matters today? Up to three things.</string>
+    <string name="today_hint">Task %d</string>
+    <string name="today_save">Done</string>
+    <string name="today_skip">Skip</string>
+    <string name="today_set_tasks">Set today\'s tasks</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -110,7 +119,7 @@
     <string name="debug_usage_now">Now %1$s (offset %2$s)</string>
     <string name="debug_usage_day">Usage day %s</string>
     <string name="debug_usage_reset">Reset</string>
-    <string name="debug_usage_unlocks">Unlocks today: %d</string>
+    <string name="debug_usage_unlocks">Unlocks today: %1$d · Vault %2$d s</string>
     <string name="debug_on">On</string>
     <string name="debug_off">Off</string>
 </resources>

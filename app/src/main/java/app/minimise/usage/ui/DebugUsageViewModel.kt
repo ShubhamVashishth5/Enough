@@ -11,6 +11,7 @@ import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
 import app.minimise.usage.domain.EventLog
 import app.minimise.usage.domain.EventType
+import app.minimise.usage.domain.TodayUsageProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -33,6 +34,8 @@ data class DebugUsageUiState(
     val day: LocalDate? = null,
     val clockOffset: Duration = Duration.ZERO,
     val unlocks: Int = 0,
+    /** Same number as the home footer. */
+    val vaultTime: Duration = Duration.ZERO,
     val spans: List<SpanRow> = emptyList(),
 )
 
@@ -47,6 +50,7 @@ class DebugUsageViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val dayBoundary: DayBoundary,
     private val timeSource: TimeSource,
+    private val todayUsage: TodayUsageProvider,
 ) : ViewModel() {
     private val todayEvents = ticker(5.seconds)
         .map { dayBoundary.today() }
@@ -65,7 +69,8 @@ class DebugUsageViewModel @Inject constructor(
             now = timeSource.now().atZone(zone).toLocalDateTime(),
             day = day,
             clockOffset = settings.debugTimeOffset,
-            unlocks = events.count { it.type == EventType.SCREEN_UNLOCK },
+            unlocks = events.count { it.type == EventType.SCREEN_UNLOCK && !it.startAt.isBefore(dayBoundary.startOf(day)) },
+            vaultTime = todayUsage.today().vaultTime,
             spans = events.filter { it.type == EventType.APP_SPAN }.map { span ->
                 val end = span.endAt ?: span.startAt
                 SpanRow(

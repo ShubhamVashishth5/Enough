@@ -13,15 +13,28 @@ import app.minimise.settings.ui.BudgetRoute
 import app.minimise.settings.ui.PendingChangesRoute
 import app.minimise.usage.ui.DebugUsageRoute
 import app.minimise.settings.ui.SettingsRoute
+import app.minimise.tasks.ui.TodayRoute
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun LauncherNavHost(homePresses: Flow<Unit>) {
+fun LauncherNavHost(
+    homePresses: Flow<Unit>,
+    todayRequests: Flow<Unit>,
+    onTodayRequestHandled: () -> Unit,
+) {
     val navController = rememberNavController()
+    val openToday = { navController.navigate(Destination.Today) { launchSingleTop = true } }
 
     // The Home button always lands on the home screen itself.
     LaunchedEffect(homePresses) {
         homePresses.collect { navController.popBackStack(Destination.Home, inclusive = false) }
+    }
+    LaunchedEffect(todayRequests) {
+        todayRequests.collect {
+            onTodayRequestHandled()
+            navController.popBackStack(Destination.Home, inclusive = false)
+            openToday()
+        }
     }
 
     NavHost(
@@ -38,7 +51,11 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
                 onOpenSearch = { navController.navigate(Destination.Search) { launchSingleTop = true } },
                 onOpenSettings = { navController.navigate(Destination.Settings) { launchSingleTop = true } },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) { launchSingleTop = true } },
+                onOpenToday = openToday,
             )
+        }
+        composable<Destination.Today> {
+            TodayRoute(onClose = { navController.popBackStack(Destination.Home, inclusive = false) })
         }
         composable<Destination.Search> {
             SearchRoute(onClose = { navController.popBackStack(Destination.Home, inclusive = false) })

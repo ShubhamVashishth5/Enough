@@ -9,6 +9,7 @@ import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.EventDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.PendingChangeDao
+import app.minimise.core.db.TaskDao
 import app.minimise.core.prefs.DataStoreSettingsStore
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.SystemTimeSource
@@ -61,6 +62,9 @@ object CoreProviders {
 
     @Provides
     fun grantDao(db: AppDatabase): GrantDao = db.grantDao()
+
+    @Provides
+    fun taskDao(db: AppDatabase): TaskDao = db.taskDao()
 
     @Provides
     @Singleton

@@ -24,6 +24,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import app.minimise.R
+import app.minimise.tasks.domain.TodayTask
+import app.minimise.tasks.ui.TodayTaskList
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -40,6 +42,8 @@ fun HomeScreen(
     onSwipeUp: () -> Unit,
     onLongPressBackground: () -> Unit,
     onFixProtection: () -> Unit,
+    onTaskTapped: (TodayTask) -> Unit,
+    onEditTasks: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -52,6 +56,7 @@ fun HomeScreen(
     ) {
         Spacer(Modifier.height(32.dp))
         state.now?.let { Clock(it) }
+        TodayTaskList(tasks = state.tasks, onTaskTapped = onTaskTapped, onEditTasks = onEditTasks)
         if (!state.isDefaultHome) {
             Text(
                 text = stringResource(R.string.home_make_default),
@@ -78,6 +83,13 @@ fun HomeScreen(
             }
         }
         Spacer(Modifier.weight(1f))
+        state.numbers?.let { numbers ->
+            Text(
+                text = stringResource(R.string.home_numbers, numbers.vaultTime.inWholeMinutes, numbers.unlocks),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
+            )
+        }
     }
 
     state.slotPicker?.let { picker ->

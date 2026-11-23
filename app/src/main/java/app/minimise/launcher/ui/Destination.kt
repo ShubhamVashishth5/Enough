@@ -11,6 +11,9 @@ sealed interface Destination {
     data object Search : Destination
 
     @Serializable
+    data object Today : Destination
+
+    @Serializable
     data object Settings : Destination
 
     @Serializable
