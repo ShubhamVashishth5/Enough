@@ -25,6 +25,7 @@ import app.minimise.R
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.core.ui.ScreenScaffold
+import app.minimise.core.ui.durationText
 
 @Composable
 fun AppsRoute(viewModel: AppsViewModel = hiltViewModel()) {
@@ -45,21 +46,33 @@ fun AppsScreen(
             modifier = Modifier.padding(bottom = 8.dp),
         )
         LazyColumn {
-            items(state.apps, key = { it.packageName }) { app ->
-                AppKindRow(app = app, onKindChosen = { onKindChosen(app, it) })
+            items(state.rows, key = { it.app.packageName }) { row ->
+                AppKindRow(row = row, onKindChosen = { onKindChosen(row.app, it) })
             }
         }
     }
 }
 
 @Composable
-private fun AppKindRow(app: AppEntry, onKindChosen: (AppKind) -> Unit) {
+private fun AppKindRow(row: AppRow, onKindChosen: (AppKind) -> Unit) {
+    val app = row.app
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
         Text(text = app.label, style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp), modifier = Modifier.padding(top = 4.dp)) {
             AppKind.entries.forEach { kind ->
                 KindChoice(kind = kind, selected = app.kind == kind, onClick = { onKindChosen(kind) })
             }
+        }
+        row.pending?.let { pending ->
+            Text(
+                text = stringResource(
+                    R.string.apps_pending_move,
+                    stringResource(pending.kind.labelRes()),
+                    durationText(pending.remaining),
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -78,7 +91,7 @@ private fun KindChoice(kind: AppKind, selected: Boolean, onClick: () -> Unit) {
     )
 }
 
-private fun AppKind.labelRes(): Int = when (this) {
+fun AppKind.labelRes(): Int = when (this) {
     AppKind.TOOL -> R.string.app_kind_tool
     AppKind.VAULT -> R.string.app_kind_vault
     AppKind.HIDDEN -> R.string.app_kind_hidden

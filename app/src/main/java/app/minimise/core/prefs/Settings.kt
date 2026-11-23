@@ -10,4 +10,6 @@ data class Settings(
     val homeSlotsChosen: Boolean = false,
     /** Debug builds only: shifts the wall clock, for testing day resets. */
     val debugTimeOffset: Duration = Duration.ZERO,
+    /** Debug builds only: loosening waits 1 minute instead of 24 hours. */
+    val debugShortLoosenDelay: Boolean = false,
 )

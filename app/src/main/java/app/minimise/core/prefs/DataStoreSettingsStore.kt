@@ -41,6 +41,7 @@ class DataStoreSettingsStore @Inject constructor(
             dailyBudget = this[Keys.DAILY_BUDGET_SECONDS]?.seconds ?: defaults.dailyBudget,
             homeSlotsChosen = this[Keys.HOME_SLOTS_CHOSEN] ?: defaults.homeSlotsChosen,
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
+            debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
         )
     }
 
@@ -48,11 +49,13 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.DAILY_BUDGET_SECONDS] = settings.dailyBudget.inWholeSeconds
         this[Keys.HOME_SLOTS_CHOSEN] = settings.homeSlotsChosen
         this[Keys.DEBUG_TIME_OFFSET_SECONDS] = settings.debugTimeOffset.inWholeSeconds
+        this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
 
     private object Keys {
         val DAILY_BUDGET_SECONDS = longPreferencesKey("daily_budget_seconds")
         val HOME_SLOTS_CHOSEN = booleanPreferencesKey("home_slots_chosen")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
+        val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")
     }
 }
