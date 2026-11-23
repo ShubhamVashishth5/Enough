@@ -12,13 +12,16 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 
 @Singleton
 class RoomAppRepository @Inject constructor(
-    source: LauncherAppsSource,
+    private val source: LauncherAppsSource,
     private val dao: AppDao,
     @ApplicationScope scope: CoroutineScope,
 ) : AppRepository {
@@ -44,6 +47,15 @@ class RoomAppRepository @Inject constructor(
                 .sortedWith { a, b -> collator.compare(a.label, b.label) }
         }
         .shareIn(scope, SharingStarted.WhileSubscribed(5_000), replay = 1)
+
+    override val kinds: Flow<Map<String, AppKind>> =
+        dao.observeAll().map { rows -> rows.associate { it.packageName to it.kind } }
+
+    override suspend fun entry(packageName: String): AppEntry? {
+        val label = withContext(Dispatchers.IO) { source.activityFor(packageName)?.label?.toString() } ?: return null
+        val row = dao.get(packageName)
+        return AppEntry(packageName, label, kind = row?.kind ?: AppKind.TOOL, homeSlot = row?.homeSlot)
+    }
 
     override suspend fun kindOf(packageName: String): AppKind = dao.get(packageName)?.kind ?: AppKind.TOOL
 

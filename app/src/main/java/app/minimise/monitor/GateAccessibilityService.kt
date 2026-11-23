@@ -9,6 +9,7 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
+import app.minimise.gate.GateMonitor
 import app.minimise.monitor.data.AccessibilityForegroundSource
 import app.minimise.monitor.data.ForegroundPackageFilter
 import app.minimise.monitor.domain.ForegroundEvent
@@ -37,6 +38,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var foregroundSource: AccessibilityForegroundSource
+    @Inject lateinit var gateMonitor: GateMonitor
     @Inject lateinit var usageTracker: UsageTracker
     @Inject lateinit var eventLog: EventLog
     @Inject lateinit var settingsGuard: SettingsGuard
@@ -71,6 +73,7 @@ class GateAccessibilityService : AccessibilityService() {
             ContextCompat.registerReceiver(this, screenReceiver, screenEvents, ContextCompat.RECEIVER_NOT_EXPORTED)
             receiverRegistered = true
             scope.launch { foregroundSource.events.collect { usageTracker.onForeground(it) } }
+            scope.launch { gateMonitor.run() }
             scope.launch {
                 while (isActive) {
                     delay(CHECKPOINT_INTERVAL)

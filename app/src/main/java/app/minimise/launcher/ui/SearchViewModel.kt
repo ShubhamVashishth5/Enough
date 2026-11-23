@@ -2,9 +2,9 @@ package app.minimise.launcher.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.minimise.apps.data.AppLauncher
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppRepository
+import app.minimise.launcher.AppOpener
 import app.minimise.launcher.domain.AppSearch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -13,39 +13,40 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val appRepository: AppRepository,
-    private val appLauncher: AppLauncher,
+    appRepository: AppRepository,
+    private val appOpener: AppOpener,
 ) : ViewModel() {
     private val query = MutableStateFlow("")
+    private val finished = MutableStateFlow(false)
     private var latestApps: List<AppEntry> = emptyList()
 
-    val uiState: StateFlow<SearchUiState> = combine(appRepository.apps, query) { apps, text ->
+    val uiState: StateFlow<SearchUiState> = combine(appRepository.apps, query, finished) { apps, text, done ->
         latestApps = apps
-        SearchUiState(query = text, results = AppSearch.search(text, apps).matches)
+        SearchUiState(query = text, results = AppSearch.search(text, apps).matches, finished = done)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SearchUiState())
 
-    /** Returns true when the query picked out a single Tool app and it was opened. */
-    fun onQueryChange(text: String): Boolean {
+    fun onQueryChange(text: String) {
         query.value = text
-        val autoLaunch = AppSearch.search(text, latestApps).autoLaunch ?: return false
-        return open(autoLaunch)
+        AppSearch.search(text, latestApps).autoLaunch?.let(::open)
     }
 
-    /** Returns true when the app was opened. */
-    fun onAppSelected(app: AppEntry): Boolean = open(app)
+    fun onAppSelected(app: AppEntry) = open(app)
 
     /** The keyboard's Go key opens the top result. */
-    fun onSubmit(): Boolean {
-        val first = uiState.value.results.firstOrNull() ?: return false
-        return open(first)
+    fun onSubmit() {
+        uiState.value.results.firstOrNull()?.let(::open)
     }
 
-    private fun open(app: AppEntry): Boolean {
-        val opened = appLauncher.launch(app.packageName)
-        if (opened) query.value = ""
-        return opened
+    private fun open(app: AppEntry) {
+        viewModelScope.launch {
+            if (appOpener.open(app)) {
+                query.value = ""
+                finished.value = true
+            }
+        }
     }
 }

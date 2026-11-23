@@ -4,13 +4,12 @@ import app.minimise.apps.domain.AppKind
 import app.minimise.core.time.FakeTimeSource
 import app.minimise.core.time.plus
 import app.minimise.testing.FakeEventLog
+import app.minimise.testing.FakePendingChangeStore
+import app.minimise.testing.FakeSettingsTarget
 import app.minimise.usage.domain.EventType
-import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -138,45 +137,5 @@ class SettingsGuardTest {
         assertEquals(Direction.TIGHTEN, budgetChangeDirection(45, 30))
         assertEquals(Direction.LOOSEN, budgetChangeDirection(45, 46))
         assertEquals(null, budgetChangeDirection(45, 45))
-    }
-}
-
-private class FakeSettingsTarget : SettingsTarget {
-    val kinds = mutableMapOf<String, AppKind>()
-    var budgetMinutes = 45
-
-    override suspend fun direction(change: SettingChange): Direction? = when (change) {
-        is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
-        is SetBudget -> budgetChangeDirection(budgetMinutes, change.minutes)
-    }
-
-    override suspend fun apply(change: SettingChange) {
-        when (change) {
-            is SetAppKind -> kinds[change.packageName] = change.kind
-            is SetBudget -> budgetMinutes = change.minutes
-        }
-    }
-}
-
-private class FakePendingChangeStore : PendingChangeStore {
-    private val rows = MutableStateFlow<List<PendingChange>>(emptyList())
-    private var nextId = 1L
-
-    override fun observeAll(): Flow<List<PendingChange>> = rows
-
-    override suspend fun all(): List<PendingChange> = rows.value.sortedBy { it.applyAt }
-
-    override suspend fun add(change: SettingChange, requestedAt: Instant, applyAt: Instant): Long {
-        val id = nextId++
-        rows.value = rows.value + PendingChange(id, change, requestedAt, applyAt)
-        return id
-    }
-
-    override suspend fun remove(id: Long) {
-        rows.value = rows.value.filterNot { it.id == id }
-    }
-
-    override suspend fun removeKey(key: String) {
-        rows.value = rows.value.filterNot { it.change.key == key }
     }
 }

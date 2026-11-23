@@ -44,6 +44,14 @@
             </intent-filter>
         </activity>
 
+        <!-- Interventions run in their own task, so finishing one reveals the app underneath. -->
+        <activity
+            android:name=".intervention.ui.PauseActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
         <service
             android:name=".monitor.GateAccessibilityService"
             android:exported="true"
