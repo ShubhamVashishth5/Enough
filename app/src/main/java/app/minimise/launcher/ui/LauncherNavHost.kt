@@ -3,11 +3,19 @@ package app.minimise.launcher.ui
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.minimise.apps.ui.AppsRoute
+import app.minimise.onboarding.ui.OnboardingRoute
 import app.minimise.settings.permissions.PermissionsRoute
 import app.minimise.settings.ui.BudgetRoute
 import app.minimise.settings.ui.PendingChangesRoute
@@ -21,7 +29,12 @@ fun LauncherNavHost(
     homePresses: Flow<Unit>,
     todayRequests: Flow<Unit>,
     onTodayRequestHandled: () -> Unit,
+    launcherViewModel: LauncherViewModel = hiltViewModel(),
 ) {
+    val onboardingDone by launcherViewModel.onboardingDone.collectAsStateWithLifecycle()
+    // Wait for settings, then fix the start destination once: finishing onboarding navigates away itself.
+    val done = onboardingDone ?: return Box(Modifier.fillMaxSize())
+    val startDestination: Destination = remember { if (done) Destination.Home else Destination.Onboarding }
     val navController = rememberNavController()
     val openToday = { navController.navigate(Destination.Today) { launchSingleTop = true } }
 
@@ -39,12 +52,19 @@ fun LauncherNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Destination.Home,
+        startDestination = startDestination,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None },
     ) {
+        composable<Destination.Onboarding> {
+            OnboardingRoute(
+                onFinished = {
+                    navController.navigate(Destination.Home) { popUpTo<Destination.Onboarding> { inclusive = true } }
+                },
+            )
+        }
         composable<Destination.Home> {
             HomeRoute(
                 homePresses = homePresses,

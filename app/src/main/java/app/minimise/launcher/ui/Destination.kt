@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 /** Screens inside HomeActivity. Interventions (pause, time's up) are separate activities. */
 sealed interface Destination {
     @Serializable
+    data object Onboarding : Destination
+
+    @Serializable
     data object Home : Destination
 
     @Serializable

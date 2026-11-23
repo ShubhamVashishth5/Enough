@@ -7,6 +7,8 @@ import kotlin.time.Duration
 /** Scalar settings kept in DataStore. Rule settings here change only through SettingsGuard. */
 data class Settings(
     val dailyBudget: Duration = Defaults.DAILY_BUDGET,
+    /** First-run setup has been completed. */
+    val onboardingDone: Boolean = false,
     /** Set once the home slots have been filled for the first time, so they aren't refilled. */
     val homeSlotsChosen: Boolean = false,
     /** The usage day the Today screen last opened by itself, so it does so once a day. */

@@ -20,7 +20,8 @@ class TodayPrompt @Inject constructor(
     /** True the first time it's asked each usage day, unless today's tasks are already set. */
     suspend fun claim(): Boolean = mutex.withLock {
         val today = dayBoundary.today()
-        if (settingsStore.current().todayPromptedDay == today) return@withLock false
+        val settings = settingsStore.current()
+        if (!settings.onboardingDone || settings.todayPromptedDay == today) return@withLock false
         settingsStore.update { it.copy(todayPromptedDay = today) }
         taskRepository.tasksFor(today).isEmpty()
     }
