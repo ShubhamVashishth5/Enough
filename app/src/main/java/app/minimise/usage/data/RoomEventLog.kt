@@ -15,6 +15,8 @@ class RoomEventLog @Inject constructor(
 ) : EventLog {
     override suspend fun log(event: Event): Long = dao.insert(event.toEntity())
 
+    override suspend fun updateEnd(id: Long, endAt: Instant) = dao.updateEnd(id, endAt)
+
     override suspend fun between(from: Instant, to: Instant, type: EventType?): List<Event> =
         dao.between(from, to, type).map { it.toEvent() }
 

@@ -17,6 +17,10 @@ class FakeEventLog : EventLog {
         return id
     }
 
+    override suspend fun updateEnd(id: Long, endAt: Instant) {
+        events.value = events.value.map { if (it.id == id) it.copy(endAt = endAt) else it }
+    }
+
     override suspend fun between(from: Instant, to: Instant, type: EventType?): List<Event> =
         events.value.filter { it.overlaps(from, to) && (type == null || it.type == type) }.sortedBy { it.startAt }
 

@@ -14,6 +14,8 @@ import app.minimise.core.ui.SettingsRow
 fun SettingsRoute(
     onOpenApps: () -> Unit,
     onOpenPendingChanges: () -> Unit,
+    onOpenPermissions: () -> Unit,
+    onOpenDebugUsage: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -21,6 +23,8 @@ fun SettingsRoute(
         state = state,
         onOpenApps = onOpenApps,
         onOpenPendingChanges = onOpenPendingChanges,
+        onOpenPermissions = onOpenPermissions,
+        onOpenDebugUsage = onOpenDebugUsage,
         onDebugShortLoosenDelayToggled = viewModel::onDebugShortLoosenDelayToggled,
     )
 }
@@ -30,6 +34,8 @@ fun SettingsScreen(
     state: SettingsUiState,
     onOpenApps: () -> Unit,
     onOpenPendingChanges: () -> Unit,
+    onOpenPermissions: () -> Unit,
+    onOpenDebugUsage: () -> Unit,
     onDebugShortLoosenDelayToggled: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title)) {
@@ -47,7 +53,16 @@ fun SettingsScreen(
             },
             onClick = onOpenPendingChanges,
         )
+        SettingsRow(
+            title = stringResource(R.string.settings_permissions),
+            summary = stringResource(R.string.settings_permissions_summary),
+            onClick = onOpenPermissions,
+        )
         if (state.showDebug) {
+            SettingsRow(
+                title = stringResource(R.string.debug_usage_title),
+                onClick = onOpenDebugUsage,
+            )
             SettingsRow(
                 title = stringResource(R.string.debug_short_loosen_delay),
                 summary = stringResource(if (state.debugShortLoosenDelay) R.string.debug_on else R.string.debug_off),

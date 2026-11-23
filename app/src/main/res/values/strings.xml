@@ -8,6 +8,7 @@
     <string name="home_slot_empty_description">Empty slot. Tap to choose an app.</string>
     <string name="home_pick_app_title">Choose an app</string>
     <string name="home_pick_app_clear">Leave empty</string>
+    <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
 
     <!-- Search -->
     <string name="search_hint">Type an app name</string>
@@ -24,6 +25,29 @@
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
     <string name="apps_pending_move">Moves to %1$s in %2$s</string>
+
+    <string name="settings_permissions">Permissions</string>
+    <string name="settings_permissions_summary">What the app needs and why</string>
+
+    <!-- Permissions -->
+    <string name="permissions_title">Permissions</string>
+    <string name="permission_granted">On</string>
+    <string name="permission_missing">Off</string>
+    <string name="permission_open_settings">Open settings</string>
+    <string name="permission_make_default">Make default</string>
+    <string name="permission_allow">Allow</string>
+    <string name="permission_open_app_info">Open app info</string>
+    <string name="permission_accessibility">Accessibility</string>
+    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads only the app\'s name, never what\'s on screen, and nothing leaves the phone.</string>
+    <string name="permission_accessibility_restricted">Installed outside the Play Store? Android 13 and later grey out this setting until you open app info, tap ⋮ and choose Allow restricted settings.</string>
+    <string name="permission_home">Default home app</string>
+    <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
+    <string name="permission_battery">Unrestricted battery</string>
+    <string name="permission_battery_why">Stops the system from pausing the app in the background, which would switch protection off.</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_service_label">Enough: Vault gate</string>
+    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Only the app\'s name is read. Nothing on screen is read and nothing leaves the phone.</string>
 
     <!-- Pending changes -->
     <string name="settings_pending">Pending changes</string>
@@ -47,6 +71,11 @@
 
     <!-- Debug (debug builds only) -->
     <string name="debug_short_loosen_delay">Debug: loosen after 1 minute</string>
+    <string name="debug_usage_title">Debug: today\'s usage</string>
+    <string name="debug_usage_now">Now %1$s (offset %2$s)</string>
+    <string name="debug_usage_day">Usage day %s</string>
+    <string name="debug_usage_reset">Reset</string>
+    <string name="debug_usage_unlocks">Unlocks today: %d</string>
     <string name="debug_on">On</string>
     <string name="debug_off">Off</string>
 </resources>
