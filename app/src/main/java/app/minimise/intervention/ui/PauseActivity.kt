@@ -85,5 +85,11 @@ private fun PauseRoute(requestId: String, onFinish: (PauseFinish) -> Unit) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(state.finish) { state.finish?.let(onFinish) }
     BackHandler { viewModel.onCancel() }
-    PauseScreen(state = state, onReasonChosen = viewModel::onReasonChosen, onCancel = viewModel::onCancel)
+    PauseScreen(
+        state = state,
+        onReasonChosen = viewModel::onReasonChosen,
+        onTimeBoxChosen = viewModel::onTimeBoxChosen,
+        onChangeReason = viewModel::onChangeReason,
+        onCancel = viewModel::onCancel,
+    )
 }

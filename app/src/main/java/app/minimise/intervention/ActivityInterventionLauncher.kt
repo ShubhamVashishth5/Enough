@@ -6,6 +6,7 @@ import app.minimise.apps.domain.AppEntry
 import app.minimise.gate.domain.Decision
 import app.minimise.intervention.domain.InterventionLauncher
 import app.minimise.intervention.ui.PauseActivity
+import app.minimise.intervention.ui.TimeUpActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -20,6 +21,10 @@ class ActivityInterventionLauncher @Inject constructor(
         // TODO(question): no Phase 1.6 rule blocks. BlockedActivity arrives with the budget in 1.8;
         // until then a block simply sends the user home.
         context.startActivity(homeIntent())
+    }
+
+    override fun showTimeUp(packageName: String) {
+        context.startActivity(TimeUpActivity.intent(context))
     }
 
     companion object {

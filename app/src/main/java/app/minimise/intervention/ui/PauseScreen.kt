@@ -31,11 +31,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.intervention.domain.PauseReason
+import kotlin.time.Duration
 
 @Composable
 fun PauseScreen(
     state: PauseUiState,
     onReasonChosen: (PauseReason) -> Unit,
+    onTimeBoxChosen: (Duration) -> Unit,
+    onChangeReason: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -56,7 +59,11 @@ fun PauseScreen(
             )
         }
         Box(contentAlignment = Alignment.Center, modifier = Modifier.weight(1f).fillMaxWidth()) {
-            if (state.waiting) Breathing(secondsLeft = state.remaining.inWholeSeconds + 1) else ReasonChoices(onReasonChosen)
+            when {
+                state.waiting -> Breathing(secondsLeft = state.remaining.inWholeSeconds + 1)
+                state.reason == null -> ReasonChoices(onReasonChosen)
+                else -> TimeBoxChoices(state.timeBoxOptions, onTimeBoxChosen, onChangeReason)
+            }
         }
         TextButton(onClick = onCancel) {
             Text(text = stringResource(R.string.pause_cancel), style = MaterialTheme.typography.titleMedium)
@@ -108,6 +115,32 @@ private fun ReasonChoices(onReasonChosen: (PauseReason) -> Unit) {
                     .clickable { onReasonChosen(reason) }
                     .padding(vertical = 12.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun TimeBoxChoices(options: List<Duration>, onTimeBoxChosen: (Duration) -> Unit, onChangeReason: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = stringResource(R.string.pause_how_long),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+        options.forEach { option ->
+            Text(
+                text = stringResource(R.string.duration_minutes, option.inWholeMinutes),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onTimeBoxChosen(option) }
+                    .padding(vertical = 12.dp),
+            )
+        }
+        TextButton(onClick = onChangeReason, modifier = Modifier.padding(top = 8.dp)) {
+            Text(stringResource(R.string.pause_change_reason))
         }
     }
 }
