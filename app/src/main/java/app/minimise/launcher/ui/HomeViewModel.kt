@@ -3,13 +3,13 @@ package app.minimise.launcher.ui
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.minimise.apps.data.AppLauncher
 import app.minimise.apps.data.HomeSlotsInitializer
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.Defaults
 import app.minimise.core.time.TimeSource
+import app.minimise.launcher.AppOpener
 import app.minimise.launcher.HomeRole
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.settings.permissions.PermissionStatus
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    private val appLauncher: AppLauncher,
+    private val appOpener: AppOpener,
     private val homeRole: HomeRole,
     private val permissionStatus: PermissionStatus,
     private val timeSource: TimeSource,
@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
 
     fun onSlotTapped(slot: HomeSlot) {
         val app = slot.app
-        if (app == null) editingSlot.value = slot.index else appLauncher.launch(app.packageName)
+        if (app == null) editingSlot.value = slot.index else viewModelScope.launch { appOpener.open(app) }
     }
 
     fun onSlotLongPressed(slot: HomeSlot) {

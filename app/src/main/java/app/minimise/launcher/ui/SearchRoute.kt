@@ -1,6 +1,7 @@
 package app.minimise.launcher.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -12,10 +13,11 @@ fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(state.finished) { if (state.finished) onClose() }
     SearchScreen(
         state = state,
-        onQueryChange = { if (viewModel.onQueryChange(it)) onClose() },
-        onAppSelected = { if (viewModel.onAppSelected(it)) onClose() },
-        onSubmit = { if (viewModel.onSubmit()) onClose() },
+        onQueryChange = viewModel::onQueryChange,
+        onAppSelected = viewModel::onAppSelected,
+        onSubmit = viewModel::onSubmit,
     )
 }

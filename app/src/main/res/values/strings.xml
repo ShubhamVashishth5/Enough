@@ -13,6 +13,16 @@
     <!-- Search -->
     <string name="search_hint">Type an app name</string>
 
+    <!-- Pause screen -->
+    <string name="pause_open_count">Open %d today</string>
+    <string name="pause_breathe">Breathe</string>
+    <string name="pause_question">What are you here for?</string>
+    <string name="pause_reason_reply">Reply to someone</string>
+    <string name="pause_reason_look_up">Look one thing up</string>
+    <string name="pause_reason_bored">Bored</string>
+    <string name="pause_reason_habit">Habit</string>
+    <string name="pause_cancel">Not now</string>
+
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_apps">Apps</string>
