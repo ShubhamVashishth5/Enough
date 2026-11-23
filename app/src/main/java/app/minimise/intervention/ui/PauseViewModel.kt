@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.minimise.apps.data.AppLauncher
 import app.minimise.apps.domain.AppRepository
+import app.minimise.core.Defaults
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
 import app.minimise.intervention.domain.GateOutcomes
@@ -14,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +29,9 @@ data class PauseUiState(
     val openNumber: Int? = null,
     val wait: Duration = Duration.ZERO,
     val remaining: Duration = Duration.ZERO,
+    /** Set once a reason is picked; the time box choice comes next. */
+    val reason: PauseReason? = null,
+    val timeBoxOptions: List<Duration> = Defaults.TIME_BOX_OPTIONS,
     val finish: PauseFinish? = null,
 ) {
     val waiting: Boolean get() = remaining > Duration.ZERO
@@ -66,7 +69,13 @@ class PauseViewModel @Inject constructor(
             savedState[KEY_DECIDED] = value
         }
 
-    private val _uiState = MutableStateFlow(PauseUiState(wait = wait, remaining = remaining()))
+    private val _uiState = MutableStateFlow(
+        PauseUiState(
+            wait = wait,
+            remaining = remaining(),
+            reason = savedState.get<String>(KEY_REASON)?.let(PauseReason::valueOf),
+        ),
+    )
     val uiState: StateFlow<PauseUiState> = _uiState.asStateFlow()
 
     init {
@@ -91,10 +100,24 @@ class PauseViewModel @Inject constructor(
 
     fun onReasonChosen(reason: PauseReason) {
         if (decided || _uiState.value.waiting) return
+        savedState[KEY_REASON] = reason.name
+        _uiState.update { it.copy(reason = reason) }
+    }
+
+    /** Back from the time box choice to the reasons. */
+    fun onChangeReason() {
+        if (decided) return
+        savedState[KEY_REASON] = null
+        _uiState.update { it.copy(reason = null) }
+    }
+
+    fun onTimeBoxChosen(timeBox: Duration) {
+        val state = _uiState.value
+        val reason = state.reason ?: return
+        if (decided || state.waiting || timeBox !in state.timeBoxOptions) return
         decided = true
         viewModelScope.launch {
-            // TODO(question): step 1.7 replaces this fixed box with the 2 / 5 / 10 minute choice.
-            outcomes.proceeded(packageName, reason, timeBox = PROVISIONAL_TIME_BOX)
+            outcomes.proceeded(packageName, reason, timeBox)
             if (launchAfter) appLauncher.launch(packageName)
             _uiState.update { it.copy(finish = PauseFinish.PROCEED) }
         }
@@ -121,7 +144,7 @@ class PauseViewModel @Inject constructor(
         const val KEY_STARTED_AT = "started_at_elapsed_ms"
         const val KEY_DECIDED = "decided"
         const val KEY_SHOWN_LOGGED = "shown_logged"
+        const val KEY_REASON = "reason"
         val TICK = 200.milliseconds
-        val PROVISIONAL_TIME_BOX = 5.minutes
     }
 }

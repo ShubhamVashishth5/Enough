@@ -22,6 +22,13 @@
     <string name="pause_reason_bored">Bored</string>
     <string name="pause_reason_habit">Habit</string>
     <string name="pause_cancel">Not now</string>
+    <string name="pause_how_long">For how long?</string>
+    <string name="pause_change_reason">Change reason</string>
+
+    <!-- Time's up -->
+    <string name="time_up_title">Time\'s up</string>
+    <string name="time_up_body">That was the time you chose. Opening it again starts a new, longer pause.</string>
+    <string name="time_up_go_home">Back to home</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
