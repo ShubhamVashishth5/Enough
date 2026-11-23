@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import app.minimise.core.ui.theme.MinimiseTheme
-import app.minimise.launcher.ui.HomeRoute
+import app.minimise.launcher.ui.LauncherNavHost
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +25,7 @@ class HomeActivity : ComponentActivity() {
         setContent {
             MinimiseTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    HomeRoute(homePresses = homePresses)
+                    LauncherNavHost(homePresses = homePresses)
                 }
             }
         }

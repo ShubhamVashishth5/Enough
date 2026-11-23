@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun HomeRoute(
     homePresses: Flow<Unit>,
+    onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -36,5 +37,6 @@ fun HomeRoute(
         onSlotAppPicked = viewModel::onSlotAppPicked,
         onSlotCleared = viewModel::onSlotCleared,
         onPickerDismissed = viewModel::onPickerDismissed,
+        onSwipeUp = onOpenSearch,
     )
 }
