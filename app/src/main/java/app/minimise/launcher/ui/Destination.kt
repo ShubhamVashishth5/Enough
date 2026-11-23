@@ -1,0 +1,12 @@
+package app.minimise.launcher.ui
+
+import kotlinx.serialization.Serializable
+
+/** Screens inside HomeActivity. Interventions (pause, time's up) are separate activities. */
+sealed interface Destination {
+    @Serializable
+    data object Home : Destination
+
+    @Serializable
+    data object Search : Destination
+}

@@ -2,6 +2,7 @@ package app.minimise.launcher.ui
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -34,11 +36,13 @@ fun HomeScreen(
     onSlotAppPicked: (String) -> Unit,
     onSlotCleared: () -> Unit,
     onPickerDismissed: () -> Unit,
+    onSwipeUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .swipeUp(onSwipeUp)
             .safeDrawingPadding()
             .padding(horizontal = 32.dp, vertical = 24.dp),
     ) {
@@ -71,6 +75,26 @@ fun HomeScreen(
             onDismiss = onPickerDismissed,
         )
     }
+}
+
+/** Calls [onSwipeUp] once per upward drag longer than a short threshold. */
+private fun Modifier.swipeUp(onSwipeUp: () -> Unit): Modifier = pointerInput(onSwipeUp) {
+    val threshold = 48.dp.toPx()
+    var dragged = 0f
+    var fired = false
+    detectVerticalDragGestures(
+        onDragStart = {
+            dragged = 0f
+            fired = false
+        },
+        onVerticalDrag = { _, amount ->
+            dragged += amount
+            if (!fired && dragged < -threshold) {
+                fired = true
+                onSwipeUp()
+            }
+        },
+    )
 }
 
 @Composable

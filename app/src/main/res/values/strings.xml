@@ -8,4 +8,7 @@
     <string name="home_slot_empty_description">Empty slot. Tap to choose an app.</string>
     <string name="home_pick_app_title">Choose an app</string>
     <string name="home_pick_app_clear">Leave empty</string>
+
+    <!-- Search -->
+    <string name="search_hint">Type an app name</string>
 </resources>
