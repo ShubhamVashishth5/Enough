@@ -10,6 +10,7 @@ import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
 import app.minimise.intervention.domain.GateOutcomes
 import app.minimise.intervention.domain.PauseReason
+import app.minimise.usage.domain.DailyBudget
 import app.minimise.usage.domain.TodayUsageProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -31,6 +32,9 @@ data class PauseUiState(
     val remaining: Duration = Duration.ZERO,
     /** Set once a reason is picked; the time box choice comes next. */
     val reason: PauseReason? = null,
+    /** Null until loaded. */
+    val budgetLeft: Duration? = null,
+    /** The usual choices, capped at the budget left. */
     val timeBoxOptions: List<Duration> = Defaults.TIME_BOX_OPTIONS,
     val finish: PauseFinish? = null,
 ) {
@@ -50,6 +54,7 @@ class PauseViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     private val appRepository: AppRepository,
     private val todayUsage: TodayUsageProvider,
+    private val dailyBudget: DailyBudget,
     private val outcomes: GateOutcomes,
     private val appLauncher: AppLauncher,
     private val timeSource: TimeSource,
@@ -82,7 +87,15 @@ class PauseViewModel @Inject constructor(
         viewModelScope.launch {
             val label = appRepository.entry(packageName)?.label ?: packageName
             val openNumber = todayUsage.today().proceededOpens + 1
-            _uiState.update { it.copy(appLabel = label, openNumber = openNumber) }
+            val budgetLeft = dailyBudget.remaining()
+            _uiState.update {
+                it.copy(
+                    appLabel = label,
+                    openNumber = openNumber,
+                    budgetLeft = budgetLeft,
+                    timeBoxOptions = timeBoxOptions(budgetLeft),
+                )
+            }
         }
         if (savedState.get<Boolean>(KEY_SHOWN_LOGGED) != true) {
             savedState[KEY_SHOWN_LOGGED] = true
@@ -136,6 +149,12 @@ class PauseViewModel @Inject constructor(
             decided = true
             appScope.launch { outcomes.cancelled(packageName) }
         }
+    }
+
+    /** Every option shorter than the budget left, then the budget left itself if it's shorter than the longest. */
+    private fun timeBoxOptions(budgetLeft: Duration): List<Duration> {
+        val under = Defaults.TIME_BOX_OPTIONS.filter { it < budgetLeft }
+        return if (budgetLeft < Defaults.TIME_BOX_OPTIONS.last()) under + budgetLeft else under
     }
 
     private fun remaining(): Duration = (wait - (timeSource.elapsed() - startedAt)).coerceAtLeast(Duration.ZERO)

@@ -7,27 +7,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.core.ui.theme.MinimiseTheme
 import app.minimise.intervention.ActivityInterventionLauncher
 import dagger.hilt.android.AndroidEntryPoint
 
-/** Shown when a time box ends while its app is in front. The only way on is home. */
+/** Shown when a time box (or the daily budget) runs out while its app is in front. The only way on is home. */
 @AndroidEntryPoint
 class TimeUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +26,13 @@ class TimeUpActivity : ComponentActivity() {
             MinimiseTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     BackHandler { goHome() }
-                    TimeUpScreen(onGoHome = ::goHome)
+                    val budgetUsed = intent.getBooleanExtra(EXTRA_BUDGET_USED, false)
+                    InterventionMessage(
+                        title = stringResource(if (budgetUsed) R.string.blocked_budget_title else R.string.time_up_title),
+                        body = stringResource(if (budgetUsed) R.string.blocked_budget_body else R.string.time_up_body),
+                        action = stringResource(R.string.time_up_go_home),
+                        onAction = ::goHome,
+                    )
                 }
             }
         }
@@ -54,31 +49,11 @@ class TimeUpActivity : ComponentActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent =
+        const val EXTRA_BUDGET_USED = "budget_used"
+
+        fun intent(context: Context, budgetUsed: Boolean): Intent =
             Intent(context, TimeUpActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
-    }
-}
-
-@Composable
-private fun TimeUpScreen(onGoHome: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-        modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-            .padding(32.dp),
-    ) {
-        Text(text = stringResource(R.string.time_up_title), style = MaterialTheme.typography.displaySmall)
-        Text(
-            text = stringResource(R.string.time_up_body),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        OutlinedButton(onClick = onGoHome, modifier = Modifier.padding(top = 16.dp)) {
-            Text(stringResource(R.string.time_up_go_home))
-        }
+                .putExtra(EXTRA_BUDGET_USED, budgetUsed)
     }
 }

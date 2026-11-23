@@ -1,14 +1,18 @@
 package app.minimise.gate
 
+import app.minimise.apps.domain.AppKind
+import app.minimise.apps.domain.AppRepository
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.gate.domain.GrantStore
 import app.minimise.intervention.domain.InterventionLauncher
 import app.minimise.monitor.domain.ForegroundAppSource
+import app.minimise.usage.domain.DailyBudget
 import app.minimise.usage.domain.Event
 import app.minimise.usage.domain.EventLog
 import app.minimise.usage.domain.EventType
 import javax.inject.Inject
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -21,7 +25,9 @@ import timber.log.Timber
  */
 class GrantWatcher @Inject constructor(
     private val foregroundSource: ForegroundAppSource,
+    private val appRepository: AppRepository,
     private val grantStore: GrantStore,
+    private val dailyBudget: DailyBudget,
     private val timeSource: TimeSource,
     private val interventions: InterventionLauncher,
     private val eventLog: EventLog,
@@ -43,19 +49,23 @@ class GrantWatcher @Inject constructor(
         // Only a box that is running when the app comes to the front is watched. An app that comes back
         // after its box ended goes through the gate instead.
         val grant = grantStore.get(packageName)?.takeIf { it.isActive(timeSource.now()) } ?: return
+        val usesBudget = appRepository.kindOf(packageName) == AppKind.VAULT
         while (true) {
-            val remaining = durationBetween(timeSource.now(), grant.endAt)
-            if (remaining <= kotlin.time.Duration.ZERO) break
+            val boxLeft = durationBetween(timeSource.now(), grant.endAt)
+            val budgetLeft = if (usesBudget) dailyBudget.remaining() else Duration.INFINITE
+            when {
+                budgetLeft <= Duration.ZERO -> return timeUp(packageName, budgetUsed = true)
+                boxLeft <= Duration.ZERO -> return timeUp(packageName, budgetUsed = false)
+            }
             // Wake up regularly rather than once, so wall-clock changes are noticed.
-            delay(minOf(remaining, CHECK_INTERVAL))
+            delay(minOf(boxLeft, budgetLeft, CHECK_INTERVAL))
         }
-        timeUp(packageName)
     }
 
-    private suspend fun timeUp(packageName: String) {
+    private suspend fun timeUp(packageName: String, budgetUsed: Boolean) {
         grantStore.remove(packageName)
         eventLog.log(Event(type = EventType.TIME_UP, startAt = timeSource.now(), packageName = packageName))
-        interventions.showTimeUp(packageName)
+        interventions.showTimeUp(packageName, budgetUsed)
     }
 
     private companion object {

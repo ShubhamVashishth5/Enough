@@ -5,6 +5,7 @@ import android.content.Intent
 import app.minimise.apps.domain.AppEntry
 import app.minimise.gate.domain.Decision
 import app.minimise.intervention.domain.InterventionLauncher
+import app.minimise.intervention.ui.BlockedActivity
 import app.minimise.intervention.ui.PauseActivity
 import app.minimise.intervention.ui.TimeUpActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,13 +19,11 @@ class ActivityInterventionLauncher @Inject constructor(
     }
 
     override fun showBlocked(app: AppEntry, block: Decision.Block) {
-        // TODO(question): no Phase 1.6 rule blocks. BlockedActivity arrives with the budget in 1.8;
-        // until then a block simply sends the user home.
-        context.startActivity(homeIntent())
+        context.startActivity(BlockedActivity.intent(context, app.packageName, block.reason))
     }
 
-    override fun showTimeUp(packageName: String) {
-        context.startActivity(TimeUpActivity.intent(context))
+    override fun showTimeUp(packageName: String, budgetUsed: Boolean) {
+        context.startActivity(TimeUpActivity.intent(context, budgetUsed))
     }
 
     companion object {

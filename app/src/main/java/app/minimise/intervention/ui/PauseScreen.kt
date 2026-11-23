@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.minimise.R
+import app.minimise.core.ui.durationText
 import app.minimise.intervention.domain.PauseReason
 import kotlin.time.Duration
 
@@ -54,6 +55,13 @@ fun PauseScreen(
         state.openNumber?.let {
             Text(
                 text = stringResource(R.string.pause_open_count, it),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        state.budgetLeft?.let {
+            Text(
+                text = stringResource(R.string.pause_budget_left, durationText(it)),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -130,7 +138,7 @@ private fun TimeBoxChoices(options: List<Duration>, onTimeBoxChosen: (Duration) 
         )
         options.forEach { option ->
             Text(
-                text = stringResource(R.string.duration_minutes, option.inWholeMinutes),
+                text = durationText(option),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier

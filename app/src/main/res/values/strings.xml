@@ -23,12 +23,30 @@
     <string name="pause_reason_habit">Habit</string>
     <string name="pause_cancel">Not now</string>
     <string name="pause_how_long">For how long?</string>
+    <string name="pause_budget_left">%s left today</string>
     <string name="pause_change_reason">Change reason</string>
 
     <!-- Time's up -->
     <string name="time_up_title">Time\'s up</string>
     <string name="time_up_body">That was the time you chose. Opening it again starts a new, longer pause.</string>
     <string name="time_up_go_home">Back to home</string>
+
+    <!-- Blocked -->
+    <string name="blocked_title">Not now</string>
+    <string name="blocked_body">This app is blocked right now.</string>
+    <string name="blocked_budget_title">Daily budget used</string>
+    <string name="blocked_budget_body">Vault apps open again after 04:00.</string>
+
+    <!-- Budget -->
+    <string name="settings_budget">Daily budget</string>
+    <string name="settings_budget_summary">%d min a day across all Vault apps</string>
+    <string name="budget_title">Daily budget</string>
+    <string name="budget_explainer">One allowance shared by every Vault app, so hopping from one to another doesn\'t dodge it. A smaller budget applies at once; a bigger one waits 24 hours.</string>
+    <string name="budget_current">Now: %d min a day</string>
+    <string name="budget_pending">Changing to %1$d min in %2$s</string>
+    <string name="budget_save">Save</string>
+    <string name="budget_applied">Saved. It applies now.</string>
+    <string name="budget_scheduled">Saved. A bigger budget applies in 24 hours; see Pending changes.</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
