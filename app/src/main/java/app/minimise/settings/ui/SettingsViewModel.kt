@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class SettingsUiState(
+    val budgetMinutes: Int? = null,
     val pendingCount: Int = 0,
     /** Debug builds only. */
     val showDebug: Boolean = false,
@@ -27,6 +28,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings) { pending, settings ->
         SettingsUiState(
+            budgetMinutes = settings.dailyBudget.inWholeMinutes.toInt(),
             pendingCount = pending.size,
             showDebug = BuildConfig.DEBUG,
             debugShortLoosenDelay = settings.debugShortLoosenDelay,

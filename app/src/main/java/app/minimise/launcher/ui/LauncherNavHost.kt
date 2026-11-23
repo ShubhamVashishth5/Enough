@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.minimise.apps.ui.AppsRoute
 import app.minimise.settings.permissions.PermissionsRoute
+import app.minimise.settings.ui.BudgetRoute
 import app.minimise.settings.ui.PendingChangesRoute
 import app.minimise.usage.ui.DebugUsageRoute
 import app.minimise.settings.ui.SettingsRoute
@@ -45,6 +46,7 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
         composable<Destination.Settings> {
             SettingsRoute(
                 onOpenApps = { navController.navigate(Destination.Apps) },
+                onOpenBudget = { navController.navigate(Destination.Budget) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
@@ -52,6 +54,9 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
         }
         composable<Destination.Apps> {
             AppsRoute()
+        }
+        composable<Destination.Budget> {
+            BudgetRoute()
         }
         composable<Destination.PendingChanges> {
             PendingChangesRoute()

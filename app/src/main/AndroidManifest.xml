@@ -53,6 +53,13 @@
             android:taskAffinity="app.minimise.intervention" />
 
         <activity
+            android:name=".intervention.ui.BlockedActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
+        <activity
             android:name=".intervention.ui.TimeUpActivity"
             android:excludeFromRecents="true"
             android:exported="false"

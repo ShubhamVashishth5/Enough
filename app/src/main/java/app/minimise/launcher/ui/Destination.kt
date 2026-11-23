@@ -17,6 +17,9 @@ sealed interface Destination {
     data object Apps : Destination
 
     @Serializable
+    data object Budget : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable
