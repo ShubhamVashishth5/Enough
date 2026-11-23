@@ -2,6 +2,14 @@
 <!-- No INTERNET permission, now or later: usage data never leaves the phone. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Lets LauncherApps and PackageManager see every app that has a launcher icon (Android 11+). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:name=".MinimiseApp"
         android:allowBackup="false"
@@ -13,9 +21,17 @@
 
         <activity
             android:name=".launcher.HomeActivity"
-            android:exported="true">
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:resumeWhilePausing="true"
+            android:stateNotNeeded="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

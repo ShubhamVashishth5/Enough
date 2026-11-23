@@ -1,5 +1,6 @@
 package app.minimise.launcher
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,17 +9,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import app.minimise.core.ui.theme.MinimiseTheme
+import app.minimise.launcher.ui.HomeRoute
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
+    /** Emits when the Home button is pressed while this activity is already running. */
+    private val homePresses = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MinimiseTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {}
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    HomeRoute(homePresses = homePresses)
+                }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.hasCategory(Intent.CATEGORY_HOME)) homePresses.tryEmit(Unit)
     }
 }

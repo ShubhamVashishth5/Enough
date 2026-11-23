@@ -17,6 +17,9 @@ object Defaults {
     /** Pause length for the 1st, 2nd, 3rd... Vault open of the day. The last step repeats. */
     val WAIT_STEPS: List<Duration> = listOf(10.seconds, 20.seconds, 40.seconds, 60.seconds, 120.seconds)
 
+    /** Rows of apps on the home screen. */
+    const val HOME_SLOT_COUNT: Int = 6
+
     /** Choices offered after a pause. */
     val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)
 }

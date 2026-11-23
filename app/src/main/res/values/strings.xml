@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Enough</string>
+
+    <!-- Home -->
+    <string name="home_make_default">Make this your home app</string>
+    <string name="home_slot_empty">—</string>
+    <string name="home_slot_empty_description">Empty slot. Tap to choose an app.</string>
+    <string name="home_pick_app_title">Choose an app</string>
+    <string name="home_pick_app_clear">Leave empty</string>
 </resources>
