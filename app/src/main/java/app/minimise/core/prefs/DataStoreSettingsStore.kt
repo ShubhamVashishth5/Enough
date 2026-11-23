@@ -40,6 +40,7 @@ class DataStoreSettingsStore @Inject constructor(
         val defaults = Settings()
         return Settings(
             dailyBudget = this[Keys.DAILY_BUDGET_SECONDS]?.seconds ?: defaults.dailyBudget,
+            onboardingDone = this[Keys.ONBOARDING_DONE] ?: defaults.onboardingDone,
             homeSlotsChosen = this[Keys.HOME_SLOTS_CHOSEN] ?: defaults.homeSlotsChosen,
             todayPromptedDay = this[Keys.TODAY_PROMPTED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
@@ -49,6 +50,7 @@ class DataStoreSettingsStore @Inject constructor(
 
     private fun MutablePreferences.write(settings: Settings) {
         this[Keys.DAILY_BUDGET_SECONDS] = settings.dailyBudget.inWholeSeconds
+        this[Keys.ONBOARDING_DONE] = settings.onboardingDone
         this[Keys.HOME_SLOTS_CHOSEN] = settings.homeSlotsChosen
         settings.todayPromptedDay?.let { this[Keys.TODAY_PROMPTED_EPOCH_DAY] = it.toEpochDay() }
             ?: remove(Keys.TODAY_PROMPTED_EPOCH_DAY)
@@ -58,6 +60,7 @@ class DataStoreSettingsStore @Inject constructor(
 
     private object Keys {
         val DAILY_BUDGET_SECONDS = longPreferencesKey("daily_budget_seconds")
+        val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val HOME_SLOTS_CHOSEN = booleanPreferencesKey("home_slots_chosen")
         val TODAY_PROMPTED_EPOCH_DAY = longPreferencesKey("today_prompted_epoch_day")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
