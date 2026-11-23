@@ -2,6 +2,9 @@ package app.minimise.core.di
 
 import android.content.Context
 import androidx.room.Room
+import app.minimise.apps.data.RoomAppRepository
+import app.minimise.apps.domain.AppRepository
+import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.EventDao
 import app.minimise.core.prefs.DataStoreSettingsStore
@@ -32,6 +35,9 @@ abstract class CoreBindings {
 
     @Binds
     abstract fun eventLog(impl: RoomEventLog): EventLog
+
+    @Binds
+    abstract fun appRepository(impl: RoomAppRepository): AppRepository
 }
 
 @Module
@@ -44,6 +50,9 @@ object CoreProviders {
 
     @Provides
     fun eventDao(db: AppDatabase): EventDao = db.eventDao()
+
+    @Provides
+    fun appDao(db: AppDatabase): AppDao = db.appDao()
 
     @Provides
     @Singleton

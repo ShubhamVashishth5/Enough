@@ -1,0 +1,51 @@
+package app.minimise.apps.data
+
+import app.minimise.apps.domain.AppEntry
+import app.minimise.apps.domain.AppKind
+import app.minimise.apps.domain.AppRepository
+import app.minimise.core.db.AppDao
+import app.minimise.core.db.AppEntity
+import app.minimise.core.di.ApplicationScope
+import java.text.Collator
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+
+@Singleton
+class RoomAppRepository @Inject constructor(
+    source: LauncherAppsSource,
+    private val dao: AppDao,
+    @ApplicationScope scope: CoroutineScope,
+) : AppRepository {
+    private val collator = Collator.getInstance()
+
+    override val apps: Flow<List<AppEntry>> = source.installed
+        .onEach { installed ->
+            // New installs start as TOOL. Rows are never deleted, so a reinstall keeps its old kind.
+            dao.insertIfMissing(installed.map { AppEntity(it.packageName, AppKind.TOOL, homeSlot = null) })
+        }
+        .combine(dao.observeAll()) { installed, rows ->
+            val stored = rows.associateBy { it.packageName }
+            installed
+                .map { app ->
+                    val row = stored[app.packageName]
+                    AppEntry(
+                        packageName = app.packageName,
+                        label = app.label,
+                        kind = row?.kind ?: AppKind.TOOL,
+                        homeSlot = row?.homeSlot,
+                    )
+                }
+                .sortedWith { a, b -> collator.compare(a.label, b.label) }
+        }
+        .shareIn(scope, SharingStarted.WhileSubscribed(5_000), replay = 1)
+
+    override suspend fun setHomeSlot(packageName: String, slot: Int) = dao.assignSlot(packageName, slot)
+
+    override suspend fun clearHomeSlot(slot: Int) = dao.clearSlot(slot)
+}
