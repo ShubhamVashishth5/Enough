@@ -18,6 +18,7 @@ fun HomeRoute(
     homePresses: Flow<Unit>,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenPermissions: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -40,5 +41,6 @@ fun HomeRoute(
         onPickerDismissed = viewModel::onPickerDismissed,
         onSwipeUp = onOpenSearch,
         onLongPressBackground = onOpenSettings,
+        onFixProtection = onOpenPermissions,
     )
 }

@@ -39,6 +39,7 @@ fun HomeScreen(
     onPickerDismissed: () -> Unit,
     onSwipeUp: () -> Unit,
     onLongPressBackground: () -> Unit,
+    onFixProtection: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -59,6 +60,15 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .combinedClickable(onClick = onMakeDefaultHome),
+            )
+        }
+        if (state.protectionOff) {
+            Text(
+                text = stringResource(R.string.home_protection_off),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .combinedClickable(onClick = onFixProtection),
             )
         }
         Spacer(Modifier.weight(1f))

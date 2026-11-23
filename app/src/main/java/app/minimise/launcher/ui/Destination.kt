@@ -18,4 +18,10 @@ sealed interface Destination {
 
     @Serializable
     data object PendingChanges : Destination
+
+    @Serializable
+    data object Permissions : Destination
+
+    @Serializable
+    data object DebugUsage : Destination
 }

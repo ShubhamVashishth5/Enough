@@ -12,6 +12,7 @@ import app.minimise.core.Defaults
 import app.minimise.core.time.TimeSource
 import app.minimise.launcher.HomeRole
 import app.minimise.settings.domain.SettingsGuard
+import app.minimise.settings.permissions.PermissionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -31,23 +32,25 @@ class HomeViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val appLauncher: AppLauncher,
     private val homeRole: HomeRole,
+    private val permissionStatus: PermissionStatus,
     private val timeSource: TimeSource,
     private val settingsGuard: SettingsGuard,
     homeSlotsInitializer: HomeSlotsInitializer,
 ) : ViewModel() {
     private val editingSlot = MutableStateFlow<Int?>(null)
-    private val isDefaultHome = MutableStateFlow(true)
+    private val permissions = MutableStateFlow(Permissions())
 
     val uiState: StateFlow<HomeUiState> = combine(
         appRepository.apps,
         minuteTicks(),
         editingSlot,
-        isDefaultHome,
-    ) { apps, now, editing, isDefault ->
+        permissions,
+    ) { apps, now, editing, permissions ->
         HomeUiState(
             now = now,
             slots = homeSlots(apps),
-            isDefaultHome = isDefault,
+            isDefaultHome = permissions.defaultHome,
+            protectionOff = !permissions.accessibility,
             slotPicker = editing?.let { SlotPicker(slot = it, choices = apps.filter { app -> app.kind == AppKind.TOOL }) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
@@ -57,7 +60,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onResume() {
-        isDefaultHome.value = homeRole.isDefaultHome()
+        permissions.value = Permissions(
+            defaultHome = permissionStatus.isDefaultHome(),
+            accessibility = permissionStatus.isAccessibilityEnabled(),
+        )
         viewModelScope.launch { settingsGuard.applyDue() }
     }
 
@@ -107,6 +113,8 @@ class HomeViewModel @Inject constructor(
             delay(MILLIS_PER_MINUTE - now.toEpochMilli() % MILLIS_PER_MINUTE)
         }
     }
+
+    private data class Permissions(val defaultHome: Boolean = true, val accessibility: Boolean = true)
 
     private companion object {
         const val MILLIS_PER_MINUTE = 60_000L

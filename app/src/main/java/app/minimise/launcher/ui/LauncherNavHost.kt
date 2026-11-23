@@ -8,7 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.minimise.apps.ui.AppsRoute
+import app.minimise.settings.permissions.PermissionsRoute
 import app.minimise.settings.ui.PendingChangesRoute
+import app.minimise.usage.ui.DebugUsageRoute
 import app.minimise.settings.ui.SettingsRoute
 import kotlinx.coroutines.flow.Flow
 
@@ -34,6 +36,7 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
                 homePresses = homePresses,
                 onOpenSearch = { navController.navigate(Destination.Search) { launchSingleTop = true } },
                 onOpenSettings = { navController.navigate(Destination.Settings) { launchSingleTop = true } },
+                onOpenPermissions = { navController.navigate(Destination.Permissions) { launchSingleTop = true } },
             )
         }
         composable<Destination.Search> {
@@ -43,6 +46,8 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
             SettingsRoute(
                 onOpenApps = { navController.navigate(Destination.Apps) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
+                onOpenPermissions = { navController.navigate(Destination.Permissions) },
+                onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
             )
         }
         composable<Destination.Apps> {
@@ -50,6 +55,12 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
         }
         composable<Destination.PendingChanges> {
             PendingChangesRoute()
+        }
+        composable<Destination.Permissions> {
+            PermissionsRoute()
+        }
+        composable<Destination.DebugUsage> {
+            DebugUsageRoute()
         }
     }
 }

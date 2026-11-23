@@ -20,6 +20,9 @@ interface EventDao {
     @Insert
     suspend fun insert(event: EventEntity): Long
 
+    @Query("UPDATE events SET endAt = :endAt WHERE id = :id")
+    suspend fun updateEnd(id: Long, endAt: Instant)
+
     @Query(OVERLAP_QUERY)
     suspend fun between(from: Instant, to: Instant, type: EventType?): List<EventEntity>
 
