@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 fun HomeRoute(
     homePresses: Flow<Unit>,
     onOpenSearch: () -> Unit,
+    onOpenSettings: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -38,5 +39,6 @@ fun HomeRoute(
         onSlotCleared = viewModel::onSlotCleared,
         onPickerDismissed = viewModel::onPickerDismissed,
         onSwipeUp = onOpenSearch,
+        onLongPressBackground = onOpenSettings,
     )
 }

@@ -45,6 +45,11 @@ class RoomAppRepository @Inject constructor(
         }
         .shareIn(scope, SharingStarted.WhileSubscribed(5_000), replay = 1)
 
+    override suspend fun setKind(packageName: String, kind: AppKind) {
+        dao.insertIfMissing(listOf(AppEntity(packageName, kind, homeSlot = null)))
+        dao.setKind(packageName, kind)
+    }
+
     override suspend fun setHomeSlot(packageName: String, slot: Int) = dao.assignSlot(packageName, slot)
 
     override suspend fun clearHomeSlot(slot: Int) = dao.clearSlot(slot)

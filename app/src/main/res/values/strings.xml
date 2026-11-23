@@ -11,4 +11,16 @@
 
     <!-- Search -->
     <string name="search_hint">Type an app name</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_apps">Apps</string>
+    <string name="settings_apps_summary">Choose which apps are tools and which go in the Vault</string>
+
+    <!-- Apps (kinds) -->
+    <string name="apps_title">Apps</string>
+    <string name="apps_explainer">Tool apps are always one search away. Vault apps leave home and search, and open only when you type their full name. Hidden apps never show.</string>
+    <string name="app_kind_tool">Tool</string>
+    <string name="app_kind_vault">Vault</string>
+    <string name="app_kind_hidden">Hidden</string>
 </resources>

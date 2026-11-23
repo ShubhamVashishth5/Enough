@@ -92,7 +92,8 @@ class HomeViewModel @Inject constructor(
 
     private fun homeSlots(apps: List<AppEntry>): List<HomeSlot> =
         (0 until Defaults.HOME_SLOT_COUNT).map { index ->
-            HomeSlot(index = index, app = apps.firstOrNull { it.homeSlot == index })
+            // Vault and Hidden apps never sit on home, even if they were placed there before.
+            HomeSlot(index = index, app = apps.firstOrNull { it.homeSlot == index && it.kind == AppKind.TOOL })
         }
 
     /** The local time now, then again at the start of every minute. */
