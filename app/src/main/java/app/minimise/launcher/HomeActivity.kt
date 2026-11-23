@@ -1,5 +1,6 @@
 package app.minimise.launcher
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,13 +20,21 @@ class HomeActivity : ComponentActivity() {
     /** Emits when the Home button is pressed while this activity is already running. */
     private val homePresses = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
+    /** Emits when the Today screen should open (the day's first unlock). Replays to a NavHost that starts late. */
+    private val todayRequests = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (savedInstanceState == null) handleTodayRequest(intent)
         setContent {
             MinimiseTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    LauncherNavHost(homePresses = homePresses)
+                    LauncherNavHost(
+                        homePresses = homePresses,
+                        todayRequests = todayRequests,
+                        onTodayRequestHandled = { todayRequests.resetReplayCache() },
+                    )
                 }
             }
         }
@@ -34,5 +43,20 @@ class HomeActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.hasCategory(Intent.CATEGORY_HOME)) homePresses.tryEmit(Unit)
+        handleTodayRequest(intent)
+    }
+
+    private fun handleTodayRequest(intent: Intent) {
+        if (intent.getBooleanExtra(EXTRA_OPEN_TODAY, false)) todayRequests.tryEmit(Unit)
+    }
+
+    companion object {
+        private const val EXTRA_OPEN_TODAY = "open_today"
+
+        /** Opens the launcher on the Today screen. */
+        fun todayIntent(context: Context): Intent =
+            Intent(context, HomeActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(EXTRA_OPEN_TODAY, true)
     }
 }

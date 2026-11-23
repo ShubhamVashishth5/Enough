@@ -49,7 +49,7 @@ fun DebugUsageScreen(
             OutlinedButton(onClick = onResetClock) { Text(stringResource(R.string.debug_usage_reset)) }
         }
         Text(
-            text = stringResource(R.string.debug_usage_unlocks, state.unlocks),
+            text = stringResource(R.string.debug_usage_unlocks, state.unlocks, state.vaultTime.inWholeSeconds),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(vertical = 8.dp),
         )

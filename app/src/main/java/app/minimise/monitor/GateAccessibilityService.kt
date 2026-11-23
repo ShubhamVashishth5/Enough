@@ -11,10 +11,12 @@ import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
 import app.minimise.gate.GateMonitor
 import app.minimise.gate.GrantWatcher
+import app.minimise.launcher.HomeActivity
 import app.minimise.monitor.data.AccessibilityForegroundSource
 import app.minimise.monitor.data.ForegroundPackageFilter
 import app.minimise.monitor.domain.ForegroundEvent
 import app.minimise.settings.domain.SettingsGuard
+import app.minimise.tasks.domain.TodayPrompt
 import app.minimise.usage.domain.Event
 import app.minimise.usage.domain.EventLog
 import app.minimise.usage.domain.EventType
@@ -45,6 +47,7 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var eventLog: EventLog
     @Inject lateinit var settingsGuard: SettingsGuard
     @Inject lateinit var timeSource: TimeSource
+    @Inject lateinit var todayPrompt: TodayPrompt
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     private val scope = CoroutineScope(
@@ -118,6 +121,7 @@ class GateAccessibilityService : AccessibilityService() {
         scope.launch {
             eventLog.log(Event(type = EventType.SCREEN_UNLOCK, startAt = now))
             settingsGuard.applyDue()
+            if (todayPrompt.claim()) startActivity(HomeActivity.todayIntent(this@GateAccessibilityService))
         }
         // The app that was in front before the screen went off is in front again, and no window
         // event may say so.

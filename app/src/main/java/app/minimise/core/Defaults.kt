@@ -26,6 +26,9 @@ object Defaults {
     /** Debug builds only: the loosen delay when the hidden debug switch is on. */
     val DEBUG_LOOSEN_DELAY: Duration = 1.minutes
 
+    /** Tasks asked for on the Today screen. */
+    const val MAX_TODAY_TASKS: Int = 3
+
     /** Choices offered after a pause. */
     val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)
 }

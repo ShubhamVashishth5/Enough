@@ -19,6 +19,7 @@ fun HomeRoute(
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenPermissions: () -> Unit,
+    onOpenToday: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -28,6 +29,12 @@ fun HomeRoute(
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
     LaunchedEffect(homePresses) { homePresses.collect { viewModel.onHomePressed() } }
+    LaunchedEffect(state.promptToday) {
+        if (state.promptToday) {
+            viewModel.onTodayPromptShown()
+            onOpenToday()
+        }
+    }
     // Back does nothing on the home screen.
     BackHandler {}
 
@@ -42,5 +49,7 @@ fun HomeRoute(
         onSwipeUp = onOpenSearch,
         onLongPressBackground = onOpenSettings,
         onFixProtection = onOpenPermissions,
+        onTaskTapped = viewModel::onTaskTapped,
+        onEditTasks = onOpenToday,
     )
 }
