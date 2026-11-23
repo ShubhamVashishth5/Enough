@@ -2,6 +2,7 @@ package app.minimise.launcher.ui
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,14 @@ fun HomeScreen(
     onSlotCleared: () -> Unit,
     onPickerDismissed: () -> Unit,
     onSwipeUp: () -> Unit,
+    onLongPressBackground: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .swipeUp(onSwipeUp)
+            .pointerInput(onLongPressBackground) { detectTapGestures(onLongPress = { onLongPressBackground() }) }
             .safeDrawingPadding()
             .padding(horizontal = 32.dp, vertical = 24.dp),
     ) {
