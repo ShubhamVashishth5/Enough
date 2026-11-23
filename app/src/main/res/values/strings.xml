@@ -23,4 +23,30 @@
     <string name="app_kind_tool">Tool</string>
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
+    <string name="apps_pending_move">Moves to %1$s in %2$s</string>
+
+    <!-- Pending changes -->
+    <string name="settings_pending">Pending changes</string>
+    <string name="settings_pending_none">Nothing pending</string>
+    <plurals name="settings_pending_count">
+        <item quantity="one">%d change waiting</item>
+        <item quantity="other">%d changes waiting</item>
+    </plurals>
+    <string name="pending_title">Pending changes</string>
+    <string name="pending_explainer">Making a rule stricter applies at once. Making it looser waits 24 hours, so a weak moment can\'t undo a calm decision. You can cancel a waiting change at any time.</string>
+    <string name="pending_applies_in">Applies in %s</string>
+    <string name="pending_cancel">Cancel</string>
+    <string name="pending_app_kind">%1$s → %2$s</string>
+    <string name="pending_budget">Daily budget → %d min</string>
+
+    <!-- Durations -->
+    <string name="duration_hours_minutes">%1$d h %2$d min</string>
+    <string name="duration_hours">%d h</string>
+    <string name="duration_minutes">%d min</string>
+    <string name="duration_under_a_minute">under a minute</string>
+
+    <!-- Debug (debug builds only) -->
+    <string name="debug_short_loosen_delay">Debug: loosen after 1 minute</string>
+    <string name="debug_on">On</string>
+    <string name="debug_off">Off</string>
 </resources>

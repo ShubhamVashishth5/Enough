@@ -7,6 +7,7 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.EventDao
+import app.minimise.core.db.PendingChangeDao
 import app.minimise.core.prefs.DataStoreSettingsStore
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.SystemTimeSource
@@ -53,6 +54,9 @@ object CoreProviders {
 
     @Provides
     fun appDao(db: AppDatabase): AppDao = db.appDao()
+
+    @Provides
+    fun pendingChangeDao(db: AppDatabase): PendingChangeDao = db.pendingChangeDao()
 
     @Provides
     @Singleton

@@ -20,6 +20,12 @@ object Defaults {
     /** Rows of apps on the home screen. */
     const val HOME_SLOT_COUNT: Int = 6
 
+    /** How long a loosening settings change waits before it applies. */
+    val LOOSEN_DELAY: Duration = 24.hours
+
+    /** Debug builds only: the loosen delay when the hidden debug switch is on. */
+    val DEBUG_LOOSEN_DELAY: Duration = 1.minutes
+
     /** Choices offered after a pause. */
     val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)
 }

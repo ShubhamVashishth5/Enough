@@ -8,7 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.minimise.apps.ui.AppsRoute
-import app.minimise.settings.ui.SettingsScreen
+import app.minimise.settings.ui.PendingChangesRoute
+import app.minimise.settings.ui.SettingsRoute
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -39,10 +40,16 @@ fun LauncherNavHost(homePresses: Flow<Unit>) {
             SearchRoute(onClose = { navController.popBackStack(Destination.Home, inclusive = false) })
         }
         composable<Destination.Settings> {
-            SettingsScreen(onOpenApps = { navController.navigate(Destination.Apps) })
+            SettingsRoute(
+                onOpenApps = { navController.navigate(Destination.Apps) },
+                onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
+            )
         }
         composable<Destination.Apps> {
             AppsRoute()
+        }
+        composable<Destination.PendingChanges> {
+            PendingChangesRoute()
         }
     }
 }

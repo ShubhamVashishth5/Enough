@@ -11,6 +11,7 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.Defaults
 import app.minimise.core.time.TimeSource
 import app.minimise.launcher.HomeRole
+import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -31,6 +32,7 @@ class HomeViewModel @Inject constructor(
     private val appLauncher: AppLauncher,
     private val homeRole: HomeRole,
     private val timeSource: TimeSource,
+    private val settingsGuard: SettingsGuard,
     homeSlotsInitializer: HomeSlotsInitializer,
 ) : ViewModel() {
     private val editingSlot = MutableStateFlow<Int?>(null)
@@ -56,6 +58,7 @@ class HomeViewModel @Inject constructor(
 
     fun onResume() {
         isDefaultHome.value = homeRole.isDefaultHome()
+        viewModelScope.launch { settingsGuard.applyDue() }
     }
 
     fun homeRoleRequestIntent(): Intent = homeRole.requestIntent()

@@ -15,4 +15,7 @@ sealed interface Destination {
 
     @Serializable
     data object Apps : Destination
+
+    @Serializable
+    data object PendingChanges : Destination
 }
