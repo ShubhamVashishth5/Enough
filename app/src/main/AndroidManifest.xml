@@ -30,6 +30,9 @@
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- Android 15 Private space: the home app may list, lock and unlock it. -->
+    <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
+
     <!-- Lets LauncherApps and PackageManager see every app with a launcher icon, plus other home apps. -->
     <queries>
         <intent>

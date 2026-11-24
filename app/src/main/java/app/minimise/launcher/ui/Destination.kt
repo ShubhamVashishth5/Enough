@@ -59,6 +59,9 @@ sealed interface Destination {
     data object Feeds : Destination
 
     @Serializable
+    data object PrivateSpace : Destination
+
+    @Serializable
     data object WindDown : Destination
 
     @Serializable

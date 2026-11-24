@@ -610,6 +610,15 @@
     <string name="pending_calendar_focus_on">Calendar focus → on</string>
     <string name="pending_calendar_focus_off">Calendar focus → off</string>
 
+    <!-- Private space -->
+    <string name="private_space_title">Private space</string>
+    <string name="private_space_explainer">Android 15 can keep apps in a Private space that the system itself locks behind your screen lock. For a hard, OS-level lock, install your worst Vault apps there (from the Private space\'s own Play Store). While it\'s locked, its apps are hidden everywhere in Enough.</string>
+    <string name="private_space_none">There\'s no Private space on this phone. Set one up in the phone\'s Settings under Security and privacy, then come back.</string>
+    <string name="private_space_locked">Locked</string>
+    <string name="private_space_unlocked">Unlocked</string>
+    <string name="private_space_lock">Lock it</string>
+    <string name="private_space_unlock">Unlock</string>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>
