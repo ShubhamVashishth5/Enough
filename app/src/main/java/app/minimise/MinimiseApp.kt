@@ -1,6 +1,7 @@
 package app.minimise
 
 import android.app.Application
+import app.minimise.apps.data.AutoVaultWatcher
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DebugClockOffset
@@ -24,6 +25,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var swapRepository: SwapRepository
     @Inject lateinit var focusSessions: FocusSessions
     @Inject lateinit var digestScheduler: DigestScheduler
+    @Inject lateinit var autoVaultWatcher: AutoVaultWatcher
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -37,6 +39,7 @@ class MinimiseApp : Application() {
         appScope.launch { swapRepository.seedDefaultsOnce() }
         appScope.launch { focusSessions.finishIfDue() }
         digestScheduler.scheduleNext()
+        autoVaultWatcher.start()
     }
 
     private fun followDebugClockOffset() {

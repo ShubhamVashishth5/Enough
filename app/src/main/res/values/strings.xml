@@ -17,6 +17,11 @@
         <item quantity="one">Digest ready · %d update</item>
         <item quantity="other">Digest ready · %d updates</item>
     </plurals>
+    <string name="event_next">%1$s %2$s</string>
+    <string name="event_now">Now: %s</string>
+    <string name="notice_channel">Notices</string>
+    <string name="auto_vault_notice">%s went into the Vault</string>
+    <string name="auto_vault_notice_body">New social, video, game and news apps go in by themselves. Taking one out waits 24 hours.</string>
     <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
 
     <!-- Search -->
@@ -305,6 +310,8 @@
     <string name="permission_notification_access_why">For the digest: holds non-urgent notifications and releases them three times a day. They stay on the phone. Installed outside the Play Store? Allow restricted settings in app info first, as for accessibility.</string>
     <string name="permission_post_notifications">Post notifications (optional)</string>
     <string name="permission_post_notifications_why">Lets the digest post its one summary, and tells you when a new app goes into the Vault.</string>
+    <string name="permission_calendar">Calendar (optional)</string>
+    <string name="permission_calendar_why">Shows your next calendar item under the clock. Nothing else is read.</string>
     <string name="permission_dnd">Do Not Disturb (optional)</string>
     <string name="permission_dnd_why">Turns on Do Not Disturb during focus sessions and puts it back afterwards.</string>
 

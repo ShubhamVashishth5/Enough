@@ -53,6 +53,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     focusSection: @Composable () -> Unit = {},
     digestLine: @Composable () -> Unit = {},
+    eventLine: @Composable () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -67,6 +68,7 @@ fun HomeScreen(
     ) {
         Spacer(Modifier.height(32.dp))
         state.now?.let { Clock(it, onLongPress = onClockLongPress) }
+        eventLine()
         TodayTaskList(tasks = state.tasks, onTaskTapped = onTaskTapped, onEditTasks = onEditTasks)
         digestLine()
         if (!state.isDefaultHome) {

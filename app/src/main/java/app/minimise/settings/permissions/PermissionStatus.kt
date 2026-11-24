@@ -48,6 +48,9 @@ class PermissionStatus @Inject constructor(
     fun appNotificationSettingsIntent(): Intent =
         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
 
+    fun canReadCalendar(): Boolean =
+        context.checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
+
     fun hasDoNotDisturbAccess(): Boolean = context.getSystemService(NotificationManager::class.java).isNotificationPolicyAccessGranted
 
     fun doNotDisturbIntent(): Intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)

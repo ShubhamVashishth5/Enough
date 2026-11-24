@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.platform.LocalContext
 import app.minimise.launcher.QuickTools
+import app.minimise.calendar.ui.NextEventLine
 import app.minimise.digest.ui.DigestHomeLine
 import app.minimise.focus.ui.FocusSection
 import kotlinx.coroutines.flow.Flow
@@ -65,5 +66,6 @@ fun HomeRoute(
         onEditTasks = onOpenToday,
         focusSection = { FocusSection(onOpenInbox = onOpenInbox) },
         digestLine = { DigestHomeLine(onOpenDigest = onOpenDigest) },
+        eventLine = { NextEventLine() },
     )
 }
