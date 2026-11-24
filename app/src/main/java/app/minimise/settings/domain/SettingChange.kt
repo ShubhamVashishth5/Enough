@@ -28,6 +28,13 @@ data class SetBudget(val minutes: Int) : SettingChange {
     override val key: String get() = "budget"
 }
 
+/** A daily cap on opens of one app; null removes it. */
+@Serializable
+@SerialName("set_open_limit")
+data class SetOpenLimit(val packageName: String, val limit: Int?) : SettingChange {
+    override val key: String get() = "open_limit:$packageName"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {
@@ -40,6 +47,15 @@ private val AppKind.strictness: Int
 fun kindChangeDirection(from: AppKind, to: AppKind): Direction? = when {
     to == from -> null
     to.strictness > from.strictness -> Direction.TIGHTEN
+    else -> Direction.LOOSEN
+}
+
+/** Adding a limit or lowering one is tightening; raising or removing one is loosening. */
+fun openLimitChangeDirection(from: Int?, to: Int?): Direction? = when {
+    to == from -> null
+    from == null -> Direction.TIGHTEN
+    to == null -> Direction.LOOSEN
+    to < from -> Direction.TIGHTEN
     else -> Direction.LOOSEN
 }
 

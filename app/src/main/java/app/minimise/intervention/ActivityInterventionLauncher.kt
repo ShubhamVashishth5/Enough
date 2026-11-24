@@ -18,8 +18,8 @@ class ActivityInterventionLauncher @Inject constructor(
         context.startActivity(PauseActivity.intent(context, app.packageName, pause.wait, launchAfter))
     }
 
-    override fun showBlocked(app: AppEntry, block: Decision.Block) {
-        context.startActivity(BlockedActivity.intent(context, app.packageName, block.reason))
+    override fun showBlocked(app: AppEntry, block: Decision.Block, launchAfter: Boolean) {
+        context.startActivity(BlockedActivity.intent(context, app.packageName, block.reason, block.overrides, launchAfter))
     }
 
     override fun showTimeUp(packageName: String, budgetUsed: Boolean) {

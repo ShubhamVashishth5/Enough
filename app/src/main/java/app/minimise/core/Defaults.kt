@@ -31,4 +31,7 @@ object Defaults {
 
     /** Choices offered after a pause. */
     val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)
+
+    /** Emergency passes per usage week (Monday 04:00 to Monday 04:00). Each skips one block. */
+    const val EMERGENCY_PASSES_PER_WEEK: Int = 3
 }

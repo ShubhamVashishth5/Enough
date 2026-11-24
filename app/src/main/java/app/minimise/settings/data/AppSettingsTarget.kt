@@ -6,10 +6,12 @@ import app.minimise.core.prefs.current
 import app.minimise.settings.domain.Direction
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingChange
 import app.minimise.settings.domain.SettingsTarget
 import app.minimise.settings.domain.budgetChangeDirection
 import app.minimise.settings.domain.kindChangeDirection
+import app.minimise.settings.domain.openLimitChangeDirection
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -23,10 +25,12 @@ class AppSettingsTarget @Inject constructor(
             fromMinutes = settingsStore.current().dailyBudget.inWholeMinutes.toInt(),
             toMinutes = change.minutes,
         )
+        is SetOpenLimit -> openLimitChangeDirection(from = appRepository.openLimitOf(change.packageName), to = change.limit)
     }
 
     override suspend fun apply(change: SettingChange) = when (change) {
         is SetAppKind -> appRepository.setKind(change.packageName, change.kind)
         is SetBudget -> settingsStore.update { it.copy(dailyBudget = change.minutes.minutes) }
+        is SetOpenLimit -> appRepository.setOpenLimit(change.packageName, change.limit)
     }
 }

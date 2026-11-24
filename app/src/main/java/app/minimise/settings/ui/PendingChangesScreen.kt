@@ -73,4 +73,7 @@ private fun describe(description: PendingDescription): String = when (descriptio
     is PendingDescription.AppKindChange ->
         stringResource(R.string.pending_app_kind, description.appLabel, stringResource(description.kind.labelRes()))
     is PendingDescription.BudgetChange -> stringResource(R.string.pending_budget, description.minutes)
+    is PendingDescription.OpenLimitChange -> description.limit
+        ?.let { stringResource(R.string.pending_open_limit, description.appLabel, it) }
+        ?: stringResource(R.string.pending_open_limit_none, description.appLabel)
 }

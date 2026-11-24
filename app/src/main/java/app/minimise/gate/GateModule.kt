@@ -4,6 +4,7 @@ import app.minimise.gate.data.RoomGrantStore
 import app.minimise.gate.domain.GrantStore
 import app.minimise.gate.domain.Rule
 import app.minimise.gate.rules.BudgetRule
+import app.minimise.gate.rules.OpenLimitRule
 import app.minimise.gate.rules.VaultPauseRule
 import dagger.Binds
 import dagger.Module
@@ -25,4 +26,8 @@ abstract class GateModule {
     @Binds
     @IntoSet
     abstract fun budgetRule(rule: BudgetRule): Rule
+
+    @Binds
+    @IntoSet
+    abstract fun openLimitRule(rule: OpenLimitRule): Rule
 }

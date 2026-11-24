@@ -42,6 +42,7 @@ class RoomAppRepository @Inject constructor(
                         label = app.label,
                         kind = row?.kind ?: AppKind.TOOL,
                         homeSlot = row?.homeSlot,
+                        openLimit = row?.openLimit,
                     )
                 }
                 .sortedWith { a, b -> collator.compare(a.label, b.label) }
@@ -54,7 +55,7 @@ class RoomAppRepository @Inject constructor(
     override suspend fun entry(packageName: String): AppEntry? {
         val label = withContext(Dispatchers.IO) { source.activityFor(packageName)?.label?.toString() } ?: return null
         val row = dao.get(packageName)
-        return AppEntry(packageName, label, kind = row?.kind ?: AppKind.TOOL, homeSlot = row?.homeSlot)
+        return AppEntry(packageName, label, kind = row?.kind ?: AppKind.TOOL, homeSlot = row?.homeSlot, openLimit = row?.openLimit)
     }
 
     override suspend fun kindOf(packageName: String): AppKind = dao.get(packageName)?.kind ?: AppKind.TOOL
@@ -62,6 +63,13 @@ class RoomAppRepository @Inject constructor(
     override suspend fun setKind(packageName: String, kind: AppKind) {
         dao.insertIfMissing(listOf(AppEntity(packageName, kind, homeSlot = null)))
         dao.setKind(packageName, kind)
+    }
+
+    override suspend fun openLimitOf(packageName: String): Int? = dao.get(packageName)?.openLimit
+
+    override suspend fun setOpenLimit(packageName: String, limit: Int?) {
+        dao.insertIfMissing(listOf(AppEntity(packageName, AppKind.TOOL, homeSlot = null)))
+        dao.setOpenLimit(packageName, limit)
     }
 
     override suspend fun setHomeSlot(packageName: String, slot: Int) = dao.assignSlot(packageName, slot)

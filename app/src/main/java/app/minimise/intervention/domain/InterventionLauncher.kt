@@ -8,7 +8,8 @@ interface InterventionLauncher {
     /** @param launchAfter true when the app isn't open yet (launcher path): start it once the user proceeds. */
     fun showPause(app: AppEntry, pause: Decision.Pause, launchAfter: Boolean)
 
-    fun showBlocked(app: AppEntry, block: Decision.Block)
+    /** @param launchAfter as for [showPause]: start the app once an override is passed. */
+    fun showBlocked(app: AppEntry, block: Decision.Block, launchAfter: Boolean)
 
     /** The time box for [packageName] ended while it was in front, or [budgetUsed] ran out mid-box. */
     fun showTimeUp(packageName: String, budgetUsed: Boolean)
