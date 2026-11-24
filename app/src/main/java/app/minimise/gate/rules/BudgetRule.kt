@@ -1,23 +1,22 @@
 package app.minimise.gate.rules
 
 import app.minimise.apps.domain.AppKind
-import app.minimise.core.prefs.SettingsStore
-import app.minimise.core.prefs.current
 import app.minimise.gate.domain.Decision
 import app.minimise.gate.domain.GateContext
 import app.minimise.gate.domain.Rule
+import app.minimise.modes.domain.ActiveModeProvider
 import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.usage.domain.DailyBudget
 import javax.inject.Inject
 import kotlin.time.Duration
 
-/** Blocks every Vault app once today's shared budget is used up. */
+/** Blocks every Vault app once today's shared budget (the active mode's) is used up. */
 class BudgetRule @Inject constructor(
-    private val settingsStore: SettingsStore,
+    private val activeMode: ActiveModeProvider,
 ) : Rule {
     override val id: String = "budget"
 
-    override suspend fun evaluate(ctx: GateContext): Decision = evaluate(ctx, settingsStore.current().dailyBudget)
+    override suspend fun evaluate(ctx: GateContext): Decision = evaluate(ctx, activeMode.values().budget)
 
     companion object {
         /** Shown by BlockedActivity as "Daily budget used". */

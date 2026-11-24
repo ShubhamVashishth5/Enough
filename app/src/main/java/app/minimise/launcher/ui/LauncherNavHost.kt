@@ -25,6 +25,8 @@ import app.minimise.swaps.ui.SwapsRoute
 import app.minimise.schedules.ui.SchedulesRoute
 import app.minimise.keys.ui.KeysRoute
 import app.minimise.focus.ui.FocusSettingsRoute
+import app.minimise.modes.ui.ModeEditRoute
+import app.minimise.modes.ui.ModesRoute
 import app.minimise.tasks.ui.TodayRoute
 import kotlinx.coroutines.flow.Flow
 
@@ -92,6 +94,7 @@ fun LauncherNavHost(
                 onOpenSchedules = { navController.navigate(Destination.Schedules) },
                 onOpenKeys = { navController.navigate(Destination.Keys) },
                 onOpenFocus = { navController.navigate(Destination.Focus) },
+                onOpenModes = { navController.navigate(Destination.Modes) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
@@ -114,6 +117,12 @@ fun LauncherNavHost(
         }
         composable<Destination.Focus> {
             FocusSettingsRoute()
+        }
+        composable<Destination.Modes> {
+            ModesRoute(onEdit = { navController.navigate(Destination.ModeEdit(it)) })
+        }
+        composable<Destination.ModeEdit> {
+            ModeEditRoute(onSaved = { navController.popBackStack() })
         }
         composable<Destination.PendingChanges> {
             PendingChangesRoute()

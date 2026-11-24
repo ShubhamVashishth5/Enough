@@ -10,6 +10,7 @@ import app.minimise.core.db.EventDao
 import app.minimise.core.db.FocusSessionDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.KeyDao
+import app.minimise.core.db.ModeDao
 import app.minimise.core.db.PendingChangeDao
 import app.minimise.core.db.ScheduleDao
 import app.minimise.core.db.SwapDao
@@ -81,6 +82,9 @@ object CoreProviders {
 
     @Provides
     fun focusSessionDao(db: AppDatabase): FocusSessionDao = db.focusSessionDao()
+
+    @Provides
+    fun modeDao(db: AppDatabase): ModeDao = db.modeDao()
 
     @Provides
     @Singleton

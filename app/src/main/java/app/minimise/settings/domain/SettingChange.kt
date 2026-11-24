@@ -69,6 +69,27 @@ data class RemoveKey(val id: Long) : SettingChange {
     override val key: String get() = "key:$id"
 }
 
+/** Picks a mode by hand; null goes back to following mode schedules. */
+@Serializable
+@SerialName("set_manual_mode")
+data class SetManualMode(val modeId: Long?) : SettingChange {
+    override val key: String get() = "manual_mode"
+}
+
+/** Edits a mode. A null allowlist keeps every app's usual kind; scheduleDays 0 means no schedule. */
+@Serializable
+@SerialName("save_mode")
+data class SaveMode(
+    val id: Long,
+    val budgetMinutes: Int,
+    val allowlist: List<String>?,
+    val scheduleDays: Int,
+    val scheduleStartMinute: Int,
+    val scheduleEndMinute: Int,
+) : SettingChange {
+    override val key: String get() = "mode:$id"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {

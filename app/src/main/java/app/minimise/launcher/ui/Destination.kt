@@ -38,6 +38,12 @@ sealed interface Destination {
     data object Focus : Destination
 
     @Serializable
+    data object Modes : Destination
+
+    @Serializable
+    data class ModeEdit(val id: Long) : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable
