@@ -29,6 +29,18 @@
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- Lite protection, when accessibility is off: usage access shows which app is in front, display
+         over other apps lets the pause open on top of it, and a foreground service keeps it running. -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- Tells whether Android's Advanced Protection took accessibility away, to say so on the Permissions screen. -->
+    <uses-permission android:name="android.permission.QUERY_ADVANCED_PROTECTION_MODE" />
+
     <!-- Android 15 Private space: the home app may list, lock and unlock it. -->
     <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
 
@@ -166,6 +178,24 @@
                 android:resource="@xml/device_admin" />
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Lite protection: polls usage access while accessibility is off. -->
+        <service
+            android:name=".protection.ProtectionService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Digital wellbeing: notices when an app the user chose to limit comes to the front, so a pause can be shown first, while the accessibility service is off." />
+        </service>
+
+        <receiver
+            android:name=".protection.ProtectionBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

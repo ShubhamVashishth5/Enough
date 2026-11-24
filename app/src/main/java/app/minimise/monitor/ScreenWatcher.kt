@@ -16,7 +16,7 @@ import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.prefs.current
 import app.minimise.core.ui.dateTimeText
 import app.minimise.intervention.ui.NoticeActivity
-import app.minimise.monitor.data.AccessibilityForegroundSource
+import app.minimise.monitor.data.ForegroundEventBus
 import app.minimise.monitor.data.AccessibilityScreenNode
 import app.minimise.monitor.domain.ForegroundEvent
 import app.minimise.monitor.domain.ScreenNode
@@ -46,7 +46,7 @@ class ScreenWatcher @Inject constructor(
     private val browserCoverage: BrowserCoverage,
     private val lockGuard: LockGuard,
     private val settingsStore: SettingsStore,
-    private val foregroundSource: AccessibilityForegroundSource,
+    private val foregroundSource: ForegroundEventBus,
     private val timeSource: TimeSource,
 ) {
     private val throttle = Throttle(Defaults.SCREEN_CHECK_INTERVAL)

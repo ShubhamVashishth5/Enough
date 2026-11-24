@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.core.ui.ScreenScaffold
+import app.minimise.protection.domain.ProtectionLevel
 import timber.log.Timber
 
 @Composable
@@ -77,6 +78,8 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
         state = state,
         onOpenAccessibility = { disclosing = true },
         onOpenAppInfo = { open(viewModel.appInfoIntent()) },
+        onRequestUsageAccess = { open(viewModel.usageAccessIntent()) },
+        onRequestOverlay = { open(viewModel.overlayIntent(), fallback = viewModel.appInfoIntent()) },
         onRequestHome = {
             runCatching { roleRequest.launch(viewModel.homeRoleIntent()) }
                 .onFailure { open(viewModel.homeSettingsIntent()) }
@@ -101,6 +104,8 @@ fun PermissionsScreen(
     state: PermissionsUiState,
     onOpenAccessibility: () -> Unit,
     onOpenAppInfo: () -> Unit,
+    onRequestUsageAccess: () -> Unit,
+    onRequestOverlay: () -> Unit,
     onRequestHome: () -> Unit,
     onRequestBattery: () -> Unit,
     onRequestDoNotDisturb: () -> Unit,
@@ -111,6 +116,16 @@ fun PermissionsScreen(
 ) {
     ScreenScaffold(title = stringResource(R.string.permissions_title)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Text(
+                text = stringResource(
+                    when (state.protection) {
+                        ProtectionLevel.FULL -> R.string.protection_level_full
+                        ProtectionLevel.LITE -> R.string.protection_level_lite
+                        ProtectionLevel.LAUNCHER_ONLY -> R.string.protection_level_launcher_only
+                    },
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+            )
             PermissionItem(
                 title = stringResource(R.string.permission_accessibility),
                 why = stringResource(R.string.permission_accessibility_why),
@@ -118,6 +133,13 @@ fun PermissionsScreen(
                 action = stringResource(R.string.permission_open_settings),
                 onAction = onOpenAccessibility,
             )
+            if (state.advancedProtection) {
+                Text(
+                    text = stringResource(R.string.permission_advanced_protection),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
             if (!state.accessibility) {
                 Text(
                     text = stringResource(R.string.permission_accessibility_restricted),
@@ -128,6 +150,20 @@ fun PermissionsScreen(
                     Text(stringResource(R.string.permission_open_app_info))
                 }
             }
+            PermissionItem(
+                title = stringResource(R.string.permission_usage_access),
+                why = stringResource(R.string.permission_usage_access_why),
+                granted = state.usageAccess,
+                action = stringResource(R.string.permission_open_settings),
+                onAction = onRequestUsageAccess,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_overlay),
+                why = stringResource(R.string.permission_overlay_why),
+                granted = state.overlay,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestOverlay,
+            )
             PermissionItem(
                 title = stringResource(R.string.permission_home),
                 why = stringResource(R.string.permission_home_why),

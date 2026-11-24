@@ -23,6 +23,17 @@
     <string name="auto_vault_notice">%s went into the Vault</string>
     <string name="auto_vault_notice_body">New social, video, game and news apps go in by themselves. Taking one out waits 24 hours.</string>
     <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
+    <string name="home_protection_lite">Protection is Lite: feeds and websites aren\'t covered.</string>
+
+    <!-- Protection levels -->
+    <string name="protection_channel">Protection</string>
+    <string name="protection_notification_title">Protection on</string>
+    <string name="protection_notification_text">Lite: Vault apps still get the pause.</string>
+    <string name="protection_level_full">Protection is Full: every Vault open is paused, and feed, website and lock rules work.</string>
+    <string name="protection_level_lite">Protection is Lite: every Vault open is paused, but feed blocking, website rules and the lock guard need accessibility.</string>
+    <string name="protection_level_launcher_only">Protection covers only opens from this home screen. Turn on accessibility, or usage access and display over other apps, so Vault apps opened from anywhere else are paused too.</string>
+    <string name="needs_full_protection">Off for now: this needs accessibility, and protection is Lite or off.</string>
+    <string name="lock_guard_needs_full_protection">Keeping you out of this app\'s system pages during a lock needs accessibility.</string>
 
     <!-- Search -->
     <string name="search_hint">Type an app name</string>
@@ -303,6 +314,11 @@
     <string name="permission_accessibility">Accessibility</string>
     <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed, a browser\'s address bar while a website is in the Vault, and Settings pages during a lock period. Nothing is stored or leaves the phone.</string>
     <string name="permission_accessibility_restricted">Installed outside the Play Store? Android 13 and later grey out this setting until you open app info, tap ⋮ and choose Allow restricted settings.</string>
+    <string name="permission_advanced_protection">Android\'s Advanced Protection is on. It takes accessibility away from apps that aren\'t accessibility tools, this one included. Lite protection takes over once usage access and display over other apps are on.</string>
+    <string name="permission_usage_access">Usage access (Lite protection)</string>
+    <string name="permission_usage_access_why">Without accessibility, checks once a second which app is in front, so a Vault app opened from a notification or recents still gets the pause and its time still counts. Nothing on screen is read, so feed blocking, website rules and the lock guard stay off.</string>
+    <string name="permission_overlay">Display over other apps (Lite protection)</string>
+    <string name="permission_overlay_why">Lets the pause screen open on top of a Vault app when accessibility is off.</string>
     <string name="permission_home">Default home app</string>
     <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
     <string name="permission_battery">Unrestricted battery</string>

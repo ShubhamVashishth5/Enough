@@ -27,4 +27,7 @@ enum class EventType {
 
     /** Earn-it: minutes added to today's budget. data: minutes, source (task or focus), ref. */
     BUDGET_BONUS,
+
+    /** The protection level changed (accessibility, usage access or overlay switched). data: level. */
+    PROTECTION_CHANGED,
 }

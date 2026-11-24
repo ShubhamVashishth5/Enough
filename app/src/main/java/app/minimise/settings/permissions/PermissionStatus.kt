@@ -2,6 +2,9 @@ package app.minimise.settings.permissions
 
 import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.AppOpsManager
+import android.os.Process
+import android.security.advancedprotection.AdvancedProtectionManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -34,6 +37,35 @@ class PermissionStatus @Inject constructor(
     }
 
     fun isDefaultHome(): Boolean = homeRole.isDefaultHome()
+
+    /** Lite protection: lets the app see which app came to the front without accessibility. */
+    fun hasUsageAccess(): Boolean {
+        val appOps = context.getSystemService(AppOpsManager::class.java)
+        val mode = appOps.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName)
+        return if (mode == AppOpsManager.MODE_DEFAULT) {
+            context.checkSelfPermission(Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED
+        } else {
+            mode == AppOpsManager.MODE_ALLOWED
+        }
+    }
+
+    fun usageAccessIntent(): Intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+
+    /** Lite protection: lets the pause screen open over another app from the background. */
+    fun canDrawOverlays(): Boolean = Settings.canDrawOverlays(context)
+
+    fun overlayIntent(): Intent =
+        Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.fromParts("package", context.packageName, null))
+
+    /**
+     * Android's Advanced Protection mode (Android 16+). On Android 17 it takes accessibility away from
+     * apps that aren't accessibility tools, this one included.
+     */
+    fun isAdvancedProtectionOn(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.BAKLAVA) return false
+        return runCatching { context.getSystemService(AdvancedProtectionManager::class.java)?.isAdvancedProtectionEnabled == true }
+            .getOrDefault(false)
+    }
 
     fun isIgnoringBatteryOptimizations(): Boolean =
         context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)

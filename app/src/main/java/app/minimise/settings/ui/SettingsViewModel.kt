@@ -16,6 +16,7 @@ import java.time.LocalDateTime
 import android.net.Uri
 import app.minimise.stats.data.CsvExporter
 import app.minimise.apps.domain.PrivateSpace
+import app.minimise.protection.ProtectionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Provider
@@ -41,6 +42,8 @@ data class SettingsUiState(
     val exported: Int? = null,
     /** Whether Private space is locked; null when there is none (or below Android 15). */
     val privateSpace: Boolean? = null,
+    /** Feed blocking and the lock guard read screens, which only Full protection can. */
+    val screensCovered: Boolean = true,
 )
 
 @HiltViewModel
@@ -53,6 +56,7 @@ class SettingsViewModel @Inject constructor(
     private val timeSource: TimeSource,
     private val csvExporter: CsvExporter,
     private val privateSpace: PrivateSpace,
+    private val protectionStatus: ProtectionStatus,
 ) : ViewModel() {
     private val exported = MutableStateFlow<Int?>(null)
 
@@ -67,6 +71,7 @@ class SettingsViewModel @Inject constructor(
             debugShortLoosenDelay = settings.debugShortLoosenDelay,
             exported = exported,
             privateSpace = if (privateSpace.exists()) privateSpace.isLocked() else null,
+            screensCovered = protectionStatus.current().readsScreens,
             lockedUntil = settings.lockedUntil?.takeIf { it.isAfter(timeSource.now()) }?.atZone(timeSource.zone())?.toLocalDateTime(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())

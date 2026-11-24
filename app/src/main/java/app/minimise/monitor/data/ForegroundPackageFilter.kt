@@ -5,12 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.inputmethod.InputMethodManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
- * Decides what a window-state event means. Keyboards, system UI and popups that aren't activities are
- * ignored; the home screen and this app's own screens mean "no tracked app in front".
+ * Decides what a foreground change means. Keyboards, system UI and popups that aren't activities are
+ * ignored; the home screen and this app's own screens mean "no tracked app in front". Shared by both
+ * watchers (the accessibility service and the usage access poller).
  */
-class ForegroundPackageFilter(private val context: Context) {
+@Singleton
+class ForegroundPackageFilter @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
     sealed interface Verdict {
         /** Not an app change (keyboard, notification shade, a popup window). */
         data object Ignore : Verdict
@@ -21,14 +29,26 @@ class ForegroundPackageFilter(private val context: Context) {
         data class App(val packageName: String) : Verdict
     }
 
-    private val activityCache = HashMap<String, Boolean>()
+    private val activityCache = ConcurrentHashMap<String, Boolean>()
+
+    @Volatile
     private var homePackages: Set<String> = queryHomePackages()
+
+    @Volatile
     private var keyboardPackages: Set<String> = queryKeyboardPackages()
 
+    /** A window change from the accessibility service: only an activity's window counts. */
     fun classify(packageName: String, className: String?): Verdict {
+        val verdict = classifyResumed(packageName)
+        if (verdict !is Verdict.App) return verdict
+        if (className == null || !isActivity(packageName, className)) return Verdict.Ignore
+        return verdict
+    }
+
+    /** An activity that came to the front, as usage access reports it. */
+    fun classifyResumed(packageName: String): Verdict {
         if (packageName in IGNORED_PACKAGES || packageName in keyboardPackages) return Verdict.Ignore
         if (packageName == context.packageName || packageName in homePackages) return Verdict.NoApp
-        if (className == null || !isActivity(packageName, className)) return Verdict.Ignore
         return Verdict.App(packageName)
     }
 

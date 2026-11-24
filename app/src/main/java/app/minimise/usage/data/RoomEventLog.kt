@@ -22,6 +22,8 @@ class RoomEventLog @Inject constructor(
 
     override fun observeBetween(from: Instant, to: Instant, type: EventType?): Flow<List<Event>> =
         dao.observeBetween(from, to, type).map { rows -> rows.map { it.toEvent() } }
+
+    override suspend fun latest(type: EventType, before: Instant): Event? = dao.latest(type, before)?.toEvent()
 }
 
 private fun Event.toEntity() = EventEntity(

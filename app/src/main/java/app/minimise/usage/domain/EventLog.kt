@@ -14,4 +14,7 @@ interface EventLog {
 
     /** Like [between], but re-emits whenever the log changes. */
     fun observeBetween(from: Instant, to: Instant, type: EventType? = null): Flow<List<Event>>
+
+    /** The most recent event of [type] that started before [before], or null. */
+    suspend fun latest(type: EventType, before: Instant): Event? = between(Instant.EPOCH, before, type).lastOrNull()
 }

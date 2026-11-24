@@ -11,9 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/** Fed only by GateAccessibilityService. Everything else reads it through [ForegroundAppSource]. */
+/**
+ * The one [ForegroundAppSource]. Fed by whichever watcher is running: GateAccessibilityService at
+ * Full protection, [UsageStatsForegroundSource] at Lite. Everything else reads it through the interface.
+ */
 @Singleton
-class AccessibilityForegroundSource @Inject constructor() : ForegroundAppSource {
+class ForegroundEventBus @Inject constructor() : ForegroundAppSource {
     private val _events = MutableSharedFlow<ForegroundEvent>(extraBufferCapacity = 64)
     private val _current = MutableStateFlow<ForegroundEvent?>(null)
 
@@ -33,5 +36,14 @@ class AccessibilityForegroundSource @Inject constructor() : ForegroundAppSource 
     fun onScreenOff(event: ForegroundEvent) {
         lastAppBeforeScreenOff = _current.value?.packageName
         emit(event)
+    }
+
+    /**
+     * Nothing is watching any more. Forget the app in front, so whichever watcher starts next reports
+     * it afresh and it goes through the gate again.
+     */
+    fun reset(event: ForegroundEvent) {
+        lastAppBeforeScreenOff = null
+        _current.value = event
     }
 }
