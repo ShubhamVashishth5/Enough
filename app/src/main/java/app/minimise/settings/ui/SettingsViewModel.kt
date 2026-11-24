@@ -16,6 +16,8 @@ import java.time.LocalDateTime
 import android.net.Uri
 import app.minimise.stats.data.CsvExporter
 import app.minimise.apps.domain.PrivateSpace
+import app.minimise.backup.data.BackupExporter
+import app.minimise.backup.data.BackupImporter
 import app.minimise.protection.ProtectionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -44,7 +46,17 @@ data class SettingsUiState(
     val privateSpace: Boolean? = null,
     /** Feed blocking and the lock guard read screens, which only Full protection can. */
     val screensCovered: Boolean = true,
+    /** The outcome of the last settings backup or restore, until it has been shown. */
+    val backupMessage: BackupMessage? = null,
 )
+
+sealed interface BackupMessage {
+    data object Saved : BackupMessage
+
+    data object SaveFailed : BackupMessage
+
+    data class Restored(val result: BackupImporter.Result) : BackupMessage
+}
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -57,10 +69,14 @@ class SettingsViewModel @Inject constructor(
     private val csvExporter: CsvExporter,
     private val privateSpace: PrivateSpace,
     private val protectionStatus: ProtectionStatus,
+    private val backupExporter: BackupExporter,
+    private val backupImporter: BackupImporter,
 ) : ViewModel() {
     private val exported = MutableStateFlow<Int?>(null)
+    private val backupMessage = MutableStateFlow<BackupMessage?>(null)
+    private val messages = combine(exported, backupMessage) { exported, backup -> exported to backup }
 
-    val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings, exported) { pending, settings, exported ->
+    val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings, messages) { pending, settings, (exported, backup) ->
         SettingsUiState(
             budgetMinutes = settings.dailyBudget.inWholeMinutes.toInt(),
             activeModeName = activeMode.active()?.name,
@@ -72,6 +88,7 @@ class SettingsViewModel @Inject constructor(
             exported = exported,
             privateSpace = if (privateSpace.exists()) privateSpace.isLocked() else null,
             screensCovered = protectionStatus.current().readsScreens,
+            backupMessage = backup,
             lockedUntil = settings.lockedUntil?.takeIf { it.isAfter(timeSource.now()) }?.atZone(timeSource.zone())?.toLocalDateTime(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
@@ -96,6 +113,18 @@ class SettingsViewModel @Inject constructor(
 
     fun onExportShown() {
         exported.value = null
+    }
+
+    fun onBackup(uri: Uri) {
+        viewModelScope.launch { backupMessage.value = if (backupExporter.export(uri)) BackupMessage.Saved else BackupMessage.SaveFailed }
+    }
+
+    fun onRestore(uri: Uri) {
+        viewModelScope.launch { backupMessage.value = BackupMessage.Restored(backupImporter.import(uri)) }
+    }
+
+    fun onBackupMessageShown() {
+        backupMessage.value = null
     }
 
     fun onDebugDumpScreen() {

@@ -588,6 +588,19 @@
         <item quantity="other">Exported %d events</item>
     </plurals>
     <string name="export_failed">Couldn\'t write the file.</string>
+    <string name="settings_backup">Back up settings</string>
+    <string name="settings_backup_summary">Every setting in one file, to set up a new phone. Keys and friend codes go in only as fingerprints.</string>
+    <string name="settings_restore">Restore settings</string>
+    <string name="settings_restore_summary">From a backup file. Anything stricter applies at once; anything looser waits 24 hours.</string>
+    <string name="backup_saved">Settings saved.</string>
+    <string name="restore_done">Restored. Everything in it applies now.</string>
+    <plurals name="restore_waiting">
+        <item quantity="one">Restored. %d looser change waits 24 hours; see Pending changes.</item>
+        <item quantity="other">Restored. %d looser changes wait 24 hours; see Pending changes.</item>
+    </plurals>
+    <string name="restore_locked">Restored what was stricter. A lock period is on, so nothing looser changed.</string>
+    <string name="restore_too_new">This backup comes from a newer version of Enough. Update the app, then restore it again.</string>
+    <string name="restore_unreadable">That isn\'t an Enough settings file, or it\'s damaged.</string>
 
     <!-- Taper, auto-tighten, earn-it -->
     <string name="taper_title">Taper</string>

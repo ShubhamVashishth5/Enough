@@ -76,7 +76,10 @@ data class SetManualMode(val modeId: Long?) : SettingChange {
     override val key: String get() = "manual_mode"
 }
 
-/** Edits a mode. A null allowlist keeps every app's usual kind; scheduleDays 0 means no schedule. */
+/**
+ * Edits a mode. A null allowlist keeps every app's usual kind; scheduleDays 0 means no schedule.
+ * [waitStepsSeconds] null keeps the mode's waits (only a restored backup sets them).
+ */
 @Serializable
 @SerialName("save_mode")
 data class SaveMode(
@@ -86,6 +89,7 @@ data class SaveMode(
     val scheduleDays: Int,
     val scheduleStartMinute: Int,
     val scheduleEndMinute: Int,
+    val waitStepsSeconds: List<Long>? = null,
 ) : SettingChange {
     override val key: String get() = "mode:$id"
 }

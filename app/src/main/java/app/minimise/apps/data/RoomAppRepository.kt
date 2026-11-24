@@ -71,6 +71,9 @@ class RoomAppRepository @Inject constructor(
 
     override suspend fun openLimitOf(packageName: String): Int? = dao.get(packageName)?.openLimit
 
+    override suspend fun openLimits(): Map<String, Int> =
+        dao.all().mapNotNull { row -> row.openLimit?.let { row.packageName to it } }.toMap()
+
     override suspend fun setOpenLimit(packageName: String, limit: Int?) {
         dao.insertIfMissing(listOf(AppEntity(packageName, AppKind.TOOL, homeSlot = null)))
         dao.setOpenLimit(packageName, limit)
