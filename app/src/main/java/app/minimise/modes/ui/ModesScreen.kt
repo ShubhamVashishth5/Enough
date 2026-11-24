@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -78,6 +79,6 @@ private fun ModeRow(title: String, summary: String, selected: Boolean, onUse: ()
 private fun modeSummary(mode: Mode): String {
     val budget = stringResource(R.string.modes_budget, mode.values.budget.inWholeMinutes)
     val schedule = mode.schedule?.let { windowText(it) } ?: stringResource(R.string.modes_no_schedule)
-    val apps = mode.values.allowlist?.let { stringResource(R.string.modes_only_apps, it.size) }
+    val apps = mode.values.allowlist?.let { pluralStringResource(R.plurals.modes_only_apps, it.size, it.size) }
     return listOfNotNull(budget, schedule, apps).joinToString(" · ")
 }

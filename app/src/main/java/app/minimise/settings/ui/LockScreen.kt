@@ -8,6 +8,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -42,8 +43,9 @@ fun LockScreen(state: LockUiState, onLengthChosen: (Duration) -> Unit, onConfirm
         }
         state.choices.forEach { length ->
             SettingsRow(
-                title = stringResource(
-                    if (state.lockedUntil == null) R.string.lock_for_days else R.string.lock_extend_days,
+                title = pluralStringResource(
+                    if (state.lockedUntil == null) R.plurals.lock_for_days else R.plurals.lock_extend_days,
+                    length.inWholeDays.toInt(),
                     length.inWholeDays,
                 ),
                 onClick = { onLengthChosen(length) },
@@ -55,7 +57,7 @@ fun LockScreen(state: LockUiState, onLengthChosen: (Duration) -> Unit, onConfirm
     if (length != null && until != null) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text(stringResource(R.string.lock_confirm_title, length.inWholeDays)) },
+            title = { Text(pluralStringResource(R.plurals.lock_confirm_title, length.inWholeDays.toInt(), length.inWholeDays)) },
             text = { Text(stringResource(R.string.lock_confirm_body, dateTimeText(until))) },
             confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(R.string.lock_confirm)) } },
             dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.swap_cancel)) } },

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Enough</string>
+    <!-- Translations: copy this file to values-xx/strings.xml (xx is the language code) and translate the
+         text. Give each plurals block every quantity your language uses (one, two, few, many, other).
+         Leave out anything you don't translate: it falls back to English. -->
+    <string name="app_name" translatable="false">Enough</string>
 
     <!-- Home -->
     <string name="home_make_default">Make this your home app</string>
@@ -47,7 +50,10 @@
     <string name="search_hint">Type an app name</string>
 
     <!-- Pause screen -->
-    <string name="pause_open_count">Open %d today</string>
+    <plurals name="pause_open_count">
+        <item quantity="one">Opened %d time today</item>
+        <item quantity="other">Opened %d times today</item>
+    </plurals>
     <string name="pause_breathe">Breathe</string>
     <string name="pause_question">What are you here for?</string>
     <string name="pause_reason_reply">Reply to someone</string>
@@ -117,7 +123,10 @@
     <string name="onboarding_welcome_3">One daily budget covers every Vault app. Making a rule stricter is instant; making it looser waits 24 hours.</string>
     <string name="onboarding_welcome_4">Nothing leaves your phone. No account, no internet access.</string>
     <string name="onboarding_home_title">Home apps</string>
-    <string name="onboarding_home_body">Pick up to %2$d tools for the home screen, in order. %1$d picked.</string>
+    <plurals name="onboarding_home_body">
+        <item quantity="one">Pick up to %2$d tool for the home screen. %1$d picked.</item>
+        <item quantity="other">Pick up to %2$d tools for the home screen, in order. %1$d picked.</item>
+    </plurals>
     <string name="onboarding_vault_title">The Vault</string>
     <string name="onboarding_vault_body">Tick the apps that eat your time. Common ones are already ticked, and their websites go in the Vault with them. You can add more later in Settings, at once; taking one out waits 24 hours.</string>
     <string name="onboarding_budget_body">How many minutes a day, across all Vault apps together? You can lower it at any time. Raising it later waits 24 hours.</string>
@@ -146,7 +155,7 @@
     <string name="apps_websites">Websites</string>
     <string name="apps_websites_explainer">A website in the Vault gets the same pause, budget and rules in Chrome, Firefox, Samsung Internet, Brave and other browsers, so switching to the browser isn\'t a way round. Adding one applies at once; taking one out waits 24 hours.</string>
     <string name="apps_add_website">Add a website</string>
-    <string name="website_hint">instagram.com</string>
+    <string name="website_hint" translatable="false">instagram.com</string>
     <string name="website_add">Add to the Vault</string>
     <string name="website_invalid">That isn\'t a web address. Try something like youtube.com.</string>
     <string name="open_limit_title">Open limit for %s</string>
@@ -212,7 +221,10 @@
     <string name="modes_use">Use now</string>
     <string name="modes_budget">%d min a day</string>
     <string name="modes_no_schedule">no schedule</string>
-    <string name="modes_only_apps">only %d apps</string>
+    <plurals name="modes_only_apps">
+        <item quantity="one">only %d app</item>
+        <item quantity="other">only %d apps</item>
+    </plurals>
     <string name="modes_switch_pending">Switching to %1$s in %2$s</string>
     <string name="mode_budget_label">Minutes a day across all Vault apps</string>
     <string name="mode_on_schedule">On a schedule</string>
@@ -362,7 +374,10 @@
     <string name="pending_cancel">Cancel</string>
     <string name="pending_app_kind">%1$s → %2$s</string>
     <string name="pending_budget">Daily budget → %d min</string>
-    <string name="pending_open_limit">%1$s → %2$d opens a day</string>
+    <plurals name="pending_open_limit">
+        <item quantity="one">%1$s → %2$d open a day</item>
+        <item quantity="other">%1$s → %2$d opens a day</item>
+    </plurals>
     <string name="pending_open_limit_none">%s → no open limit</string>
     <string name="pending_schedule_changed">Schedule %s changes</string>
     <string name="pending_schedule_removed">Schedule %s is removed</string>
@@ -394,9 +409,18 @@
     <string name="settings_lock_summary">Lock every setting for 7, 30 or 90 days</string>
     <string name="lock_explainer">During a lock nothing can be loosened at all: no bigger budget, no apps out of the Vault, no rules switched off, and no skipping waits with a friend code, typing or a key. Tightening still works. Changes already waiting apply only once the lock ends. A lock can be made longer but never shorter.</string>
     <string name="lock_locked_until">Locked until %s</string>
-    <string name="lock_for_days">Lock for %d days</string>
-    <string name="lock_extend_days">Extend to %d days from now</string>
-    <string name="lock_confirm_title">Lock for %d days?</string>
+    <plurals name="lock_for_days">
+        <item quantity="one">Lock for %d day</item>
+        <item quantity="other">Lock for %d days</item>
+    </plurals>
+    <plurals name="lock_extend_days">
+        <item quantity="one">Extend to %d day from now</item>
+        <item quantity="other">Extend to %d days from now</item>
+    </plurals>
+    <plurals name="lock_confirm_title">
+        <item quantity="one">Lock for %d day?</item>
+        <item quantity="other">Lock for %d days?</item>
+    </plurals>
     <string name="lock_confirm_body">Until %s nothing can be loosened. This can\'t be undone or shortened.</string>
     <string name="lock_confirm">Lock</string>
     <string name="lock_refused">Locked until %s. Nothing can be loosened until then.</string>
@@ -577,7 +601,10 @@
     <string name="stats_no_slips">No slips past the budget this week.</string>
     <string name="stats_slips">Most slips %1$s–%2$s</string>
     <string name="stats_trigger">Most often pulled in by %s</string>
-    <string name="stats_days_under">%1$d of %2$d days under budget this month</string>
+    <plurals name="stats_days_under">
+        <item quantity="one">%1$d of %2$d day under budget this month</item>
+        <item quantity="other">%1$d of %2$d days under budget this month</item>
+    </plurals>
     <string name="report_channel">Weekly report</string>
     <string name="report_ready">Your week</string>
     <string name="report_ready_text">This week against last, on one screen.</string>
@@ -604,8 +631,8 @@
 
     <!-- Taper, auto-tighten, earn-it -->
     <string name="taper_title">Taper</string>
-    <string name="taper_off">Off. Lowers the budget by 5% each week until it reaches a floor you choose.</string>
-    <string name="taper_on">On: 5% less each week, stopping at %d min a day.</string>
+    <string name="taper_off" formatted="false">Off. Lowers the budget by 5% each week until it reaches a floor you choose.</string>
+    <string name="taper_on">On: 5%% less each week, stopping at %d min a day.</string>
     <string name="taper_floor">Floor %d min</string>
     <string name="taper_start">Start tapering</string>
     <string name="taper_save">Save floor</string>
@@ -666,11 +693,44 @@
     <string name="disclosure_agree">Agree and continue</string>
     <string name="disclosure_decline">Not now</string>
 
+    <!-- Read out by TalkBack -->
+    <string name="a11y_search_apps">Search apps</string>
+    <string name="a11y_settings">Settings</string>
+    <string name="a11y_capture">Save a thought for later</string>
+    <string name="a11y_camera">Camera</string>
+    <string name="a11y_lock_screen">Lock the screen</string>
+    <string name="a11y_open_timer">open the timer</string>
+    <string name="a11y_change_app">change app</string>
+    <string name="a11y_edit_tasks">edit today\'s tasks</string>
+    <string name="a11y_fewer_minutes">Fewer minutes</string>
+    <string name="a11y_more_minutes">More minutes</string>
+    <plurals name="a11y_vault_minutes">
+        <item quantity="one">%d minute in the Vault today</item>
+        <item quantity="other">%d minutes in the Vault today</item>
+    </plurals>
+    <plurals name="a11y_unlocks">
+        <item quantity="one">%d unlock</item>
+        <item quantity="other">%d unlocks</item>
+    </plurals>
+    <plurals name="pause_breathe_spoken">
+        <item quantity="one">Breathe, %d second left</item>
+        <item quantity="other">Breathe, %d seconds left</item>
+    </plurals>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>
     <string name="duration_minutes">%d min</string>
     <string name="duration_under_a_minute">under a minute</string>
+    <plurals name="duration_hours_spoken">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="duration_minutes_spoken">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="duration_spoken_both">%1$s %2$s</string>
 
     <!-- Debug (debug builds only) -->
     <string name="debug_short_loosen_delay">Debug: loosen after 1 minute</string>

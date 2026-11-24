@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -18,6 +17,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import app.minimise.core.ui.CheckRow
+import app.minimise.core.ui.durationSpoken
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -47,7 +51,7 @@ fun FocusSection(onOpenInbox: () -> Unit, viewModel: FocusViewModel = hiltViewMo
             text = if (active == null) stringResource(R.string.focus_start_line) else stringResource(R.string.focus_left, durationText(state.left)),
             style = MaterialTheme.typography.titleMedium,
             color = if (active == null) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.clickable(onClick = viewModel::onFocusTapped).padding(vertical = 8.dp),
+            modifier = Modifier.clickable(role = Role.Button, onClick = viewModel::onFocusTapped).padding(vertical = 8.dp),
         )
     }
     when (state.dialog) {
@@ -67,17 +71,19 @@ private fun StartDialog(canLock: Boolean, onStart: (kotlin.time.Duration, Boolea
             Column {
                 Text(stringResource(R.string.focus_explainer), style = MaterialTheme.typography.bodyMedium)
                 Defaults.FOCUS_LENGTHS.forEach { length ->
+                    val spoken = durationSpoken(length)
                     Text(
                         text = durationText(length),
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth().clickable { onStart(length, locked) }.padding(vertical = 12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(role = Role.Button) { onStart(length, locked) }
+                            .semantics { contentDescription = spoken }
+                            .padding(vertical = 12.dp),
                     )
                 }
                 if (canLock) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { locked = !locked }) {
-                        Checkbox(checked = locked, onCheckedChange = { locked = it })
-                        Text(stringResource(R.string.focus_lock))
-                    }
+                    CheckRow(label = stringResource(R.string.focus_lock), checked = locked, onToggle = { locked = !locked })
                 }
             }
         },

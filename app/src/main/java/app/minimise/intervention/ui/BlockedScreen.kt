@@ -1,10 +1,8 @@
 package app.minimise.intervention.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.minimise.R
+import app.minimise.core.ui.ChoiceText
+import app.minimise.core.ui.announcedHeading
+import app.minimise.core.ui.durationSpoken
 import app.minimise.core.ui.durationText
 import app.minimise.gate.rules.BudgetRule
 import app.minimise.gate.rules.FirstHourRule
@@ -64,17 +65,10 @@ fun BlockedScreen(
                     text = stringResource(R.string.pause_how_long),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.announcedHeading(),
                 )
                 state.timeBoxOptions.forEach { option ->
-                    Text(
-                        text = durationText(option),
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onTimeBoxChosen(option) }
-                            .padding(vertical = 12.dp),
-                    )
+                    ChoiceText(text = durationText(option), description = durationSpoken(option), onClick = { onTimeBoxChosen(option) })
                 }
                 TextButton(onClick = onBack) { Text(stringResource(R.string.blocked_back)) }
             }
@@ -84,18 +78,15 @@ fun BlockedScreen(
 
 @Composable
 private fun TriggerQuestion(onTriggerChosen: (Trigger?) -> Unit) {
-    Text(text = stringResource(R.string.blocked_budget_title), style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center)
+    Text(
+        text = stringResource(R.string.blocked_budget_title),
+        style = MaterialTheme.typography.displaySmall,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.announcedHeading(),
+    )
     Text(text = stringResource(R.string.trigger_question), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
     Trigger.entries.forEach { trigger ->
-        Text(
-            text = stringResource(trigger.labelRes()),
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onTriggerChosen(trigger) }
-                .padding(vertical = 12.dp),
-        )
+        ChoiceText(text = stringResource(trigger.labelRes()), onClick = { onTriggerChosen(trigger) })
     }
     TextButton(onClick = { onTriggerChosen(null) }) { Text(stringResource(R.string.trigger_skip)) }
 }
@@ -109,7 +100,12 @@ fun Trigger.labelRes(): Int = when (this) {
 
 @Composable
 private fun Choose(state: BlockedUiState, onOverrideChosen: (UnlockMethodId) -> Unit, onGoHome: () -> Unit) {
-    Text(text = blockedTitle(state.reason), style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center)
+    Text(
+        text = blockedTitle(state.reason),
+        style = MaterialTheme.typography.displaySmall,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.announcedHeading(),
+    )
     Text(
         text = blockedBody(state.reason, state.appLabel),
         style = MaterialTheme.typography.bodyLarge,

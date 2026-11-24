@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -91,7 +92,7 @@ private fun describe(description: PendingDescription): String = when (descriptio
         stringResource(R.string.pending_app_kind, description.appLabel, stringResource(description.kind.labelRes()))
     is PendingDescription.BudgetChange -> stringResource(R.string.pending_budget, description.minutes)
     is PendingDescription.OpenLimitChange -> description.limit
-        ?.let { stringResource(R.string.pending_open_limit, description.appLabel, it) }
+        ?.let { pluralStringResource(R.plurals.pending_open_limit, it, description.appLabel, it) }
         ?: stringResource(R.string.pending_open_limit_none, description.appLabel)
     is PendingDescription.ScheduleChange ->
         stringResource(if (description.removed) R.string.pending_schedule_removed else R.string.pending_schedule_changed, description.name)
