@@ -1,0 +1,34 @@
+package app.minimise.core
+
+import java.time.LocalTime
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+
+/** Every tunable number in the app lives here. */
+object Defaults {
+    /** Usage days start at this local time, not midnight. */
+    val DAY_RESET: LocalTime = LocalTime.of(4, 0)
+
+    /** Shared daily allowance across all Vault apps. */
+    val DAILY_BUDGET: Duration = 45.minutes
+
+    /** Pause length for the 1st, 2nd, 3rd... Vault open of the day. The last step repeats. */
+    val WAIT_STEPS: List<Duration> = listOf(10.seconds, 20.seconds, 40.seconds, 60.seconds, 120.seconds)
+
+    /** Rows of apps on the home screen. */
+    const val HOME_SLOT_COUNT: Int = 6
+
+    /** How long a loosening settings change waits before it applies. */
+    val LOOSEN_DELAY: Duration = 24.hours
+
+    /** Debug builds only: the loosen delay when the hidden debug switch is on. */
+    val DEBUG_LOOSEN_DELAY: Duration = 1.minutes
+
+    /** Tasks asked for on the Today screen. */
+    const val MAX_TODAY_TASKS: Int = 3
+
+    /** Choices offered after a pause. */
+    val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)
+}

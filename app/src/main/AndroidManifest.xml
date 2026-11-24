@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No INTERNET permission, now or later: usage data never leaves the phone. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Lets LauncherApps and PackageManager see every app that has a launcher icon (Android 11+). -->
+    <!-- Opens the system dialog that exempts the app from battery optimisation. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- Lets LauncherApps and PackageManager see every app with a launcher icon, plus other home apps. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.HOME" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".MinimiseApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Minimise">
+
+        <activity
+            android:name=".launcher.HomeActivity"
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:resumeWhilePausing="true"
+            android:stateNotNeeded="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Interventions run in their own task, so finishing one reveals the app underneath. -->
+        <activity
+            android:name=".intervention.ui.PauseActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
+        <activity
+            android:name=".intervention.ui.BlockedActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
+        <activity
+            android:name=".intervention.ui.TimeUpActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
+        <service
+            android:name=".monitor.GateAccessibilityService"
+            android:exported="true"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/gate_accessibility_service" />
+        </service>
+    </application>
+
+</manifest>
