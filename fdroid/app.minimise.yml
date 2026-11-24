@@ -1,0 +1,38 @@
+# Draft of metadata/app.minimise.yml for F-Droid's fdroiddata repository
+# (https://gitlab.com/fdroid/fdroiddata). Copy it there and open a merge request once v0.1.0 is tagged.
+# Title, descriptions, changelogs and screenshots come from fastlane/metadata/android in this repo.
+Categories:
+  - Digital Wellbeing
+  - Launcher
+License: Apache-2.0
+SourceCode: https://github.com/ShubhamVashishth5/Enough
+IssueTracker: https://github.com/ShubhamVashishth5/Enough/issues
+Changelog: https://github.com/ShubhamVashishth5/Enough/releases
+
+AutoName: Enough
+
+RepoType: git
+Repo: https://github.com/ShubhamVashishth5/Enough.git
+
+# Reproducible: F-Droid builds the tag, checks it matches the APK on the GitHub release byte for byte
+# apart from the signature, then publishes that APK with the developer's signature.
+# TODO(question): fill in the release key's certificate SHA-256 (apksigner verify --print-certs).
+Binaries: https://github.com/ShubhamVashishth5/Enough/releases/download/v%v/enough-%v.apk
+AllowedAPKSigningKeys: 0000000000000000000000000000000000000000000000000000000000000000
+
+Builds:
+  - versionName: 0.1.0
+    versionCode: 1
+    commit: v0.1.0
+    subdir: app
+    # The project compiles against Android 17 QPR2 (API 37.2) with build-tools 37.0.0.
+    # TODO(question): drop this if the build server already has them.
+    sudo:
+      - sdkmanager 'platforms;android-37.2' 'build-tools;37.0.0'
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+$
+CurrentVersion: 0.1.0
+CurrentVersionCode: 1

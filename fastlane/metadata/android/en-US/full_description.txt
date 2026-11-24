@@ -36,4 +36,7 @@ Enough has no internet permission. Usage data never leaves the phone and no acco
 <b>Honest limits</b>
 Safe mode, a factory reset or a computer with USB debugging can get around everything. The aim is to make cheating take effort, not to make it impossible.
 
-The accessibility service sees which app is in front so the pause screen can appear first, and reads screen content only where a rule you switched on needs it.
+The accessibility service sees which app is in front so the pause screen can appear first, and reads screen content only where a rule you switched on needs it. Without it, Lite protection uses usage access instead: every Vault open is still paused, but feeds and websites aren't covered.
+
+<b>Moving phones</b>
+Back up every setting to one file and restore it on the new phone. Anything looser than what's there waits 24 hours, as always.
