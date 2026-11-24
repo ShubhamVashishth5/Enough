@@ -11,6 +11,8 @@ import app.minimise.modes.domain.ActiveModeProvider
 import app.minimise.monitor.AccessibilityActions
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
+import app.minimise.core.time.TimeSource
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,6 +31,8 @@ data class SettingsUiState(
     /** Debug builds only. */
     val showDebug: Boolean = false,
     val debugShortLoosenDelay: Boolean = false,
+    /** The end of the lock period in force, if any. */
+    val lockedUntil: LocalDateTime? = null,
 )
 
 @HiltViewModel
@@ -38,6 +42,7 @@ class SettingsViewModel @Inject constructor(
     private val displayFilter: Provider<DisplayFilter>,
     private val activeMode: ActiveModeProvider,
     private val accessibilityActions: AccessibilityActions,
+    private val timeSource: TimeSource,
 ) : ViewModel() {
     val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings) { pending, settings ->
         SettingsUiState(
@@ -48,6 +53,7 @@ class SettingsViewModel @Inject constructor(
             grayscaleAvailable = displayFilter.get().isAvailable(),
             showDebug = BuildConfig.DEBUG,
             debugShortLoosenDelay = settings.debugShortLoosenDelay,
+            lockedUntil = settings.lockedUntil?.takeIf { it.isAfter(timeSource.now()) }?.atZone(timeSource.zone())?.toLocalDateTime(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 

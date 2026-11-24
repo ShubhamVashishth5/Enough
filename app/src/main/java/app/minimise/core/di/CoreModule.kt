@@ -9,6 +9,7 @@ import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.BufferedNotificationDao
 import app.minimise.core.db.EventDao
 import app.minimise.core.db.FocusSessionDao
+import app.minimise.core.db.FriendCodeDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.KeyDao
 import app.minimise.core.db.ModeDao
@@ -93,6 +94,9 @@ object CoreProviders {
 
     @Provides
     fun noteDao(db: AppDatabase): NoteDao = db.noteDao()
+
+    @Provides
+    fun friendCodeDao(db: AppDatabase): FriendCodeDao = db.friendCodeDao()
 
     @Provides
     @Singleton

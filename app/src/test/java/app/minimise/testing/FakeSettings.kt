@@ -13,6 +13,8 @@ import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetManualMode
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetFeedBlocked
+import app.minimise.settings.domain.StartLock
+import app.minimise.settings.domain.LockPeriod
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingChange
@@ -36,6 +38,7 @@ class FakeSettingsTarget : SettingsTarget {
     val keys = mutableMapOf<Long, AddKey>()
     var manualModeId: Long? = null
     val blockedFeeds = mutableSetOf<String>()
+    var lockedUntil: Instant? = null
 
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
@@ -51,6 +54,7 @@ class FakeSettingsTarget : SettingsTarget {
         is SetManualMode -> if (change.modeId == manualModeId) null else Direction.TIGHTEN
         is SaveMode -> Direction.LOOSEN
         is SetFeedBlocked -> switchDirection(change.feedId in blockedFeeds, change.blocked)
+        is StartLock -> if (change.untilEpochMillis > (lockedUntil?.toEpochMilli() ?: Long.MIN_VALUE)) Direction.TIGHTEN else null
     }
 
     override suspend fun apply(change: SettingChange) {
@@ -66,6 +70,7 @@ class FakeSettingsTarget : SettingsTarget {
             is SetManualMode -> manualModeId = change.modeId
             is SaveMode -> Unit
             is SetFeedBlocked -> if (change.blocked) blockedFeeds += change.feedId else blockedFeeds -= change.feedId
+            is StartLock -> lockedUntil = Instant.ofEpochMilli(change.untilEpochMillis)
         }
     }
 
@@ -93,4 +98,14 @@ class FakePendingChangeStore : PendingChangeStore {
     override suspend fun removeKey(key: String) {
         rows.value = rows.value.filterNot { it.change.key == key }
     }
+}
+
+/** Reads the lock straight from a [FakeSettingsTarget], as the real one reads settings. */
+class FakeLockPeriod(private val target: FakeSettingsTarget) : LockPeriod {
+    override suspend fun lockedUntil(): Instant? = target.lockedUntil
+}
+
+/** No lock period, ever. */
+object NoLockPeriod : LockPeriod {
+    override suspend fun lockedUntil(): Instant? = null
 }

@@ -65,7 +65,7 @@ fun BudgetScreen(
         when (val result = state.lastResult) {
             GuardResult.AppliedNow -> Text(stringResource(R.string.budget_applied), style = MaterialTheme.typography.bodyLarge)
             is GuardResult.Scheduled -> Text(stringResource(R.string.budget_scheduled), style = MaterialTheme.typography.bodyLarge)
-            is GuardResult.Refused -> Text(result.reason, style = MaterialTheme.typography.bodyLarge)
+            is GuardResult.Refused -> Text(stringResource(R.string.lock_refused_short), style = MaterialTheme.typography.bodyLarge)
             null -> Unit
         }
     }

@@ -20,18 +20,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.apps.ui.labelRes
 import app.minimise.core.ui.ScreenScaffold
+import app.minimise.core.ui.dateTimeText
 import app.minimise.core.ui.durationText
+import kotlin.time.Duration
 
 @Composable
-fun PendingChangesRoute(viewModel: PendingChangesViewModel = hiltViewModel()) {
+fun PendingChangesRoute(onApplyNow: (Long) -> Unit, viewModel: PendingChangesViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    PendingChangesScreen(state = state, onCancel = viewModel::onCancel)
+    PendingChangesScreen(state = state, onCancel = viewModel::onCancel, onApplyNow = { onApplyNow(it.id) })
 }
 
 @Composable
 fun PendingChangesScreen(
     state: PendingChangesUiState,
     onCancel: (PendingItem) -> Unit,
+    onApplyNow: (PendingItem) -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.pending_title)) {
         Text(
@@ -40,6 +43,13 @@ fun PendingChangesScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp),
         )
+        state.lockedUntil?.let {
+            Text(
+                text = stringResource(R.string.pending_locked, dateTimeText(it)),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
         if (state.items.isEmpty()) {
             Text(
                 text = stringResource(R.string.settings_pending_none),
@@ -56,10 +66,17 @@ fun PendingChangesScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = describe(item.description), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            text = stringResource(R.string.pending_applies_in, durationText(item.remaining)),
+                            text = if (state.lockedUntil != null && item.remaining <= Duration.ZERO) {
+                                stringResource(R.string.pending_after_lock)
+                            } else {
+                                stringResource(R.string.pending_applies_in, durationText(item.remaining))
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                    }
+                    if (state.lockedUntil == null) {
+                        TextButton(onClick = { onApplyNow(item) }) { Text(stringResource(R.string.pending_apply_now)) }
                     }
                     TextButton(onClick = { onCancel(item) }) { Text(stringResource(R.string.pending_cancel)) }
                 }
@@ -85,6 +102,7 @@ private fun describe(description: PendingDescription): String = when (descriptio
     is PendingDescription.ModeSwitch ->
         stringResource(R.string.pending_mode_switch, description.modeName ?: stringResource(R.string.modes_follow))
     is PendingDescription.ModeEdit -> stringResource(R.string.pending_mode_edit, description.modeName)
+    PendingDescription.LockChange -> stringResource(R.string.lock_title)
     is PendingDescription.FeedChange ->
         stringResource(if (description.blocked) R.string.pending_feed_on else R.string.pending_feed_off, description.feedName)
 }

@@ -22,6 +22,7 @@ import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetFeedBlocked
+import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetManualMode
 import app.minimise.settings.domain.SetOpenLimit
@@ -32,6 +33,7 @@ import app.minimise.settings.domain.kindChangeDirection
 import app.minimise.settings.domain.openLimitChangeDirection
 import app.minimise.settings.domain.scheduleChangeDirection
 import app.minimise.settings.domain.switchDirection
+import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -57,6 +59,11 @@ class AppSettingsTarget @Inject constructor(
         is RemoveSchedule -> if (scheduleRepository.get(change.id) != null) Direction.LOOSEN else null
         is SetFirstHourRule -> switchDirection(from = settingsStore.current().firstHourRule, to = change.enabled)
         is SetFeedBlocked -> switchDirection(from = change.feedId in settingsStore.current().blockedFeeds, to = change.blocked)
+        // Only ever lengthens a lock; anything else is no change at all.
+        is StartLock -> {
+            val current = settingsStore.current().lockedUntil?.toEpochMilli() ?: Long.MIN_VALUE
+            if (change.untilEpochMillis > current) Direction.TIGHTEN else null
+        }
         // As the plan has it: a key is what ends locked sessions, so adding one is tightening.
         is AddKey -> if (keyRepository.all().any { it.secretHash == change.secretHash }) null else Direction.TIGHTEN
         is RemoveKey -> if (keyRepository.get(change.id) != null) Direction.LOOSEN else null
@@ -78,6 +85,7 @@ class AppSettingsTarget @Inject constructor(
         is SaveSchedule -> scheduleRepository.save(Schedule(change.id, change.name, change.window()))
         is RemoveSchedule -> scheduleRepository.delete(change.id)
         is SetFirstHourRule -> settingsStore.update { it.copy(firstHourRule = change.enabled) }
+        is StartLock -> settingsStore.update { it.copy(lockedUntil = Instant.ofEpochMilli(change.untilEpochMillis)) }
         is SetFeedBlocked -> settingsStore.update {
             it.copy(blockedFeeds = if (change.blocked) it.blockedFeeds + change.feedId else it.blockedFeeds - change.feedId)
         }

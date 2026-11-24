@@ -12,6 +12,7 @@ import app.minimise.testing.FakeAppRepository
 import app.minimise.testing.FakeEventLog
 import app.minimise.testing.FakeGrantStore
 import app.minimise.testing.FakePendingChangeStore
+import app.minimise.testing.NoLockPeriod
 import app.minimise.testing.FakeSettingsTarget
 import app.minimise.testing.app
 import app.minimise.unlock.domain.UnlockMethodId
@@ -42,6 +43,7 @@ class GateEngineTest {
             override suspend fun current(): Duration = 24.hours
         },
         eventLog,
+        NoLockPeriod,
     )
     private val todayUsage = TodayUsageProvider(eventLog, DayBoundary(clock), clock, apps, UsageTracker(eventLog, clock))
 

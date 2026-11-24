@@ -1,6 +1,10 @@
 package app.minimise.unlock
 
+import app.minimise.unlock.data.RoomFriendCodeRepository
 import app.minimise.unlock.domain.EmergencyPassMethod
+import app.minimise.unlock.domain.FriendCodeMethod
+import app.minimise.unlock.domain.FriendCodeRepository
+import app.minimise.unlock.domain.TypingMethod
 import app.minimise.unlock.domain.UnlockMethod
 import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.unlock.domain.WaitMethod
@@ -27,4 +31,17 @@ abstract class UnlockModule {
     @IntoMap
     @UnlockMethodKey(UnlockMethodId.WAIT)
     abstract fun waitMethod(method: WaitMethod): UnlockMethod
+
+    @Binds
+    @IntoMap
+    @UnlockMethodKey(UnlockMethodId.FRIEND_CODE)
+    abstract fun friendCode(method: FriendCodeMethod): UnlockMethod
+
+    @Binds
+    @IntoMap
+    @UnlockMethodKey(UnlockMethodId.TYPING)
+    abstract fun typing(method: TypingMethod): UnlockMethod
+
+    @Binds
+    abstract fun friendCodeRepository(impl: RoomFriendCodeRepository): FriendCodeRepository
 }

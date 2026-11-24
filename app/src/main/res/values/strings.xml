@@ -365,6 +365,158 @@
     <string name="debug_dump_screen">Debug: dump screen in 5 s</string>
     <string name="debug_dump_screen_summary">Switch to the app; its node tree goes to logcat (tag ScreenDump)</string>
 
+    <!-- Lock period, friend key, typing penance -->
+    <string name="lock_title">Lock period</string>
+    <string name="settings_lock_summary">Lock every setting for 7, 30 or 90 days</string>
+    <string name="lock_explainer">During a lock nothing can be loosened at all: no bigger budget, no apps out of the Vault, no rules switched off, and no skipping waits with a friend code, typing or a key. Tightening still works. Changes already waiting apply only once the lock ends. A lock can be made longer but never shorter.</string>
+    <string name="lock_locked_until">Locked until %s</string>
+    <string name="lock_for_days">Lock for %d days</string>
+    <string name="lock_extend_days">Extend to %d days from now</string>
+    <string name="lock_confirm_title">Lock for %d days?</string>
+    <string name="lock_confirm_body">Until %s nothing can be loosened. This can\'t be undone or shortened.</string>
+    <string name="lock_confirm">Lock</string>
+    <string name="lock_refused">Locked until %s. Nothing can be loosened until then.</string>
+    <string name="lock_refused_short">Not saved: a lock period is on.</string>
+    <string name="pending_locked">Locked until %s. These wait until the lock ends.</string>
+    <string name="pending_after_lock">Applies when the lock ends</string>
+    <string name="pending_apply_now">Apply now</string>
+    <string name="apply_now_title">Apply now</string>
+    <string name="apply_now_explainer">Skip the rest of the wait with one of these. Each is meant to take some effort, so a weak moment still costs something.</string>
+    <string name="friend_key_title">Friend key</string>
+    <string name="settings_friend_key_summary">Codes a friend keeps, to skip a wait</string>
+    <string name="friend_key_explainer">Make 10 one-time codes and send them to a friend. When you want a waiting change to apply now, ask them to read you one. Each code works once. The app keeps only fingerprints of them, and this screen can\'t be screenshotted.</string>
+    <string name="friend_key_none">No codes yet.</string>
+    <plurals name="friend_key_left">
+        <item quantity="one">%d code left</item>
+        <item quantity="other">%d codes left</item>
+    </plurals>
+    <string name="friend_key_make">Make 10 codes</string>
+    <string name="friend_key_remake">Make 10 new codes (the old ones stop working)</string>
+    <string name="friend_key_once">These are shown only once. Send them to your friend now.</string>
+    <string name="friend_key_share">Send to a friend</string>
+    <string name="friend_key_share_title">Send the codes</string>
+    <string name="friend_key_share_text">Please keep these codes for me. When I ask, read me one, but only if you think I really mean it. Each works once.</string>
+    <string name="friend_key_done">Done, they\'re sent</string>
+    <string name="friend_code_ask">Ask your friend to read you one of the codes.</string>
+    <string name="friend_code_check">Check</string>
+    <string name="friend_code_wrong">That isn\'t one of the codes, or it was used already.</string>
+    <plurals name="override_friend_code">
+        <item quantity="one">A friend\'s code (%d left)</item>
+        <item quantity="other">A friend\'s code (%d left)</item>
+    </plurals>
+    <string name="override_typing">Type out a passage</string>
+    <string name="typing_progress">%1$d of %2$d</string>
+    <string name="typing_mistake">Mistake at character %d</string>
+    <!-- Typing penance passages are random words from this list. -->
+    <string-array name="typing_words">
+        <item>apple</item>
+        <item>river</item>
+        <item>window</item>
+        <item>garden</item>
+        <item>pencil</item>
+        <item>morning</item>
+        <item>quiet</item>
+        <item>yellow</item>
+        <item>bridge</item>
+        <item>candle</item>
+        <item>forest</item>
+        <item>mountain</item>
+        <item>silver</item>
+        <item>paper</item>
+        <item>basket</item>
+        <item>wooden</item>
+        <item>orange</item>
+        <item>letter</item>
+        <item>summer</item>
+        <item>winter</item>
+        <item>number</item>
+        <item>simple</item>
+        <item>honest</item>
+        <item>gentle</item>
+        <item>market</item>
+        <item>pocket</item>
+        <item>button</item>
+        <item>ladder</item>
+        <item>kettle</item>
+        <item>carpet</item>
+        <item>island</item>
+        <item>meadow</item>
+        <item>harbor</item>
+        <item>engine</item>
+        <item>planet</item>
+        <item>rocket</item>
+        <item>butter</item>
+        <item>cotton</item>
+        <item>marble</item>
+        <item>violin</item>
+        <item>turtle</item>
+        <item>rabbit</item>
+        <item>monkey</item>
+        <item>spider</item>
+        <item>lemon</item>
+        <item>cherry</item>
+        <item>tomato</item>
+        <item>potato</item>
+        <item>carrot</item>
+        <item>onion</item>
+        <item>pepper</item>
+        <item>ginger</item>
+        <item>noodle</item>
+        <item>biscuit</item>
+        <item>blanket</item>
+        <item>pillow</item>
+        <item>mirror</item>
+        <item>shadow</item>
+        <item>thunder</item>
+        <item>rainbow</item>
+        <item>pebble</item>
+        <item>canyon</item>
+        <item>desert</item>
+        <item>valley</item>
+        <item>stream</item>
+        <item>breeze</item>
+        <item>cloud</item>
+        <item>ocean</item>
+        <item>shell</item>
+        <item>anchor</item>
+        <item>sailor</item>
+        <item>compass</item>
+        <item>lantern</item>
+        <item>chimney</item>
+        <item>cottage</item>
+        <item>village</item>
+        <item>castle</item>
+        <item>tower</item>
+        <item>clock</item>
+        <item>calendar</item>
+        <item>journey</item>
+        <item>ticket</item>
+        <item>station</item>
+        <item>platform</item>
+        <item>puzzle</item>
+        <item>riddle</item>
+        <item>story</item>
+        <item>chapter</item>
+        <item>poem</item>
+        <item>song</item>
+        <item>melody</item>
+        <item>rhythm</item>
+        <item>drum</item>
+        <item>flute</item>
+        <item>guitar</item>
+        <item>piano</item>
+        <item>circle</item>
+        <item>square</item>
+        <item>triangle</item>
+        <item>corner</item>
+        <item>middle</item>
+        <item>center</item>
+        <item>border</item>
+        <item>edge</item>
+        <item>surface</item>
+        <item>layer</item>
+    </string-array>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>

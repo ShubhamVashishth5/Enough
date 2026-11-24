@@ -97,6 +97,13 @@ data class SetFeedBlocked(val feedId: String, val blocked: Boolean) : SettingCha
     override val key: String get() = "feed:$feedId"
 }
 
+/** Starts (or extends) a lock period: until then nothing can be loosened. Shortening one isn't possible. */
+@Serializable
+@SerialName("start_lock")
+data class StartLock(val untilEpochMillis: Long) : SettingChange {
+    override val key: String get() = "lock"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {

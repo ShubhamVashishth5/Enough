@@ -20,11 +20,13 @@ import app.minimise.settings.domain.RemoveSchedule
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetFeedBlocked
+import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -36,7 +38,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class PendingChangesUiState(val items: List<PendingItem> = emptyList())
+/** @property lockedUntil while a lock period runs, nothing can be applied early and waiting changes wait for it to end. */
+data class PendingChangesUiState(val items: List<PendingItem> = emptyList(), val lockedUntil: LocalDateTime? = null)
 
 data class PendingItem(val id: Long, val description: PendingDescription, val remaining: Duration)
 
@@ -60,6 +63,9 @@ sealed interface PendingDescription {
     data class ModeEdit(val modeName: String) : PendingDescription
 
     data class FeedChange(val feedName: String, val blocked: Boolean) : PendingDescription
+
+    /** Never pending in practice (a lock only tightens), but every change needs a description. */
+    data object LockChange : PendingDescription
 }
 
 @HiltViewModel
@@ -97,6 +103,7 @@ class PendingChangesViewModel @Inject constructor(
         val labels = names.apps
         val now = timeSource.now()
         PendingChangesUiState(
+            lockedUntil = settingsGuard.lockedUntil()?.atZone(timeSource.zone())?.toLocalDateTime(),
             items = pending.map { p ->
                 val description = when (val change = p.change) {
                     is SetAppKind -> PendingDescription.AppKindChange(
@@ -115,6 +122,7 @@ class PendingChangesViewModel @Inject constructor(
                     is RemoveKey -> PendingDescription.KeyChange(names.keys[change.id].orEmpty(), removed = true)
                     is SetManualMode -> PendingDescription.ModeSwitch(change.modeId?.let { names.modes[it] })
                     is SaveMode -> PendingDescription.ModeEdit(names.modes[change.id].orEmpty())
+                    is StartLock -> PendingDescription.LockChange
                     is SetFeedBlocked -> PendingDescription.FeedChange(feedNames[change.feedId] ?: change.feedId, change.blocked)
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))
