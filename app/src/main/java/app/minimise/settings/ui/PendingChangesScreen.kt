@@ -106,6 +106,8 @@ private fun describe(description: PendingDescription): String = when (descriptio
     is PendingDescription.TaperChange -> description.floorMinutes
         ?.let { stringResource(R.string.pending_taper_floor, it) }
         ?: stringResource(R.string.pending_taper_off)
+    is PendingDescription.CalendarFocusChange ->
+        stringResource(if (description.enabled) R.string.pending_calendar_focus_on else R.string.pending_calendar_focus_off)
     is PendingDescription.EarnItChange -> stringResource(if (description.enabled) R.string.pending_earn_it_on else R.string.pending_earn_it_off)
     is PendingDescription.FeedChange ->
         stringResource(if (description.blocked) R.string.pending_feed_on else R.string.pending_feed_off, description.feedName)

@@ -587,6 +587,29 @@
     <string name="pending_earn_it_on">Earn-it → on</string>
     <string name="pending_earn_it_off">Earn-it → off</string>
 
+    <!-- Wind-down and calendar focus -->
+    <string name="wind_down_title">Wind-down</string>
+    <string name="settings_wind_down_summary">Bedtime: Sleep mode, grey screen, only calls, alarm and a book</string>
+    <string name="wind_down_explainer">From 30 minutes before bedtime until you wake, the Sleep mode is on: no Vault apps, the screen goes grey (if grayscale is set up), and only calls, the alarm clock and an e-book app open. The first unlock after waking lands on Today. Setting it up applies at once; switching it off or loosening it waits 24 hours.</string>
+    <string name="wind_down_on">On every night</string>
+    <string name="wind_down_off">Off</string>
+    <string name="wind_down_bedtime">Bedtime</string>
+    <string name="wind_down_wake">Wake</string>
+    <string name="wind_down_ebook">E-book app</string>
+    <string name="wind_down_ebook_none">None</string>
+    <string name="wind_down_start">Start wind-down</string>
+    <string name="wind_down_save">Save</string>
+    <string name="wind_down_stop">Switch off</string>
+    <string name="wind_down_saved">Saved. It applies now.</string>
+    <string name="wind_down_pending">That makes bedtime looser, so it applies in %s. See Pending changes.</string>
+    <string name="calendar_focus_title">Calendar focus</string>
+    <string name="calendar_focus_on">On: calendar events with \u201cfocus\u201d in the title start a session for their length</string>
+    <string name="calendar_focus_off">Off. Tap so events with \u201cfocus\u201d in the title start a session.</string>
+    <string name="calendar_focus_off_in">Switches off in %s. Tap to keep it on.</string>
+    <string name="calendar_focus_needs_calendar">Needs calendar access. Tap to allow it.</string>
+    <string name="pending_calendar_focus_on">Calendar focus → on</string>
+    <string name="pending_calendar_focus_off">Calendar focus → off</string>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>

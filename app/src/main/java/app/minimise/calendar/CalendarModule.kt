@@ -1,6 +1,8 @@
 package app.minimise.calendar
 
+import app.minimise.calendar.data.AlarmCalendarFocusScheduler
 import app.minimise.calendar.data.ContentCalendarSource
+import app.minimise.calendar.domain.CalendarFocusScheduler
 import app.minimise.calendar.domain.CalendarSource
 import dagger.Binds
 import dagger.Module
@@ -12,4 +14,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class CalendarModule {
     @Binds
     abstract fun calendarSource(impl: ContentCalendarSource): CalendarSource
+
+    @Binds
+    abstract fun calendarFocusScheduler(impl: AlarmCalendarFocusScheduler): CalendarFocusScheduler
 }

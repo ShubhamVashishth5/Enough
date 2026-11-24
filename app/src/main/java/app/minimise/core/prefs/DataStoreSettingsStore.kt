@@ -60,6 +60,8 @@ class DataStoreSettingsStore @Inject constructor(
             taperFloorMinutes = this[Keys.TAPER_FLOOR_MINUTES]?.toInt(),
             taperWeek = this[Keys.TAPER_WEEK_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             earnIt = this[Keys.EARN_IT] ?: defaults.earnIt,
+            calendarFocus = this[Keys.CALENDAR_FOCUS] ?: defaults.calendarFocus,
+            calendarFocusStartedKey = this[Keys.CALENDAR_FOCUS_STARTED],
             tightenAnsweredDay = this[Keys.TIGHTEN_ANSWERED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
@@ -83,6 +85,8 @@ class DataStoreSettingsStore @Inject constructor(
         settings.taperFloorMinutes?.let { this[Keys.TAPER_FLOOR_MINUTES] = it.toLong() } ?: remove(Keys.TAPER_FLOOR_MINUTES)
         settings.taperWeek?.let { this[Keys.TAPER_WEEK_EPOCH_DAY] = it.toEpochDay() } ?: remove(Keys.TAPER_WEEK_EPOCH_DAY)
         this[Keys.EARN_IT] = settings.earnIt
+        this[Keys.CALENDAR_FOCUS] = settings.calendarFocus
+        settings.calendarFocusStartedKey?.let { this[Keys.CALENDAR_FOCUS_STARTED] = it } ?: remove(Keys.CALENDAR_FOCUS_STARTED)
         settings.tightenAnsweredDay?.let { this[Keys.TIGHTEN_ANSWERED_EPOCH_DAY] = it.toEpochDay() } ?: remove(Keys.TIGHTEN_ANSWERED_EPOCH_DAY)
         settings.manualModeId?.let { this[Keys.MANUAL_MODE_ID] = it } ?: remove(Keys.MANUAL_MODE_ID)
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
@@ -109,6 +113,8 @@ class DataStoreSettingsStore @Inject constructor(
         val TAPER_FLOOR_MINUTES = longPreferencesKey("taper_floor_minutes")
         val TAPER_WEEK_EPOCH_DAY = longPreferencesKey("taper_week_epoch_day")
         val EARN_IT = booleanPreferencesKey("earn_it")
+        val CALENDAR_FOCUS = booleanPreferencesKey("calendar_focus")
+        val CALENDAR_FOCUS_STARTED = stringPreferencesKey("calendar_focus_started")
         val TIGHTEN_ANSWERED_EPOCH_DAY = longPreferencesKey("tighten_answered_epoch_day")
         val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")

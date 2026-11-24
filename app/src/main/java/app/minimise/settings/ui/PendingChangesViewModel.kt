@@ -23,6 +23,7 @@ import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetTaper
 import app.minimise.settings.domain.SetEarnIt
+import app.minimise.settings.domain.SetCalendarFocus
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetOpenLimit
@@ -73,6 +74,8 @@ sealed interface PendingDescription {
     data class TaperChange(val floorMinutes: Int?) : PendingDescription
 
     data class EarnItChange(val enabled: Boolean) : PendingDescription
+
+    data class CalendarFocusChange(val enabled: Boolean) : PendingDescription
 }
 
 @HiltViewModel
@@ -132,6 +135,7 @@ class PendingChangesViewModel @Inject constructor(
                     is StartLock -> PendingDescription.LockChange
                     is SetTaper -> PendingDescription.TaperChange(change.floorMinutes)
                     is SetEarnIt -> PendingDescription.EarnItChange(change.enabled)
+                    is SetCalendarFocus -> PendingDescription.CalendarFocusChange(change.enabled)
                     is SetFeedBlocked -> PendingDescription.FeedChange(feedNames[change.feedId] ?: change.feedId, change.blocked)
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))

@@ -16,6 +16,7 @@ import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetTaper
 import app.minimise.settings.domain.SetEarnIt
+import app.minimise.settings.domain.SetCalendarFocus
 import app.minimise.settings.domain.LockPeriod
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetOpenLimit
@@ -43,6 +44,7 @@ class FakeSettingsTarget : SettingsTarget {
     var lockedUntil: Instant? = null
     var taperFloor: Int? = null
     var earnIt = false
+    var calendarFocus = false
 
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
@@ -60,6 +62,7 @@ class FakeSettingsTarget : SettingsTarget {
         is SetFeedBlocked -> switchDirection(change.feedId in blockedFeeds, change.blocked)
         is SetTaper -> openLimitChangeDirection(taperFloor, change.floorMinutes)
         is SetEarnIt -> switchDirection(!earnIt, !change.enabled)
+        is SetCalendarFocus -> switchDirection(calendarFocus, change.enabled)
         is StartLock -> if (change.untilEpochMillis > (lockedUntil?.toEpochMilli() ?: Long.MIN_VALUE)) Direction.TIGHTEN else null
     }
 
@@ -78,6 +81,7 @@ class FakeSettingsTarget : SettingsTarget {
             is SetFeedBlocked -> if (change.blocked) blockedFeeds += change.feedId else blockedFeeds -= change.feedId
             is SetTaper -> taperFloor = change.floorMinutes
             is SetEarnIt -> earnIt = change.enabled
+            is SetCalendarFocus -> calendarFocus = change.enabled
             is StartLock -> lockedUntil = Instant.ofEpochMilli(change.untilEpochMillis)
         }
     }

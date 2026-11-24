@@ -2,6 +2,9 @@ package app.minimise.focus.data
 
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.provider.AlarmClock
 import android.telecom.TelecomManager
 import app.minimise.focus.domain.DoNotDisturb
 import app.minimise.focus.domain.EssentialApps
@@ -32,12 +35,16 @@ class SystemDoNotDisturb @Inject constructor(
     }
 }
 
-/** The phone app and the system's call screens, so a call always gets through. */
+/** The phone app and the system's call screens, so a call always gets through, and the alarm clock. */
 class AndroidEssentialApps @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : EssentialApps {
     override fun packages(): Set<String> {
         val dialer = runCatching { context.getSystemService(TelecomManager::class.java).defaultDialerPackage }.getOrNull()
-        return setOfNotNull(dialer, "com.android.server.telecom", "com.android.phone")
+        val clock = runCatching {
+            context.packageManager.resolveActivity(Intent(AlarmClock.ACTION_SHOW_ALARMS), PackageManager.MATCH_DEFAULT_ONLY)
+                ?.activityInfo?.packageName?.takeIf { it != "android" }
+        }.getOrNull()
+        return setOfNotNull(dialer, clock, "com.android.server.telecom", "com.android.phone")
     }
 }

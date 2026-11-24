@@ -2,6 +2,7 @@ package app.minimise
 
 import android.app.Application
 import app.minimise.apps.data.AutoVaultWatcher
+import app.minimise.calendar.domain.CalendarFocusScheduler
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DebugClockOffset
@@ -30,6 +31,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var weeklyReportScheduler: WeeklyReportScheduler
     @Inject lateinit var autoVaultWatcher: AutoVaultWatcher
     @Inject lateinit var taper: Taper
+    @Inject lateinit var calendarFocusScheduler: CalendarFocusScheduler
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -47,6 +49,7 @@ class MinimiseApp : Application() {
         appScope.launch { focusSessions.finishIfDue() }
         digestScheduler.scheduleNext()
         weeklyReportScheduler.scheduleNext()
+        appScope.launch { calendarFocusScheduler.scheduleNext() }
         autoVaultWatcher.start()
     }
 

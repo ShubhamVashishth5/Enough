@@ -62,9 +62,10 @@ fun WindowFields(window: WeeklyWindow, onChange: (WeeklyWindow) -> Unit) {
     }
 }
 
+/** Picks a time of day, following the phone's 24-hour setting. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimeDialog(initial: LocalTime, onPicked: (LocalTime) -> Unit, onDismiss: () -> Unit) {
+fun TimeDialog(initial: LocalTime, onPicked: (LocalTime) -> Unit, onDismiss: () -> Unit) {
     val state = rememberTimePickerState(
         initialHour = initial.hour,
         initialMinute = initial.minute,
