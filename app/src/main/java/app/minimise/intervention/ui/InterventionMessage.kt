@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import app.minimise.core.ui.announcedHeading
 
 /** A full-screen title, a line of explanation and one button. Used by time's up and blocked screens. */
 @Composable
@@ -30,7 +31,7 @@ fun InterventionMessage(
             .safeDrawingPadding()
             .padding(32.dp),
     ) {
-        Text(text = title, style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center)
+        Text(text = title, style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center, modifier = Modifier.announcedHeading())
         Text(
             text = body,
             style = MaterialTheme.typography.bodyLarge,

@@ -20,8 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import app.minimise.R
@@ -69,7 +74,15 @@ fun HomeScreen(
             .padding(horizontal = 32.dp, vertical = 24.dp),
     ) {
         Spacer(Modifier.height(32.dp))
-        state.now?.let { Clock(it, onLongPress = onClockLongPress) }
+        // TalkBack takes over swipes and double taps, so the home gestures are actions on the clock too.
+        val gestures = listOf(
+            CustomAccessibilityAction(stringResource(R.string.a11y_search_apps)) { onSwipeUp(); true },
+            CustomAccessibilityAction(stringResource(R.string.a11y_settings)) { onLongPressBackground(); true },
+            CustomAccessibilityAction(stringResource(R.string.a11y_capture)) { onSwipeLeft(); true },
+            CustomAccessibilityAction(stringResource(R.string.a11y_camera)) { onSwipeRight(); true },
+            CustomAccessibilityAction(stringResource(R.string.a11y_lock_screen)) { onDoubleTap(); true },
+        )
+        state.now?.let { Clock(it, onLongPress = onClockLongPress, actions = gestures) }
         eventLine()
         TodayTaskList(tasks = state.tasks, onTaskTapped = onTaskTapped, onEditTasks = onEditTasks)
         digestLine()
@@ -80,7 +93,7 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
                     .padding(top = 16.dp)
-                    .combinedClickable(onClick = onMakeDefaultHome),
+                    .combinedClickable(role = Role.Button, onClick = onMakeDefaultHome),
             )
         }
         if (state.protection != ProtectionLevel.FULL) {
@@ -91,7 +104,7 @@ fun HomeScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(top = 16.dp)
-                    .combinedClickable(onClick = onFixProtection),
+                    .combinedClickable(role = Role.Button, onClick = onFixProtection),
             )
         }
         appLockLine()
@@ -104,10 +117,14 @@ fun HomeScreen(
         Spacer(Modifier.weight(1f))
         focusSection()
         state.numbers?.let { numbers ->
+            val minutes = numbers.vaultTime.inWholeMinutes.toInt()
+            val spoken = pluralStringResource(R.plurals.a11y_vault_minutes, minutes, minutes) + ". " +
+                pluralStringResource(R.plurals.a11y_unlocks, numbers.unlocks, numbers.unlocks)
             Text(
                 text = stringResource(R.string.home_numbers, numbers.vaultTime.inWholeMinutes, numbers.unlocks),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.clearAndSetSemantics { contentDescription = spoken },
             )
         }
     }
@@ -166,14 +183,18 @@ private fun Modifier.swipeSideways(onLeft: () -> Unit, onRight: () -> Unit): Mod
 }
 
 @Composable
-private fun Clock(now: LocalDateTime, onLongPress: () -> Unit) {
+private fun Clock(now: LocalDateTime, onLongPress: () -> Unit, actions: List<CustomAccessibilityAction>) {
     val context = LocalContext.current
     val is24Hour = DateFormat.is24HourFormat(context)
     val timeFormat = remember(is24Hour) { DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm") }
     val dateFormat = remember {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM"))
     }
-    Column(modifier = Modifier.combinedClickable(onClick = {}, onLongClick = onLongPress)) {
+    Column(
+        modifier = Modifier
+            .combinedClickable(onClick = {}, onLongClick = onLongPress, onLongClickLabel = stringResource(R.string.a11y_open_timer))
+            .semantics(mergeDescendants = true) { customActions = actions },
+    ) {
         Text(text = now.format(timeFormat), style = MaterialTheme.typography.displayLarge)
         Text(
             text = now.format(dateFormat),
@@ -187,6 +208,7 @@ private fun Clock(now: LocalDateTime, onLongPress: () -> Unit) {
 private fun SlotRow(slot: HomeSlot, onTap: () -> Unit, onLongPress: () -> Unit) {
     val app = slot.app
     val emptyDescription = stringResource(R.string.home_slot_empty_description)
+    val changeLabel = stringResource(R.string.a11y_change_app)
     Text(
         text = app?.label ?: stringResource(R.string.home_slot_empty),
         style = MaterialTheme.typography.headlineMedium,
@@ -194,7 +216,7 @@ private fun SlotRow(slot: HomeSlot, onTap: () -> Unit, onLongPress: () -> Unit) 
         maxLines = 1,
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(onClick = onTap, onLongClick = onLongPress)
+            .combinedClickable(role = Role.Button, onClick = onTap, onLongClick = onLongPress, onLongClickLabel = changeLabel)
             .padding(vertical = 10.dp)
             .then(if (app == null) Modifier.semantics { contentDescription = emptyDescription } else Modifier),
     )

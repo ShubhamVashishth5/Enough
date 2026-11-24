@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -61,7 +62,7 @@ private fun Report(state: StatsUiState.Ready) {
             Line(stringResource(R.string.stats_slips, timeText(LocalTime.of(hour, 0)), timeText(LocalTime.of((hour + 2) % 24, 0))))
         }
         report.topTrigger?.let { Line(stringResource(R.string.stats_trigger, stringResource(it.labelRes()).lowercase())) }
-        if (report.daysSoFar > 0) Line(stringResource(R.string.stats_days_under, report.daysUnderBudget, report.daysSoFar))
+        if (report.daysSoFar > 0) Line(pluralStringResource(R.plurals.stats_days_under, report.daysSoFar, report.daysUnderBudget, report.daysSoFar))
     }
 }
 

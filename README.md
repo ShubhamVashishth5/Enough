@@ -158,6 +158,23 @@ Tag builds fail without them, rather than publish an APK that can't be installed
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
+## Translations
+
+Translations are welcome. Copy `app/src/main/res/values/strings.xml` to
+`app/src/main/res/values-xx/strings.xml`, where `xx` is the language code (`de`, `pt-rBR`), translate the
+text and open a pull request. Counts are `<plurals>`: give each one every quantity your language uses
+(`one`, `two`, `few`, `many`, `other`). Strings marked `translatable="false"` stay as they are, and any
+string you leave out falls back to English. The typing penance word list (`typing_words`) is worth
+translating too, so the passage is in the user's language.
+
+## Accessibility
+
+The launcher replaces the home screen for everyone who installs it, TalkBack users included. Every home
+row, the pause countdown, the time box choices and the Blocked screen's overrides have labels and roles.
+TalkBack takes over swipes and double taps, so the home gestures (search, settings, capture, camera,
+lock) are also custom actions on the clock. The breathing circle holds still when *Remove animations* is
+on.
+
 ## Keeping the screen rules up to date
 
 Rules that read other apps' screens are data, not code, so a redesign of YouTube or Chrome is a one-line

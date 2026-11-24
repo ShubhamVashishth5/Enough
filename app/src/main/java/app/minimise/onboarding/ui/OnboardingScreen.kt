@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -25,6 +24,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import app.minimise.core.ui.CheckRow
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -68,7 +71,7 @@ fun OnboardingScreen(
                 OnboardingStep.PERMISSIONS -> PermissionsRoute()
                 OnboardingStep.HOME_APPS -> PickStep(
                     title = stringResource(R.string.onboarding_home_title),
-                    body = stringResource(R.string.onboarding_home_body, state.homePicks.size, Defaults.HOME_SLOT_COUNT),
+                    body = pluralStringResource(R.plurals.onboarding_home_body, Defaults.HOME_SLOT_COUNT, state.homePicks.size, Defaults.HOME_SLOT_COUNT),
                     apps = state.apps,
                     isPicked = { it.packageName in state.homePicks },
                     onToggle = onHomePickToggled,
@@ -168,13 +171,7 @@ private fun PickStep(
         )
         LazyColumn {
             items(apps, key = { it.packageName }) { app ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable { onToggle(app) }.padding(vertical = 2.dp),
-                ) {
-                    Checkbox(checked = isPicked(app), onCheckedChange = null)
-                    Text(text = app.label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 12.dp))
-                }
+                CheckRow(label = app.label, checked = isPicked(app), onToggle = { onToggle(app) })
             }
         }
     }
@@ -193,9 +190,11 @@ private fun BudgetStep(minutes: Int, onStep: (Int) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(vertical = 24.dp),
         ) {
-            OutlinedButton(onClick = { onStep(-BUDGET_STEP_MINUTES) }) { Text("−") }
+            val fewer = stringResource(R.string.a11y_fewer_minutes)
+            val more = stringResource(R.string.a11y_more_minutes)
+            OutlinedButton(onClick = { onStep(-BUDGET_STEP_MINUTES) }, modifier = Modifier.semantics { contentDescription = fewer }) { Text("−") }
             Text(text = stringResource(R.string.duration_minutes, minutes), style = MaterialTheme.typography.displaySmall)
-            OutlinedButton(onClick = { onStep(BUDGET_STEP_MINUTES) }) { Text("+") }
+            OutlinedButton(onClick = { onStep(BUDGET_STEP_MINUTES) }, modifier = Modifier.semantics { contentDescription = more }) { Text("+") }
         }
     }
 }

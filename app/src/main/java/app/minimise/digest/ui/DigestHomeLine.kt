@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -21,7 +22,7 @@ fun DigestHomeLine(onOpenDigest: () -> Unit, viewModel: DigestViewModel = hiltVi
         released > 0 -> Text(
             text = pluralStringResource(app.minimise.R.plurals.home_digest_ready, released, released),
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.clickable(onClick = onOpenDigest).padding(vertical = 6.dp),
+            modifier = Modifier.clickable(role = Role.Button, onClick = onOpenDigest).padding(vertical = 6.dp),
         )
         state.waiting > 0 -> Text(
             text = pluralStringResource(app.minimise.R.plurals.home_updates_waiting, state.waiting, state.waiting),

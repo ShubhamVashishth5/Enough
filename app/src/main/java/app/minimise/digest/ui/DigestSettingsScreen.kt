@@ -6,13 +6,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import app.minimise.core.ui.CheckRow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -86,13 +86,7 @@ fun DigestSettingsRoute(onOpenPermissions: () -> Unit, viewModel: DigestSettings
         Text(stringResource(R.string.digest_settings_exempt), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
         LazyColumn {
             items(state.apps, key = { it.packageName }) { app ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable { viewModel.onExemptToggled(app) },
-                ) {
-                    Checkbox(checked = app.packageName in state.exempt, onCheckedChange = { viewModel.onExemptToggled(app) })
-                    Text(app.label, style = MaterialTheme.typography.titleMedium)
-                }
+                CheckRow(label = app.label, checked = app.packageName in state.exempt, onToggle = { viewModel.onExemptToggled(app) })
             }
         }
     }
