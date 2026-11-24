@@ -30,13 +30,22 @@ import app.minimise.core.ui.durationText
 @Composable
 fun AppsRoute(viewModel: AppsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    AppsScreen(state = state, onKindChosen = viewModel::onKindChosen)
+    AppsScreen(
+        state = state,
+        onKindChosen = viewModel::onKindChosen,
+        onEditLimit = viewModel::onEditLimit,
+        onLimitChosen = viewModel::onLimitChosen,
+        onLimitDismissed = viewModel::onLimitDismissed,
+    )
 }
 
 @Composable
 fun AppsScreen(
     state: AppsUiState,
     onKindChosen: (AppEntry, AppKind) -> Unit,
+    onEditLimit: (AppEntry) -> Unit,
+    onLimitChosen: (Int?) -> Unit,
+    onLimitDismissed: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.apps_title)) {
         Text(
@@ -47,14 +56,17 @@ fun AppsScreen(
         )
         LazyColumn {
             items(state.rows, key = { it.app.packageName }) { row ->
-                AppKindRow(row = row, onKindChosen = { onKindChosen(row.app, it) })
+                AppKindRow(row = row, onKindChosen = { onKindChosen(row.app, it) }, onEditLimit = { onEditLimit(row.app) })
             }
         }
+    }
+    state.editingLimit?.let { app ->
+        OpenLimitDialog(app = app, onChosen = onLimitChosen, onDismiss = onLimitDismissed)
     }
 }
 
 @Composable
-private fun AppKindRow(row: AppRow, onKindChosen: (AppKind) -> Unit) {
+private fun AppKindRow(row: AppRow, onKindChosen: (AppKind) -> Unit, onEditLimit: () -> Unit) {
     val app = row.app
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
         Text(text = app.label, style = MaterialTheme.typography.titleMedium)
@@ -70,6 +82,24 @@ private fun AppKindRow(row: AppRow, onKindChosen: (AppKind) -> Unit) {
                     stringResource(pending.kind.labelRes()),
                     durationText(pending.remaining),
                 ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (app.kind == AppKind.VAULT) {
+            Text(
+                text = app.openLimit?.let { stringResource(R.string.apps_open_limit, it) }
+                    ?: stringResource(R.string.apps_open_limit_none),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable(onClick = onEditLimit).padding(vertical = 6.dp),
+            )
+        }
+        row.pendingLimit?.let { pending ->
+            Text(
+                text = pending.limit
+                    ?.let { stringResource(R.string.apps_pending_limit, it, durationText(pending.remaining)) }
+                    ?: stringResource(R.string.apps_pending_limit_none, durationText(pending.remaining)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -90,6 +90,8 @@ private fun PauseRoute(requestId: String, onFinish: (PauseFinish) -> Unit) {
         onReasonChosen = viewModel::onReasonChosen,
         onTimeBoxChosen = viewModel::onTimeBoxChosen,
         onChangeReason = viewModel::onChangeReason,
+        onSwapTaken = viewModel::onSwapTaken,
+        onSwapDeclined = viewModel::onSwapDeclined,
         onCancel = viewModel::onCancel,
     )
 }

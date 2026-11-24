@@ -21,14 +21,25 @@ import app.minimise.settings.ui.BudgetRoute
 import app.minimise.settings.ui.PendingChangesRoute
 import app.minimise.usage.ui.DebugUsageRoute
 import app.minimise.settings.ui.SettingsRoute
+import app.minimise.swaps.ui.SwapsRoute
+import app.minimise.schedules.ui.SchedulesRoute
+import app.minimise.keys.ui.KeysRoute
+import app.minimise.focus.ui.FocusSettingsRoute
+import app.minimise.modes.ui.ModeEditRoute
+import app.minimise.modes.ui.ModesRoute
+import app.minimise.digest.ui.DigestRoute
+import app.minimise.digest.ui.DigestSettingsRoute
+import app.minimise.capture.ui.CaptureRoute
+import app.minimise.capture.ui.InboxLink
+import app.minimise.capture.ui.InboxRoute
 import app.minimise.tasks.ui.TodayRoute
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun LauncherNavHost(
     homePresses: Flow<Unit>,
-    todayRequests: Flow<Unit>,
-    onTodayRequestHandled: () -> Unit,
+    openRequests: Flow<Destination>,
+    onOpenRequestHandled: () -> Unit,
     launcherViewModel: LauncherViewModel = hiltViewModel(),
 ) {
     val onboardingDone by launcherViewModel.onboardingDone.collectAsStateWithLifecycle()
@@ -42,11 +53,11 @@ fun LauncherNavHost(
     LaunchedEffect(homePresses) {
         homePresses.collect { navController.popBackStack(Destination.Home, inclusive = false) }
     }
-    LaunchedEffect(todayRequests) {
-        todayRequests.collect {
-            onTodayRequestHandled()
+    LaunchedEffect(openRequests) {
+        openRequests.collect { destination ->
+            onOpenRequestHandled()
             navController.popBackStack(Destination.Home, inclusive = false)
-            openToday()
+            navController.navigate(destination) { launchSingleTop = true }
         }
     }
 
@@ -72,6 +83,9 @@ fun LauncherNavHost(
                 onOpenSettings = { navController.navigate(Destination.Settings) { launchSingleTop = true } },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) { launchSingleTop = true } },
                 onOpenToday = openToday,
+                onOpenDigest = { navController.navigate(Destination.Digest) { launchSingleTop = true } },
+                onOpenCapture = { navController.navigate(Destination.Capture) { launchSingleTop = true } },
+                onOpenInbox = { navController.navigate(Destination.Inbox) { launchSingleTop = true } },
             )
         }
         composable<Destination.Today> {
@@ -84,6 +98,12 @@ fun LauncherNavHost(
             SettingsRoute(
                 onOpenApps = { navController.navigate(Destination.Apps) },
                 onOpenBudget = { navController.navigate(Destination.Budget) },
+                onOpenSwaps = { navController.navigate(Destination.Swaps) },
+                onOpenSchedules = { navController.navigate(Destination.Schedules) },
+                onOpenKeys = { navController.navigate(Destination.Keys) },
+                onOpenFocus = { navController.navigate(Destination.Focus) },
+                onOpenModes = { navController.navigate(Destination.Modes) },
+                onOpenDigest = { navController.navigate(Destination.DigestSettings) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
@@ -94,6 +114,36 @@ fun LauncherNavHost(
         }
         composable<Destination.Budget> {
             BudgetRoute()
+        }
+        composable<Destination.Swaps> {
+            SwapsRoute()
+        }
+        composable<Destination.Schedules> {
+            SchedulesRoute()
+        }
+        composable<Destination.Keys> {
+            KeysRoute()
+        }
+        composable<Destination.Focus> {
+            FocusSettingsRoute()
+        }
+        composable<Destination.Modes> {
+            ModesRoute(onEdit = { navController.navigate(Destination.ModeEdit(it)) })
+        }
+        composable<Destination.Digest> {
+            DigestRoute(extra = { InboxLink(onOpenInbox = { navController.navigate(Destination.Inbox) }) })
+        }
+        composable<Destination.Capture> {
+            CaptureRoute(onDone = { navController.popBackStack(Destination.Home, inclusive = false) })
+        }
+        composable<Destination.Inbox> {
+            InboxRoute()
+        }
+        composable<Destination.DigestSettings> {
+            DigestSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })
+        }
+        composable<Destination.ModeEdit> {
+            ModeEditRoute(onSaved = { navController.popBackStack() })
         }
         composable<Destination.PendingChanges> {
             PendingChangesRoute()

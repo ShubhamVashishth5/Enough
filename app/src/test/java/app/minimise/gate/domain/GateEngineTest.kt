@@ -7,6 +7,7 @@ import app.minimise.core.time.plus
 import app.minimise.gate.rules.VaultPauseRule
 import app.minimise.settings.domain.LoosenDelay
 import app.minimise.settings.domain.SettingsGuard
+import app.minimise.testing.FakeActiveMode
 import app.minimise.testing.FakeAppRepository
 import app.minimise.testing.FakeEventLog
 import app.minimise.testing.FakeGrantStore
@@ -44,7 +45,7 @@ class GateEngineTest {
     )
     private val todayUsage = TodayUsageProvider(eventLog, DayBoundary(clock), clock, apps, UsageTracker(eventLog, clock))
 
-    private fun engine(rules: Set<Rule> = setOf(VaultPauseRule())) = GateEngine(rules, grants, todayUsage, clock, guard)
+    private fun engine(rules: Set<Rule> = setOf(VaultPauseRule(FakeActiveMode()))) = GateEngine(rules, grants, todayUsage, clock, guard)
 
     private suspend fun proceededOnce() {
         eventLog.log(Event(type = EventType.GATE_PROCEEDED, startAt = clock.now, packageName = instagram.packageName))

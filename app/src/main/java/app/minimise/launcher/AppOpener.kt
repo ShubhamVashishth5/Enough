@@ -24,7 +24,7 @@ class AppOpener @Inject constructor(
             true
         }
         is Decision.Block -> {
-            interventions.showBlocked(app, decision)
+            interventions.showBlocked(app, decision, launchAfter = true)
             true
         }
     }

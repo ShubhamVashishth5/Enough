@@ -4,6 +4,8 @@ import app.minimise.core.time.TimeSource
 import app.minimise.core.time.plus
 import app.minimise.gate.domain.Grant
 import app.minimise.gate.domain.GrantStore
+import app.minimise.swaps.domain.Swap
+import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.usage.domain.Event
 import app.minimise.usage.domain.EventLog
 import app.minimise.usage.domain.EventType
@@ -40,6 +42,38 @@ class GateOutcomes @Inject constructor(
                 data = buildJsonObject {
                     put("reason", reason.name)
                     put("timeBoxMinutes", timeBox.inWholeMinutes)
+                }.toString(),
+            ),
+        )
+    }
+
+    /** An override got past a block: log it and grant the chosen time box. */
+    suspend fun overridden(packageName: String, method: UnlockMethodId, timeBox: Duration) {
+        val now = timeSource.now()
+        grantStore.put(Grant(packageName = packageName, startAt = now, endAt = now + timeBox, viaOverride = true))
+        eventLog.log(
+            Event(
+                type = EventType.OVERRIDE_USED,
+                startAt = now,
+                packageName = packageName,
+                data = buildJsonObject {
+                    put("method", method.name)
+                    put("timeBoxMinutes", timeBox.inWholeMinutes)
+                }.toString(),
+            ),
+        )
+    }
+
+    /** The user took [swap] instead of opening [packageName]. Like a cancel, no grant is given. */
+    suspend fun swapTaken(packageName: String, swap: Swap) {
+        eventLog.log(
+            Event(
+                type = EventType.SWAP_TAKEN,
+                startAt = timeSource.now(),
+                packageName = packageName,
+                data = buildJsonObject {
+                    put("swapId", swap.id)
+                    put("text", swap.text)
                 }.toString(),
             ),
         )

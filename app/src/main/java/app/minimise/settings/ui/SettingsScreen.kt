@@ -9,11 +9,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.SettingsRow
+import app.minimise.display.domain.GrayscaleMode
 
 @Composable
 fun SettingsRoute(
     onOpenApps: () -> Unit,
     onOpenBudget: () -> Unit,
+    onOpenSwaps: () -> Unit,
+    onOpenSchedules: () -> Unit,
+    onOpenKeys: () -> Unit,
+    onOpenFocus: () -> Unit,
+    onOpenModes: () -> Unit,
+    onOpenDigest: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -24,9 +31,16 @@ fun SettingsRoute(
         state = state,
         onOpenApps = onOpenApps,
         onOpenBudget = onOpenBudget,
+        onOpenSwaps = onOpenSwaps,
+        onOpenSchedules = onOpenSchedules,
+        onOpenKeys = onOpenKeys,
+        onOpenFocus = onOpenFocus,
+        onOpenModes = onOpenModes,
+        onOpenDigest = onOpenDigest,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
+        onGrayscaleTapped = viewModel::onGrayscaleTapped,
         onDebugShortLoosenDelayToggled = viewModel::onDebugShortLoosenDelayToggled,
     )
 }
@@ -36,9 +50,16 @@ fun SettingsScreen(
     state: SettingsUiState,
     onOpenApps: () -> Unit,
     onOpenBudget: () -> Unit,
+    onOpenSwaps: () -> Unit,
+    onOpenSchedules: () -> Unit,
+    onOpenKeys: () -> Unit,
+    onOpenFocus: () -> Unit,
+    onOpenModes: () -> Unit,
+    onOpenDigest: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
+    onGrayscaleTapped: () -> Unit,
     onDebugShortLoosenDelayToggled: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title)) {
@@ -53,6 +74,32 @@ fun SettingsScreen(
             onClick = onOpenBudget,
         )
         SettingsRow(
+            title = stringResource(R.string.settings_modes),
+            summary = state.activeModeName?.let { stringResource(R.string.settings_modes_now, it) }
+                ?: stringResource(R.string.settings_modes_none),
+            onClick = onOpenModes,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_schedules),
+            summary = stringResource(R.string.settings_schedules_summary),
+            onClick = onOpenSchedules,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_focus),
+            summary = stringResource(R.string.settings_focus_summary),
+            onClick = onOpenFocus,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_keys),
+            summary = stringResource(R.string.settings_keys_summary),
+            onClick = onOpenKeys,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_swaps),
+            summary = stringResource(R.string.settings_swaps_summary),
+            onClick = onOpenSwaps,
+        )
+        SettingsRow(
             title = stringResource(R.string.settings_pending),
             summary = if (state.pendingCount == 0) {
                 stringResource(R.string.settings_pending_none)
@@ -60,6 +107,26 @@ fun SettingsScreen(
                 pluralStringResource(R.plurals.settings_pending_count, state.pendingCount, state.pendingCount)
             },
             onClick = onOpenPendingChanges,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_digest),
+            summary = stringResource(R.string.settings_digest_summary),
+            onClick = onOpenDigest,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_grayscale),
+            summary = if (state.grayscaleAvailable) {
+                stringResource(
+                    when (state.grayscaleMode) {
+                        GrayscaleMode.OFF -> R.string.grayscale_off
+                        GrayscaleMode.VAULT_APPS -> R.string.grayscale_vault
+                        GrayscaleMode.ALWAYS -> R.string.grayscale_always
+                    },
+                )
+            } else {
+                stringResource(R.string.grayscale_needs_grant)
+            },
+            onClick = if (state.grayscaleAvailable) onGrayscaleTapped else onOpenPermissions,
         )
         SettingsRow(
             title = stringResource(R.string.settings_permissions),

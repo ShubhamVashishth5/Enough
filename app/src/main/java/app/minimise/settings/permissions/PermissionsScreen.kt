@@ -1,6 +1,8 @@
 package app.minimise.settings.permissions
 
+import android.Manifest
 import android.content.ActivityNotFoundException
+import android.os.Build
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -15,7 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -31,6 +37,12 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val roleRequest = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.onResume()
+    }
+    val notificationRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        viewModel.onResume()
+    }
+    val calendarRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         viewModel.onResume()
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
@@ -53,6 +65,16 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
                 .onFailure { open(viewModel.homeSettingsIntent()) }
         },
         onRequestBattery = { open(viewModel.batteryIntent(), fallback = viewModel.appInfoIntent()) },
+        onRequestDoNotDisturb = { open(viewModel.doNotDisturbIntent()) },
+        onRequestNotificationAccess = { open(viewModel.notificationAccessIntent()) },
+        onRequestCalendar = { calendarRequest.launch(Manifest.permission.READ_CALENDAR) },
+        onRequestPostNotifications = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notificationRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                open(viewModel.appNotificationSettingsIntent())
+            }
+        },
     )
 }
 
@@ -63,6 +85,10 @@ fun PermissionsScreen(
     onOpenAppInfo: () -> Unit,
     onRequestHome: () -> Unit,
     onRequestBattery: () -> Unit,
+    onRequestDoNotDisturb: () -> Unit,
+    onRequestNotificationAccess: () -> Unit,
+    onRequestPostNotifications: () -> Unit,
+    onRequestCalendar: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.permissions_title)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -97,6 +123,67 @@ fun PermissionsScreen(
                 action = stringResource(R.string.permission_allow),
                 onAction = onRequestBattery,
             )
+            PermissionItem(
+                title = stringResource(R.string.permission_notification_access),
+                why = stringResource(R.string.permission_notification_access_why),
+                granted = state.notificationAccess,
+                action = stringResource(R.string.permission_open_settings),
+                onAction = onRequestNotificationAccess,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_post_notifications),
+                why = stringResource(R.string.permission_post_notifications_why),
+                granted = state.postNotifications,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestPostNotifications,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_dnd),
+                why = stringResource(R.string.permission_dnd_why),
+                granted = state.doNotDisturb,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestDoNotDisturb,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_calendar),
+                why = stringResource(R.string.permission_calendar_why),
+                granted = state.calendar,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestCalendar,
+            )
+            GrayscaleItem(granted = state.grayscale, command = state.grayscaleCommand)
+        }
+    }
+}
+
+/** Can't be granted from the phone: show the ADB command to run once from a computer. */
+@Composable
+private fun GrayscaleItem(granted: Boolean, command: String) {
+    val clipboard = LocalClipboardManager.current
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) {
+        Text(text = stringResource(R.string.permission_grayscale), style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(if (granted) R.string.permission_granted else R.string.permission_missing),
+            style = MaterialTheme.typography.titleSmall,
+            color = if (granted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(R.string.permission_grayscale_why),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        if (!granted) {
+            SelectionContainer {
+                Text(
+                    text = command,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            OutlinedButton(onClick = { clipboard.setText(AnnotatedString(command)) }, modifier = Modifier.padding(top = 8.dp)) {
+                Text(stringResource(R.string.permission_copy_command))
+            }
         }
     }
 }

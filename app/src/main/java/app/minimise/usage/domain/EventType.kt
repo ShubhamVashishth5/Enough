@@ -10,4 +10,6 @@ enum class EventType {
     TIME_UP,
     OVERRIDE_USED,
     SETTING_CHANGED,
+    SWAP_TAKEN,
+    FOCUS_SESSION,
 }

@@ -56,4 +56,16 @@ class TodayUsageTest {
         assertEquals(2, today.proceededOpens)
         assertEquals(1, today.unlocks)
     }
+
+    @Test
+    fun `counts pauses shown however they ended`() {
+        val events = listOf(
+            Event(type = EventType.GATE_SHOWN, startAt = dayStart - 1.minutes),
+            Event(type = EventType.GATE_SHOWN, startAt = dayStart + 1.hours),
+            Event(type = EventType.GATE_CANCELLED, startAt = dayStart + 1.hours),
+            Event(type = EventType.GATE_SHOWN, startAt = dayStart + 2.hours),
+            Event(type = EventType.SWAP_TAKEN, startAt = dayStart + 2.hours),
+        )
+        assertEquals(2, usage(events).pausesShown)
+    }
 }

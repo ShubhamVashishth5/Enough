@@ -10,6 +10,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.platform.LocalContext
+import app.minimise.launcher.QuickTools
+import app.minimise.calendar.ui.NextEventLine
+import app.minimise.digest.ui.DigestHomeLine
+import app.minimise.focus.ui.FocusSection
 import kotlinx.coroutines.flow.Flow
 
 /** Connects [HomeScreen] to its ViewModel and to the activity (role request, Back, Home presses). */
@@ -20,8 +25,12 @@ fun HomeRoute(
     onOpenSettings: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenToday: () -> Unit,
+    onOpenDigest: () -> Unit,
+    onOpenCapture: () -> Unit,
+    onOpenInbox: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val roleRequest = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.onResume()
@@ -47,9 +56,16 @@ fun HomeRoute(
         onSlotCleared = viewModel::onSlotCleared,
         onPickerDismissed = viewModel::onPickerDismissed,
         onSwipeUp = onOpenSearch,
+        onSwipeLeft = onOpenCapture,
+        onSwipeRight = { QuickTools.openCamera(context) },
+        onDoubleTap = viewModel::onDoubleTap,
+        onClockLongPress = { QuickTools.openTimer(context) },
         onLongPressBackground = onOpenSettings,
         onFixProtection = onOpenPermissions,
         onTaskTapped = viewModel::onTaskTapped,
         onEditTasks = onOpenToday,
+        focusSection = { FocusSection(onOpenInbox = onOpenInbox) },
+        digestLine = { DigestHomeLine(onOpenDigest = onOpenDigest) },
+        eventLine = { NextEventLine() },
     )
 }

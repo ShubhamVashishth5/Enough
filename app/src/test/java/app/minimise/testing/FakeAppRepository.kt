@@ -22,6 +22,12 @@ class FakeAppRepository(initial: List<AppEntry> = emptyList()) : AppRepository {
         state.value = state.value.map { if (it.packageName == packageName) it.copy(kind = kind) else it }
     }
 
+    override suspend fun openLimitOf(packageName: String): Int? = entry(packageName)?.openLimit
+
+    override suspend fun setOpenLimit(packageName: String, limit: Int?) {
+        state.value = state.value.map { if (it.packageName == packageName) it.copy(openLimit = limit) else it }
+    }
+
     override suspend fun setHomeSlot(packageName: String, slot: Int) {
         state.value = state.value.map {
             when {
