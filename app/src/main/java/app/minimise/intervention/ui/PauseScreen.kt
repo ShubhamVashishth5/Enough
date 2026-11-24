@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.core.ui.durationText
 import app.minimise.intervention.domain.PauseReason
+import app.minimise.swaps.domain.Swap
 import kotlin.time.Duration
 
 @Composable
@@ -40,6 +42,8 @@ fun PauseScreen(
     onReasonChosen: (PauseReason) -> Unit,
     onTimeBoxChosen: (Duration) -> Unit,
     onChangeReason: () -> Unit,
+    onSwapTaken: () -> Unit,
+    onSwapDeclined: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -70,6 +74,8 @@ fun PauseScreen(
             when {
                 state.waiting -> Breathing(secondsLeft = state.remaining.inWholeSeconds + 1)
                 state.reason == null -> ReasonChoices(onReasonChosen)
+                state.offeringSwap && state.swap != null ->
+                    SwapOffer(state.swap, state.swapAppLabel, onSwapTaken, onSwapDeclined)
                 else -> TimeBoxChoices(state.timeBoxOptions, onTimeBoxChosen, onChangeReason)
             }
         }
@@ -124,6 +130,34 @@ private fun ReasonChoices(onReasonChosen: (PauseReason) -> Unit) {
                     .padding(vertical = 12.dp),
             )
         }
+    }
+}
+
+@Composable
+private fun SwapOffer(swap: Swap, appLabel: String?, onSwapTaken: () -> Unit, onSwapDeclined: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.pause_swap_question),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = swap.text,
+            style = MaterialTheme.typography.displaySmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 16.dp),
+        )
+        appLabel?.let {
+            Text(
+                text = stringResource(R.string.swaps_opens, it),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        OutlinedButton(onClick = onSwapTaken, modifier = Modifier.padding(top = 16.dp)) {
+            Text(text = stringResource(R.string.pause_swap_take), style = MaterialTheme.typography.titleMedium)
+        }
+        TextButton(onClick = onSwapDeclined) { Text(stringResource(R.string.pause_swap_open_anyway)) }
     }
 }
 

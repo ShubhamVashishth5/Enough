@@ -14,6 +14,7 @@ import app.minimise.core.ui.SettingsRow
 fun SettingsRoute(
     onOpenApps: () -> Unit,
     onOpenBudget: () -> Unit,
+    onOpenSwaps: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -24,6 +25,7 @@ fun SettingsRoute(
         state = state,
         onOpenApps = onOpenApps,
         onOpenBudget = onOpenBudget,
+        onOpenSwaps = onOpenSwaps,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
@@ -36,6 +38,7 @@ fun SettingsScreen(
     state: SettingsUiState,
     onOpenApps: () -> Unit,
     onOpenBudget: () -> Unit,
+    onOpenSwaps: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -51,6 +54,11 @@ fun SettingsScreen(
             title = stringResource(R.string.settings_budget),
             summary = state.budgetMinutes?.let { stringResource(R.string.settings_budget_summary, it) },
             onClick = onOpenBudget,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_swaps),
+            summary = stringResource(R.string.settings_swaps_summary),
+            onClick = onOpenSwaps,
         )
         SettingsRow(
             title = stringResource(R.string.settings_pending),

@@ -13,6 +13,8 @@ data class Settings(
     val homeSlotsChosen: Boolean = false,
     /** The usage day the Today screen last opened by itself, so it does so once a day. */
     val todayPromptedDay: LocalDate? = null,
+    /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */
+    val swapsSeeded: Boolean = false,
     /** Debug builds only: shifts the wall clock, for testing day resets. */
     val debugTimeOffset: Duration = Duration.ZERO,
     /** Debug builds only: loosening waits 1 minute instead of 24 hours. */
