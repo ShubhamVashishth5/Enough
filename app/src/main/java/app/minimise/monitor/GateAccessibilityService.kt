@@ -125,7 +125,8 @@ class GateAccessibilityService : AccessibilityService() {
         when (verdict) {
             ForegroundPackageFilter.Verdict.Ignore -> Unit
             ForegroundPackageFilter.Verdict.NoApp -> foregroundSource.emit(ForegroundEvent(null, now))
-            is ForegroundPackageFilter.Verdict.App -> foregroundSource.emit(ForegroundEvent(verdict.packageName, now))
+            is ForegroundPackageFilter.Verdict.App ->
+                if (!screenWatcher.showsWebsiteFrom(verdict.packageName)) foregroundSource.emit(ForegroundEvent(verdict.packageName, now))
         }
     }
 

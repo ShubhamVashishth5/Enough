@@ -100,7 +100,7 @@
     <string name="onboarding_home_title">Home apps</string>
     <string name="onboarding_home_body">Pick up to %2$d tools for the home screen, in order. %1$d picked.</string>
     <string name="onboarding_vault_title">The Vault</string>
-    <string name="onboarding_vault_body">Tick the apps that eat your time. Common ones are already ticked. You can add more later in Settings, at once; taking one out waits 24 hours.</string>
+    <string name="onboarding_vault_body">Tick the apps that eat your time. Common ones are already ticked, and their websites go in the Vault with them. You can add more later in Settings, at once; taking one out waits 24 hours.</string>
     <string name="onboarding_budget_body">How many minutes a day, across all Vault apps together? You can lower it at any time. Raising it later waits 24 hours.</string>
     <string name="onboarding_start">Get started</string>
     <string name="onboarding_next">Next</string>
@@ -124,6 +124,12 @@
     <string name="apps_open_limit_none">Open limit: none</string>
     <string name="apps_pending_limit">Limit changes to %1$d a day in %2$s</string>
     <string name="apps_pending_limit_none">Limit comes off in %s</string>
+    <string name="apps_websites">Websites</string>
+    <string name="apps_websites_explainer">A website in the Vault gets the same pause, budget and rules in Chrome, Firefox, Samsung Internet, Brave and other browsers, so switching to the browser isn\'t a way round. Adding one applies at once; taking one out waits 24 hours.</string>
+    <string name="apps_add_website">Add a website</string>
+    <string name="website_hint">instagram.com</string>
+    <string name="website_add">Add to the Vault</string>
+    <string name="website_invalid">That isn\'t a web address. Try something like youtube.com.</string>
     <string name="open_limit_title">Open limit for %s</string>
     <string name="open_limit_hint">Opens a day</string>
     <string name="open_limit_save">Save</string>
@@ -295,7 +301,7 @@
     <string name="permission_allow">Allow</string>
     <string name="permission_open_app_info">Open app info</string>
     <string name="permission_accessibility">Accessibility</string>
-    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed. Nothing is stored or leaves the phone.</string>
+    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed, and a browser\'s address bar while a website is in the Vault. Nothing is stored or leaves the phone.</string>
     <string name="permission_accessibility_restricted">Installed outside the Play Store? Android 13 and later grey out this setting until you open app info, tap ⋮ and choose Allow restricted settings.</string>
     <string name="permission_home">Default home app</string>
     <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
@@ -317,7 +323,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>
-    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Screen content is read only where a rule you switched on needs it, such as a blocked feed inside YouTube. Nothing is stored and nothing leaves the phone.</string>
+    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Screen content is read only where a rule you switched on needs it, such as a blocked feed inside YouTube or a browser\'s address bar for a Vault website. Nothing is stored and nothing leaves the phone.</string>
 
     <!-- Pending changes -->
     <string name="settings_pending">Pending changes</string>

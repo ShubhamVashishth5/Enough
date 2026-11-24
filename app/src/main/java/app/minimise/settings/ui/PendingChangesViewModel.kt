@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
+import app.minimise.apps.domain.WebTarget
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
@@ -99,7 +100,7 @@ class PendingChangesViewModel @Inject constructor(
             items = pending.map { p ->
                 val description = when (val change = p.change) {
                     is SetAppKind -> PendingDescription.AppKindChange(
-                        appLabel = labels[change.packageName] ?: change.packageName,
+                        appLabel = labels[change.packageName] ?: WebTarget.domainOf(change.packageName),
                         kind = change.kind,
                     )
                     is SetBudget -> PendingDescription.BudgetChange(change.minutes)

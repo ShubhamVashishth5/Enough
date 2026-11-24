@@ -6,10 +6,13 @@ interface AppRepository {
     /** Installed, launchable apps (all profiles) with their stored kind, sorted by label. */
     val apps: Flow<List<AppEntry>>
 
+    /** Websites the user added ("web:instagram.com"), labelled by domain, sorted. Never on home or in search. */
+    val webTargets: Flow<List<AppEntry>>
+
     /** Stored kind of every package ever seen, installed or not. */
     val kinds: Flow<Map<String, AppKind>>
 
-    /** One app, without listing all of them. Null if it isn't installed and launchable. */
+    /** One app, without listing all of them. Null if it isn't installed and launchable (or, for a website, never added). */
     suspend fun entry(packageName: String): AppEntry?
 
     /** The stored kind, whether or not the app is installed right now. Unknown packages are TOOL. */

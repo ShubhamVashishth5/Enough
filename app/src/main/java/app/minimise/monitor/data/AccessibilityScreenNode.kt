@@ -14,6 +14,9 @@ class AccessibilityScreenNode(private val info: AccessibilityNodeInfo) : ScreenN
     override val childCount: Int get() = info.childCount
 
     override fun child(index: Int): ScreenNode? = runCatching { info.getChild(index) }.getOrNull()?.let(::AccessibilityScreenNode)
+
+    override fun findByViewId(viewId: String): List<ScreenNode> =
+        runCatching { info.findAccessibilityNodeInfosByViewId(viewId) }.getOrNull().orEmpty().map(::AccessibilityScreenNode)
 }
 
 /** Debug builds: logs a window's node tree, to find the view IDs a rule file needs. */
