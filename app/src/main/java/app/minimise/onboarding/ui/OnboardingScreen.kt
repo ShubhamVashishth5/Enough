@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -62,6 +64,7 @@ fun OnboardingScreen(
         Box(modifier = Modifier.weight(1f)) {
             when (state.step) {
                 OnboardingStep.WELCOME -> WelcomeStep()
+                OnboardingStep.HONEST_LIMITS -> HonestLimitsStep()
                 OnboardingStep.PERMISSIONS -> PermissionsRoute()
                 OnboardingStep.HOME_APPS -> PickStep(
                     title = stringResource(R.string.onboarding_home_title),
@@ -119,6 +122,31 @@ private fun WelcomeStep() {
             ).forEach { line ->
                 Text(text = stringResource(line), style = MaterialTheme.typography.bodyLarge)
             }
+        }
+    }
+}
+
+/** What can't be stopped. The aim is to make cheating take effort, not to make it impossible. */
+@Composable
+private fun HonestLimitsStep() {
+    ScreenScaffold(title = stringResource(R.string.honest_limits_title)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Text(text = stringResource(R.string.honest_limits_intro), style = MaterialTheme.typography.bodyLarge)
+            listOf(
+                R.string.honest_limits_safe_mode,
+                R.string.honest_limits_reset,
+                R.string.honest_limits_adb,
+                R.string.honest_limits_clock,
+                R.string.honest_limits_screens,
+                R.string.honest_limits_battery,
+            ).forEach { line ->
+                Text(
+                    text = "· " + stringResource(line),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(text = stringResource(R.string.honest_limits_aim), style = MaterialTheme.typography.bodyLarge)
         }
     }
 }

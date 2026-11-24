@@ -301,7 +301,7 @@
     <string name="permission_allow">Allow</string>
     <string name="permission_open_app_info">Open app info</string>
     <string name="permission_accessibility">Accessibility</string>
-    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed, and a browser\'s address bar while a website is in the Vault. Nothing is stored or leaves the phone.</string>
+    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed, a browser\'s address bar while a website is in the Vault, and Settings pages during a lock period. Nothing is stored or leaves the phone.</string>
     <string name="permission_accessibility_restricted">Installed outside the Play Store? Android 13 and later grey out this setting until you open app info, tap ⋮ and choose Allow restricted settings.</string>
     <string name="permission_home">Default home app</string>
     <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
@@ -323,7 +323,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>
-    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Screen content is read only where a rule you switched on needs it, such as a blocked feed inside YouTube or a browser\'s address bar for a Vault website. Nothing is stored and nothing leaves the phone.</string>
+    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Screen content is read only where a rule you switched on needs it, such as a blocked feed inside YouTube, a browser\'s address bar for a Vault website, or Settings during a lock period. Nothing is stored and nothing leaves the phone.</string>
 
     <!-- Pending changes -->
     <string name="settings_pending">Pending changes</string>
@@ -516,6 +516,23 @@
         <item>surface</item>
         <item>layer</item>
     </string-array>
+
+    <!-- Uninstall guard and honest limits -->
+    <string name="admin_label">Enough: uninstall guard</string>
+    <string name="admin_explanation">While this is on, Android won\'t uninstall Enough until you switch it off. Enough asks for no other device controls.</string>
+    <string name="admin_disable_warning">Switching this off lets Enough be uninstalled. During a lock period, this page is blocked.</string>
+    <string name="permission_device_admin">Uninstall guard (optional)</string>
+    <string name="permission_device_admin_why">Android won\'t uninstall the app while this is on. During a lock period the app also keeps you out of its own App info, device admin and accessibility pages, so it can\'t be switched off from there.</string>
+    <string name="guard_title">Locked</string>
+    <string name="honest_limits_title">Honest limits</string>
+    <string name="honest_limits_intro">Enough makes cheating take effort. It can\'t make it impossible, and it won\'t pretend to:</string>
+    <string name="honest_limits_safe_mode">Safe mode starts the phone without any downloaded app, this one included.</string>
+    <string name="honest_limits_reset">A factory reset wipes everything, rules and all.</string>
+    <string name="honest_limits_adb">A computer with USB debugging can switch off or uninstall any app.</string>
+    <string name="honest_limits_clock">Changing the phone\'s clock is ignored while the phone stays on, but not across a restart.</string>
+    <string name="honest_limits_screens">Feed blocking, website rules and the uninstall guard read other apps\' screens. When those apps change their design, a rule can stop working until it\'s updated.</string>
+    <string name="honest_limits_battery">Some phones stop background apps to save battery. Allowing unrestricted battery on the next screen helps.</string>
+    <string name="honest_limits_aim">The point is a pause between the urge and the app, not a cage.</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

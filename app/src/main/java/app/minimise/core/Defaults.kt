@@ -77,6 +77,12 @@ object Defaults {
     const val TYPING_PASSAGE_LENGTH: Int = 300
     const val TYPING_MAX_INSERT: Int = 2
 
+    /** A wall-clock jump bigger than this, against time since boot, is ignored as tampering. */
+    val CLOCK_TAMPER_TOLERANCE: Duration = 5.minutes
+
+    /** How often the trusted clock reading is written to disk. */
+    val CLOCK_ANCHOR_SAVE_INTERVAL: Duration = 1.minutes
+
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(
         ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),
