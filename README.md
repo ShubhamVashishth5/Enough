@@ -36,6 +36,8 @@ It's Android only, works fully offline and has no internet permission. Nothing y
 
 The product spec is in [Minimisation Machine — Feature Draft.md](Minimisation%20Machine%20—%20Feature%20Draft.md)
 and the build plan in [Minimisation Machine — Implementation Plan.md](Minimisation%20Machine%20—%20Implementation%20Plan.md).
+What comes next is in [Minimisation Machine — Beyond Plan.md](Minimisation%20Machine%20—%20Beyond%20Plan.md) and
+[Minimisation Machine — Beyond Implementation Plan.md](Minimisation%20Machine%20—%20Beyond%20Implementation%20Plan.md).
 
 ## Install
 
