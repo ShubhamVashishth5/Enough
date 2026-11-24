@@ -1,0 +1,1 @@
+Choose Celsius or Fahrenheit for the weather in Settings > Home screen; switching shows at once. Air quality now shows PM2.5 too and is marked as an estimate, since it comes from a forecast model rather than sensors. Ticked tasks show on the Today screen, so one that has made way for the next on home can be unticked.

@@ -19,7 +19,8 @@ rough location.
   long-press a result to see its info or uninstall it.
 - **Small lines under the clock, each one switchable.** Battery, the next alarm, what's playing (with
   previous, play/pause and next; tap the song to open the player), and the weather and US air quality
-  index for where you are. A lock button by the clock, swipe down for notifications, and an option to
+  index for where you are (an estimate from a forecast model, shown with PM2.5; sensor sites such as
+  aqi.in can read much higher, especially in Indian cities). A lock button by the clock, swipe down for notifications, and an option to
   hide the status bar on home. Settings → Home screen lists every tap and swipe and what it does.
 - **Breathe apps.** For apps you want to notice reaching for but not ration: they stay on home and in
   search, and every open starts with a short breathing pause. No reason asked, no time box, nothing
@@ -100,7 +101,9 @@ apps) or **home screen only**.
 The `INTERNET` permission is there for one thing: home's weather and air quality lines. They are off
 until you switch them on in Settings → Home screen. Then, when home is shown and the last reading is
 over half an hour old, the app asks [Open-Meteo](https://open-meteo.com) (free, open source, no account
-or key) for the current weather and US AQI. The request carries the phone's coarse location rounded to
+or key) for the current weather, US AQI and PM2.5. The air quality is CAMS model data on a grid of
+about 45 km outside Europe, with the AQI averaged over 24 hours, so it's an estimate rather than a
+sensor reading. The request carries the phone's coarse location rounded to
 two decimal places (about a kilometre) and a User-Agent of `Enough`, and nothing else: no usage data, no
 identifiers. Nothing else in the app uses the network. It uses no Google Play Services, Firebase or
 analytics.
