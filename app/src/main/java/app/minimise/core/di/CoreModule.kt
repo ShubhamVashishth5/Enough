@@ -8,6 +8,7 @@ import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.EventDao
 import app.minimise.core.db.GrantDao
+import app.minimise.core.db.KeyDao
 import app.minimise.core.db.PendingChangeDao
 import app.minimise.core.db.ScheduleDao
 import app.minimise.core.db.SwapDao
@@ -73,6 +74,9 @@ object CoreProviders {
 
     @Provides
     fun scheduleDao(db: AppDatabase): ScheduleDao = db.scheduleDao()
+
+    @Provides
+    fun keyDao(db: AppDatabase): KeyDao = db.keyDao()
 
     @Provides
     @Singleton

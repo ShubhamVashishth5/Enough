@@ -8,6 +8,8 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.Defaults
 import app.minimise.intervention.domain.GateOutcomes
 import app.minimise.intervention.domain.TimeBoxOptions
+import app.minimise.keys.domain.NfcKeyMethod
+import app.minimise.keys.domain.QrKeyMethod
 import app.minimise.unlock.domain.UnlockMethod
 import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.usage.domain.DailyBudget
@@ -27,6 +29,8 @@ data class BlockedUiState(
     val options: List<OverrideOption> = emptyList(),
     val step: BlockedStep = BlockedStep.Choose,
     val timeBoxOptions: List<Duration> = Defaults.TIME_BOX_OPTIONS,
+    /** The last tap or scan didn't match a paired key. */
+    val verifyFailed: Boolean = false,
     val finish: PauseFinish? = null,
 )
 
@@ -52,6 +56,8 @@ class BlockedViewModel @Inject constructor(
     private val dailyBudget: DailyBudget,
     private val outcomes: GateOutcomes,
     private val appLauncher: AppLauncher,
+    private val nfcKey: NfcKeyMethod,
+    private val qrKey: QrKeyMethod,
 ) : ViewModel() {
     private val packageName: String = savedState[BlockedActivity.EXTRA_PACKAGE] ?: ""
     private val launchAfter: Boolean = savedState[BlockedActivity.EXTRA_LAUNCH_AFTER] ?: false
@@ -80,7 +86,19 @@ class BlockedViewModel @Inject constructor(
     fun onOverrideChosen(method: UnlockMethodId) {
         if (decided || _uiState.value.options.none { it.method == method }) return
         val step = if (method in VERIFIED_METHODS) BlockedStep.Verify(method) else BlockedStep.TimeBox(method)
-        _uiState.update { it.copy(step = step) }
+        _uiState.update { it.copy(step = step, verifyFailed = false) }
+    }
+
+    fun onNfcTag(tagId: ByteArray) {
+        viewModelScope.launch { checked(UnlockMethodId.NFC_KEY, nfcKey.verify(tagId)) }
+    }
+
+    fun onQrScanned(text: String) {
+        viewModelScope.launch { checked(UnlockMethodId.QR_KEY, qrKey.verify(text)) }
+    }
+
+    private fun checked(method: UnlockMethodId, matched: Boolean) {
+        if (matched) onVerified(method) else _uiState.update { it.copy(verifyFailed = true) }
     }
 
     /** The method's screen confirmed the attempt (a matching tap, scan or a finished wait). */

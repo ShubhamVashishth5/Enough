@@ -5,6 +5,8 @@ import app.minimise.settings.domain.Direction
 import app.minimise.settings.domain.PendingChange
 import app.minimise.settings.domain.PendingChangeStore
 import app.minimise.settings.domain.SetAppKind
+import app.minimise.settings.domain.AddKey
+import app.minimise.settings.domain.RemoveKey
 import app.minimise.settings.domain.RemoveSchedule
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetBudget
@@ -28,6 +30,7 @@ class FakeSettingsTarget : SettingsTarget {
     val openLimits = mutableMapOf<String, Int?>()
     val schedules = mutableMapOf<Long, SaveSchedule>()
     var firstHour = false
+    val keys = mutableMapOf<Long, AddKey>()
 
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
@@ -38,6 +41,8 @@ class FakeSettingsTarget : SettingsTarget {
         }
         is RemoveSchedule -> if (change.id in schedules) Direction.LOOSEN else null
         is SetFirstHourRule -> switchDirection(firstHour, change.enabled)
+        is AddKey -> if (keys.values.any { it.secretHash == change.secretHash }) null else Direction.TIGHTEN
+        is RemoveKey -> if (change.id in keys) Direction.LOOSEN else null
     }
 
     override suspend fun apply(change: SettingChange) {
@@ -48,6 +53,8 @@ class FakeSettingsTarget : SettingsTarget {
             is SaveSchedule -> schedules[change.id] = change
             is RemoveSchedule -> schedules.remove(change.id)
             is SetFirstHourRule -> firstHour = change.enabled
+            is AddKey -> keys[keys.size + 1L] = change
+            is RemoveKey -> keys.remove(change.id)
         }
     }
 

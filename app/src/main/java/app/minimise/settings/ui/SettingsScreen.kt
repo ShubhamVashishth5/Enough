@@ -16,6 +16,7 @@ fun SettingsRoute(
     onOpenBudget: () -> Unit,
     onOpenSwaps: () -> Unit,
     onOpenSchedules: () -> Unit,
+    onOpenKeys: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -28,6 +29,7 @@ fun SettingsRoute(
         onOpenBudget = onOpenBudget,
         onOpenSwaps = onOpenSwaps,
         onOpenSchedules = onOpenSchedules,
+        onOpenKeys = onOpenKeys,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
@@ -42,6 +44,7 @@ fun SettingsScreen(
     onOpenBudget: () -> Unit,
     onOpenSwaps: () -> Unit,
     onOpenSchedules: () -> Unit,
+    onOpenKeys: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -62,6 +65,11 @@ fun SettingsScreen(
             title = stringResource(R.string.settings_schedules),
             summary = stringResource(R.string.settings_schedules_summary),
             onClick = onOpenSchedules,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_keys),
+            summary = stringResource(R.string.settings_keys_summary),
+            onClick = onOpenKeys,
         )
         SettingsRow(
             title = stringResource(R.string.settings_swaps),

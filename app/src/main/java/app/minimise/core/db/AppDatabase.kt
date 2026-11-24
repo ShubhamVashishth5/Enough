@@ -6,8 +6,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [EventEntity::class, AppEntity::class, PendingChangeEntity::class, GrantEntity::class, TaskEntity::class, SwapEntity::class, ScheduleEntity::class],
-    version = 8,
+    entities = [EventEntity::class, AppEntity::class, PendingChangeEntity::class, GrantEntity::class, TaskEntity::class, SwapEntity::class, ScheduleEntity::class, KeyEntity::class],
+    version = 9,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
@@ -17,6 +17,7 @@ import androidx.room.TypeConverters
         AutoMigration(from = 5, to = 6),
         AutoMigration(from = 6, to = 7),
         AutoMigration(from = 7, to = 8),
+        AutoMigration(from = 8, to = 9),
     ],
 )
 @TypeConverters(Converters::class)
@@ -34,6 +35,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun swapDao(): SwapDao
 
     abstract fun scheduleDao(): ScheduleDao
+
+    abstract fun keyDao(): KeyDao
 
     companion object {
         const val NAME = "minimise.db"

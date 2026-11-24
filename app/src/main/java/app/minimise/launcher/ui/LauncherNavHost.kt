@@ -23,6 +23,7 @@ import app.minimise.usage.ui.DebugUsageRoute
 import app.minimise.settings.ui.SettingsRoute
 import app.minimise.swaps.ui.SwapsRoute
 import app.minimise.schedules.ui.SchedulesRoute
+import app.minimise.keys.ui.KeysRoute
 import app.minimise.tasks.ui.TodayRoute
 import kotlinx.coroutines.flow.Flow
 
@@ -88,6 +89,7 @@ fun LauncherNavHost(
                 onOpenBudget = { navController.navigate(Destination.Budget) },
                 onOpenSwaps = { navController.navigate(Destination.Swaps) },
                 onOpenSchedules = { navController.navigate(Destination.Schedules) },
+                onOpenKeys = { navController.navigate(Destination.Keys) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
@@ -104,6 +106,9 @@ fun LauncherNavHost(
         }
         composable<Destination.Schedules> {
             SchedulesRoute()
+        }
+        composable<Destination.Keys> {
+            KeysRoute()
         }
         composable<Destination.PendingChanges> {
             PendingChangesRoute()

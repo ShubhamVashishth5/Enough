@@ -7,7 +7,10 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
+import app.minimise.keys.domain.KeyRepository
 import app.minimise.schedules.domain.ScheduleRepository
+import app.minimise.settings.domain.AddKey
+import app.minimise.settings.domain.RemoveKey
 import app.minimise.settings.domain.RemoveSchedule
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
@@ -41,12 +44,15 @@ sealed interface PendingDescription {
     data class ScheduleChange(val name: String, val removed: Boolean) : PendingDescription
 
     data class FirstHourChange(val enabled: Boolean) : PendingDescription
+
+    data class KeyChange(val label: String, val removed: Boolean) : PendingDescription
 }
 
 @HiltViewModel
 class PendingChangesViewModel @Inject constructor(
     appRepository: AppRepository,
     scheduleRepository: ScheduleRepository,
+    keyRepository: KeyRepository,
     private val settingsGuard: SettingsGuard,
     private val timeSource: TimeSource,
 ) : ViewModel() {
@@ -54,8 +60,9 @@ class PendingChangesViewModel @Inject constructor(
         settingsGuard.pending,
         appRepository.apps,
         scheduleRepository.schedules,
+        keyRepository.keys,
         ticker(REFRESH).onEach { settingsGuard.applyDue() },
-    ) { pending, apps, schedules, _ ->
+    ) { pending, apps, schedules, keys, _ ->
         val labels = apps.associate { it.packageName to it.label }
         val scheduleNames = schedules.associate { it.id to it.name }
         val now = timeSource.now()
@@ -74,6 +81,8 @@ class PendingChangesViewModel @Inject constructor(
                     is SaveSchedule -> PendingDescription.ScheduleChange(change.name, removed = false)
                     is RemoveSchedule -> PendingDescription.ScheduleChange(scheduleNames[change.id].orEmpty(), removed = true)
                     is SetFirstHourRule -> PendingDescription.FirstHourChange(change.enabled)
+                    is AddKey -> PendingDescription.KeyChange(change.label, removed = false)
+                    is RemoveKey -> PendingDescription.KeyChange(keys.firstOrNull { it.id == change.id }?.label.orEmpty(), removed = true)
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))
             },

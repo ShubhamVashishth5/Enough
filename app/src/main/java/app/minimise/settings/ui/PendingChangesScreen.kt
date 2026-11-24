@@ -80,4 +80,6 @@ private fun describe(description: PendingDescription): String = when (descriptio
         stringResource(if (description.removed) R.string.pending_schedule_removed else R.string.pending_schedule_changed, description.name)
     is PendingDescription.FirstHourChange ->
         stringResource(if (description.enabled) R.string.pending_first_hour_on else R.string.pending_first_hour_off)
+    is PendingDescription.KeyChange ->
+        stringResource(if (description.removed) R.string.pending_key_removed else R.string.pending_key_added, description.label)
 }
