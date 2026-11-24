@@ -1,6 +1,7 @@
 package app.minimise.settings.domain
 
 import app.minimise.apps.domain.AppKind
+import app.minimise.core.time.WeeklyWindow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -35,6 +36,26 @@ data class SetOpenLimit(val packageName: String, val limit: Int?) : SettingChang
     override val key: String get() = "open_limit:$packageName"
 }
 
+/** Adds (id 0) or edits a schedule. Times are minutes after midnight; days have Monday as bit 0. */
+@Serializable
+@SerialName("save_schedule")
+data class SaveSchedule(val id: Long, val name: String, val days: Int, val startMinute: Int, val endMinute: Int) : SettingChange {
+    override val key: String get() = "schedule:$id"
+}
+
+/** Shares its key with [SaveSchedule], so removing a schedule replaces a pending edit of it. */
+@Serializable
+@SerialName("remove_schedule")
+data class RemoveSchedule(val id: Long) : SettingChange {
+    override val key: String get() = "schedule:$id"
+}
+
+@Serializable
+@SerialName("set_first_hour_rule")
+data class SetFirstHourRule(val enabled: Boolean) : SettingChange {
+    override val key: String get() = "first_hour_rule"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {
@@ -56,6 +77,25 @@ fun openLimitChangeDirection(from: Int?, to: Int?): Direction? = when {
     from == null -> Direction.TIGHTEN
     to == null -> Direction.LOOSEN
     to < from -> Direction.TIGHTEN
+    else -> Direction.LOOSEN
+}
+
+/**
+ * A new schedule, or an edit whose window covers the old one, is tightening (a rename alone too).
+ * Shrinking or moving a window is loosening. Null when nothing would change.
+ */
+fun scheduleChangeDirection(old: WeeklyWindow?, oldName: String?, new: WeeklyWindow, newName: String): Direction? = when {
+    new.days.isEmpty() && old == null -> null
+    old == null -> Direction.TIGHTEN
+    old == new && oldName == newName -> null
+    new.covers(old) -> Direction.TIGHTEN
+    else -> Direction.LOOSEN
+}
+
+/** Switching a rule on is tightening; off is loosening. */
+fun switchDirection(from: Boolean, to: Boolean): Direction? = when {
+    from == to -> null
+    to -> Direction.TIGHTEN
     else -> Direction.LOOSEN
 }
 

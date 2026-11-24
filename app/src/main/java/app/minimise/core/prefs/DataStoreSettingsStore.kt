@@ -44,6 +44,7 @@ class DataStoreSettingsStore @Inject constructor(
             homeSlotsChosen = this[Keys.HOME_SLOTS_CHOSEN] ?: defaults.homeSlotsChosen,
             todayPromptedDay = this[Keys.TODAY_PROMPTED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             swapsSeeded = this[Keys.SWAPS_SEEDED] ?: defaults.swapsSeeded,
+            firstHourRule = this[Keys.FIRST_HOUR_RULE] ?: defaults.firstHourRule,
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
         )
@@ -56,6 +57,7 @@ class DataStoreSettingsStore @Inject constructor(
         settings.todayPromptedDay?.let { this[Keys.TODAY_PROMPTED_EPOCH_DAY] = it.toEpochDay() }
             ?: remove(Keys.TODAY_PROMPTED_EPOCH_DAY)
         this[Keys.SWAPS_SEEDED] = settings.swapsSeeded
+        this[Keys.FIRST_HOUR_RULE] = settings.firstHourRule
         this[Keys.DEBUG_TIME_OFFSET_SECONDS] = settings.debugTimeOffset.inWholeSeconds
         this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
@@ -66,6 +68,7 @@ class DataStoreSettingsStore @Inject constructor(
         val HOME_SLOTS_CHOSEN = booleanPreferencesKey("home_slots_chosen")
         val TODAY_PROMPTED_EPOCH_DAY = longPreferencesKey("today_prompted_epoch_day")
         val SWAPS_SEEDED = booleanPreferencesKey("swaps_seeded")
+        val FIRST_HOUR_RULE = booleanPreferencesKey("first_hour_rule")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")
     }

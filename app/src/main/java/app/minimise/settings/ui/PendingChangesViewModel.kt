@@ -7,7 +7,11 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
+import app.minimise.schedules.domain.ScheduleRepository
+import app.minimise.settings.domain.RemoveSchedule
+import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
+import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingsGuard
@@ -33,20 +37,27 @@ sealed interface PendingDescription {
 
     /** @property limit null when the limit is being removed. */
     data class OpenLimitChange(val appLabel: String, val limit: Int?) : PendingDescription
+
+    data class ScheduleChange(val name: String, val removed: Boolean) : PendingDescription
+
+    data class FirstHourChange(val enabled: Boolean) : PendingDescription
 }
 
 @HiltViewModel
 class PendingChangesViewModel @Inject constructor(
     appRepository: AppRepository,
+    scheduleRepository: ScheduleRepository,
     private val settingsGuard: SettingsGuard,
     private val timeSource: TimeSource,
 ) : ViewModel() {
     val uiState: StateFlow<PendingChangesUiState> = combine(
         settingsGuard.pending,
         appRepository.apps,
+        scheduleRepository.schedules,
         ticker(REFRESH).onEach { settingsGuard.applyDue() },
-    ) { pending, apps, _ ->
+    ) { pending, apps, schedules, _ ->
         val labels = apps.associate { it.packageName to it.label }
+        val scheduleNames = schedules.associate { it.id to it.name }
         val now = timeSource.now()
         PendingChangesUiState(
             items = pending.map { p ->
@@ -60,6 +71,9 @@ class PendingChangesViewModel @Inject constructor(
                         appLabel = labels[change.packageName] ?: change.packageName,
                         limit = change.limit,
                     )
+                    is SaveSchedule -> PendingDescription.ScheduleChange(change.name, removed = false)
+                    is RemoveSchedule -> PendingDescription.ScheduleChange(scheduleNames[change.id].orEmpty(), removed = true)
+                    is SetFirstHourRule -> PendingDescription.FirstHourChange(change.enabled)
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))
             },

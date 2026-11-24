@@ -34,4 +34,7 @@ object Defaults {
 
     /** Emergency passes per usage week (Monday 04:00 to Monday 04:00). Each skips one block. */
     const val EMERGENCY_PASSES_PER_WEEK: Int = 3
+
+    /** With the first-hour rule on, Vault apps stay blocked this long after the day's first unlock. */
+    val FIRST_HOUR: Duration = 60.minutes
 }

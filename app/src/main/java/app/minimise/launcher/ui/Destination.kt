@@ -29,6 +29,9 @@ sealed interface Destination {
     data object Swaps : Destination
 
     @Serializable
+    data object Schedules : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable

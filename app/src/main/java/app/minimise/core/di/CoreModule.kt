@@ -9,6 +9,7 @@ import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.EventDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.PendingChangeDao
+import app.minimise.core.db.ScheduleDao
 import app.minimise.core.db.SwapDao
 import app.minimise.core.db.TaskDao
 import app.minimise.core.prefs.DataStoreSettingsStore
@@ -69,6 +70,9 @@ object CoreProviders {
 
     @Provides
     fun swapDao(db: AppDatabase): SwapDao = db.swapDao()
+
+    @Provides
+    fun scheduleDao(db: AppDatabase): ScheduleDao = db.scheduleDao()
 
     @Provides
     @Singleton

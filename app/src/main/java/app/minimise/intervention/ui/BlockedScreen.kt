@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.core.ui.durationText
 import app.minimise.gate.rules.BudgetRule
+import app.minimise.gate.rules.FirstHourRule
 import app.minimise.gate.rules.OpenLimitRule
+import app.minimise.gate.rules.ScheduleRule
 import app.minimise.unlock.domain.UnlockMethodId
 import kotlin.time.Duration
 
@@ -111,6 +113,8 @@ private fun blockedTitle(reason: String): String = stringResource(
     when (reason) {
         BudgetRule.REASON -> R.string.blocked_budget_title
         OpenLimitRule.REASON -> R.string.blocked_open_limit_title
+        ScheduleRule.REASON -> R.string.blocked_schedule_title
+        FirstHourRule.REASON -> R.string.blocked_first_hour_title
         else -> R.string.blocked_title
     },
 )
@@ -119,5 +123,7 @@ private fun blockedTitle(reason: String): String = stringResource(
 private fun blockedBody(reason: String, appLabel: String): String = when (reason) {
     BudgetRule.REASON -> stringResource(R.string.blocked_budget_body)
     OpenLimitRule.REASON -> stringResource(R.string.blocked_open_limit_body, appLabel)
+    ScheduleRule.REASON -> stringResource(R.string.blocked_schedule_body)
+    FirstHourRule.REASON -> stringResource(R.string.blocked_first_hour_body)
     else -> stringResource(R.string.blocked_body)
 }
