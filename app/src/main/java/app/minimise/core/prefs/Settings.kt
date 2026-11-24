@@ -2,6 +2,7 @@ package app.minimise.core.prefs
 
 import app.minimise.core.Defaults
 import app.minimise.display.domain.GrayscaleMode
+import java.time.Instant
 import java.time.LocalDate
 import kotlin.time.Duration
 
@@ -29,6 +30,8 @@ data class Settings(
     val blockedFeeds: Set<String> = emptySet(),
     /** The user's colour correction (enabled, mode) from before grayscale first went on; null when not saved. */
     val savedColourCorrection: List<Int>? = null,
+    /** While a lock period runs, nothing can be loosened; null when there never was one. */
+    val lockedUntil: Instant? = null,
     /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */
     val swapsSeeded: Boolean = false,
     /** Debug builds only: shifts the wall clock, for testing day resets. */

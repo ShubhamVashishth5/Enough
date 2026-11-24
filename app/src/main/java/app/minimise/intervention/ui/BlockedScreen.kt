@@ -107,7 +107,8 @@ private fun overrideLabel(option: OverrideOption): String = when (option.method)
     UnlockMethodId.NFC_KEY -> stringResource(R.string.override_nfc_key)
     UnlockMethodId.QR_KEY -> stringResource(R.string.override_qr_key)
     UnlockMethodId.WAIT -> stringResource(R.string.override_wait)
-    UnlockMethodId.FRIEND_CODE, UnlockMethodId.TYPING -> option.method.name
+    UnlockMethodId.FRIEND_CODE -> pluralStringResource(R.plurals.override_friend_code, option.usesLeft ?: 0, option.usesLeft ?: 0)
+    UnlockMethodId.TYPING -> stringResource(R.string.override_typing)
 }
 
 @Composable

@@ -4,6 +4,7 @@ import app.minimise.apps.domain.AppKind
 import app.minimise.core.time.FakeTimeSource
 import app.minimise.core.time.plus
 import app.minimise.testing.FakeEventLog
+import app.minimise.testing.FakeLockPeriod
 import app.minimise.testing.FakePendingChangeStore
 import app.minimise.testing.FakeSettingsTarget
 import app.minimise.usage.domain.EventType
@@ -23,7 +24,7 @@ class SettingsGuardTest {
     private val delay = object : LoosenDelay {
         override suspend fun current(): Duration = 24.hours
     }
-    private val guard = SettingsGuard(target, store, clock, delay, eventLog)
+    private val guard = SettingsGuard(target, store, clock, delay, eventLog, FakeLockPeriod(target))
 
     @Test
     fun `moving a tool app into the vault applies at once`() = runTest {

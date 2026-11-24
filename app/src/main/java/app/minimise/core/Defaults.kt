@@ -2,6 +2,7 @@ package app.minimise.core
 
 import java.time.LocalTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -65,6 +66,16 @@ object Defaults {
 
     /** After stepping out of a blocked feed, give the app this long to leave it before acting again. */
     val FEED_ACTION_COOLDOWN: Duration = 1500.milliseconds
+
+    /** Lock period lengths on offer. */
+    val LOCK_LENGTHS: List<Duration> = listOf(7.days, 30.days, 90.days)
+
+    /** Friend key: one-time codes made at a time. */
+    const val FRIEND_CODE_COUNT: Int = 10
+
+    /** Typing penance: passage length, and the most characters one keystroke may add (so no paste or swipe). */
+    const val TYPING_PASSAGE_LENGTH: Int = 300
+    const val TYPING_MAX_INSERT: Int = 2
 
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(

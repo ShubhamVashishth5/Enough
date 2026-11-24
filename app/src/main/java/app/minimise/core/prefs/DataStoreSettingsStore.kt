@@ -12,6 +12,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import app.minimise.display.domain.GrayscaleMode
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -55,6 +56,7 @@ class DataStoreSettingsStore @Inject constructor(
             grayscaleMode = this[Keys.GRAYSCALE_MODE]?.let { name -> GrayscaleMode.entries.firstOrNull { it.name == name } }
                 ?: defaults.grayscaleMode,
             blockedFeeds = this[Keys.BLOCKED_FEEDS] ?: defaults.blockedFeeds,
+            lockedUntil = this[Keys.LOCKED_UNTIL_MILLIS]?.let(Instant::ofEpochMilli),
             savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
@@ -73,6 +75,7 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.DIGEST_ENABLED] = settings.digestEnabled
         this[Keys.DIGEST_EXEMPT] = settings.digestExempt
         this[Keys.BLOCKED_FEEDS] = settings.blockedFeeds
+        settings.lockedUntil?.let { this[Keys.LOCKED_UNTIL_MILLIS] = it.toEpochMilli() } ?: remove(Keys.LOCKED_UNTIL_MILLIS)
         settings.manualModeId?.let { this[Keys.MANUAL_MODE_ID] = it } ?: remove(Keys.MANUAL_MODE_ID)
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
         settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
@@ -94,6 +97,7 @@ class DataStoreSettingsStore @Inject constructor(
         val DIGEST_ENABLED = booleanPreferencesKey("digest_enabled")
         val DIGEST_EXEMPT = stringSetPreferencesKey("digest_exempt")
         val BLOCKED_FEEDS = stringSetPreferencesKey("blocked_feeds")
+        val LOCKED_UNTIL_MILLIS = longPreferencesKey("locked_until_millis")
         val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")

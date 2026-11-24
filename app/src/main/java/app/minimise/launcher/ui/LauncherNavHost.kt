@@ -34,6 +34,13 @@ import app.minimise.capture.ui.InboxLink
 import app.minimise.capture.ui.InboxRoute
 import app.minimise.tasks.ui.TodayRoute
 import app.minimise.feeds.ui.FeedsRoute
+import app.minimise.settings.ui.ApplyNowRoute
+import app.minimise.settings.ui.LockRoute
+import app.minimise.unlock.ui.FriendKeyRoute
+import app.minimise.core.ui.dateTimeText
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import app.minimise.R
 import app.minimise.BuildConfig
 import kotlinx.coroutines.flow.Flow
 
@@ -50,6 +57,14 @@ fun LauncherNavHost(
     val startDestination: Destination = remember { if (done) Destination.Home else Destination.Onboarding }
     val navController = rememberNavController()
     val openToday = { navController.navigate(Destination.Today) { launchSingleTop = true } }
+
+    // Whatever screen asked for it, say why a loosening change did nothing.
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        launcherViewModel.refusals.collect { until ->
+            Toast.makeText(context, context.getString(R.string.lock_refused, dateTimeText(context, until)), Toast.LENGTH_LONG).show()
+        }
+    }
 
     // The Home button always lands on the home screen itself.
     LaunchedEffect(homePresses) {
@@ -107,6 +122,8 @@ fun LauncherNavHost(
                 onOpenModes = { navController.navigate(Destination.Modes) },
                 onOpenDigest = { navController.navigate(Destination.DigestSettings) },
                 onOpenFeeds = { navController.navigate(Destination.Feeds) },
+                onOpenLock = { navController.navigate(Destination.Lock) },
+                onOpenFriendKey = { navController.navigate(Destination.FriendKey) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
@@ -151,8 +168,17 @@ fun LauncherNavHost(
         composable<Destination.Feeds> {
             FeedsRoute()
         }
+        composable<Destination.Lock> {
+            LockRoute()
+        }
+        composable<Destination.FriendKey> {
+            FriendKeyRoute()
+        }
+        composable<Destination.ApplyNow> {
+            ApplyNowRoute(onDone = { navController.popBackStack() })
+        }
         composable<Destination.PendingChanges> {
-            PendingChangesRoute()
+            PendingChangesRoute(onApplyNow = { navController.navigate(Destination.ApplyNow(it)) })
         }
         composable<Destination.Permissions> {
             PermissionsRoute()

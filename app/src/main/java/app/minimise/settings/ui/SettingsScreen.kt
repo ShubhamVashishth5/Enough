@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.SettingsRow
+import app.minimise.core.ui.dateTimeText
 import app.minimise.display.domain.GrayscaleMode
 
 @Composable
@@ -22,6 +23,8 @@ fun SettingsRoute(
     onOpenModes: () -> Unit,
     onOpenDigest: () -> Unit,
     onOpenFeeds: () -> Unit,
+    onOpenLock: () -> Unit,
+    onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -39,6 +42,8 @@ fun SettingsRoute(
         onOpenModes = onOpenModes,
         onOpenDigest = onOpenDigest,
         onOpenFeeds = onOpenFeeds,
+        onOpenLock = onOpenLock,
+        onOpenFriendKey = onOpenFriendKey,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
@@ -60,6 +65,8 @@ fun SettingsScreen(
     onOpenModes: () -> Unit,
     onOpenDigest: () -> Unit,
     onOpenFeeds: () -> Unit,
+    onOpenLock: () -> Unit,
+    onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -103,6 +110,17 @@ fun SettingsScreen(
             title = stringResource(R.string.settings_feeds),
             summary = stringResource(R.string.settings_feeds_summary),
             onClick = onOpenFeeds,
+        )
+        SettingsRow(
+            title = stringResource(R.string.lock_title),
+            summary = state.lockedUntil?.let { stringResource(R.string.lock_locked_until, dateTimeText(it)) }
+                ?: stringResource(R.string.settings_lock_summary),
+            onClick = onOpenLock,
+        )
+        SettingsRow(
+            title = stringResource(R.string.friend_key_title),
+            summary = stringResource(R.string.settings_friend_key_summary),
+            onClick = onOpenFriendKey,
         )
         SettingsRow(
             title = stringResource(R.string.settings_swaps),

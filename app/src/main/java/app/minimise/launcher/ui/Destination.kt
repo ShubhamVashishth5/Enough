@@ -59,6 +59,15 @@ sealed interface Destination {
     data object Feeds : Destination
 
     @Serializable
+    data object Lock : Destination
+
+    @Serializable
+    data object FriendKey : Destination
+
+    @Serializable
+    data class ApplyNow(val pendingId: Long) : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable
