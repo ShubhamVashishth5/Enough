@@ -12,8 +12,18 @@ import kotlinx.coroutines.flow.Flow
  */
 data class ModeValues(val budget: Duration, val waitSteps: List<Duration>, val allowlist: Set<String>?)
 
-/** Work, Study, Home or Sleep: its own values, switched on by hand or by [schedule]. */
-data class Mode(val id: Long, val name: String, val values: ModeValues, val schedule: WeeklyWindow?)
+/**
+ * Work, Study, Home or Sleep: its own values, switched on by hand or by [schedule].
+ *
+ * @property presetKey which shipped mode this is ("work", "study", "home", "sleep").
+ */
+data class Mode(val id: Long, val name: String, val values: ModeValues, val schedule: WeeklyWindow?, val presetKey: String? = null) {
+    val isSleep: Boolean get() = presetKey == SLEEP
+
+    companion object {
+        const val SLEEP = "sleep"
+    }
+}
 
 interface ModeRepository {
     /** The shipped modes, in order. Seeded on first use. */

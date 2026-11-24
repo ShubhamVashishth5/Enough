@@ -8,8 +8,15 @@ import app.minimise.display.GrayscaleController
 import app.minimise.display.domain.DisplayFilter
 import app.minimise.display.domain.GrayscaleMode
 import app.minimise.modes.domain.ActiveModeProvider
+import app.minimise.monitor.AccessibilityActions
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
+import app.minimise.core.time.TimeSource
+import java.time.LocalDateTime
+import android.net.Uri
+import app.minimise.stats.data.CsvExporter
+import app.minimise.apps.domain.PrivateSpace
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +35,12 @@ data class SettingsUiState(
     /** Debug builds only. */
     val showDebug: Boolean = false,
     val debugShortLoosenDelay: Boolean = false,
+    /** The end of the lock period in force, if any. */
+    val lockedUntil: LocalDateTime? = null,
+    /** Events written by the last export (-1 when it failed), until the toast has shown. */
+    val exported: Int? = null,
+    /** Whether Private space is locked; null when there is none (or below Android 15). */
+    val privateSpace: Boolean? = null,
 )
 
 @HiltViewModel
@@ -36,8 +49,14 @@ class SettingsViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val displayFilter: Provider<DisplayFilter>,
     private val activeMode: ActiveModeProvider,
+    private val accessibilityActions: AccessibilityActions,
+    private val timeSource: TimeSource,
+    private val csvExporter: CsvExporter,
+    private val privateSpace: PrivateSpace,
 ) : ViewModel() {
-    val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings) { pending, settings ->
+    private val exported = MutableStateFlow<Int?>(null)
+
+    val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings, exported) { pending, settings, exported ->
         SettingsUiState(
             budgetMinutes = settings.dailyBudget.inWholeMinutes.toInt(),
             activeModeName = activeMode.active()?.name,
@@ -46,6 +65,9 @@ class SettingsViewModel @Inject constructor(
             grayscaleAvailable = displayFilter.get().isAvailable(),
             showDebug = BuildConfig.DEBUG,
             debugShortLoosenDelay = settings.debugShortLoosenDelay,
+            exported = exported,
+            privateSpace = if (privateSpace.exists()) privateSpace.isLocked() else null,
+            lockedUntil = settings.lockedUntil?.takeIf { it.isAfter(timeSource.now()) }?.atZone(timeSource.zone())?.toLocalDateTime(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
@@ -61,5 +83,17 @@ class SettingsViewModel @Inject constructor(
     fun onDebugShortLoosenDelayToggled() {
         if (!BuildConfig.DEBUG) return
         viewModelScope.launch { settingsStore.update { it.copy(debugShortLoosenDelay = !it.debugShortLoosenDelay) } }
+    }
+
+    fun onExport(uri: Uri) {
+        viewModelScope.launch { exported.value = csvExporter.export(uri) ?: -1 }
+    }
+
+    fun onExportShown() {
+        exported.value = null
+    }
+
+    fun onDebugDumpScreen() {
+        accessibilityActions.dumpScreenSoon()
     }
 }

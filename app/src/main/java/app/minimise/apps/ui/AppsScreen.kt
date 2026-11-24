@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
+import app.minimise.apps.domain.WebTarget
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.durationText
 
@@ -36,6 +38,9 @@ fun AppsRoute(viewModel: AppsViewModel = hiltViewModel()) {
         onEditLimit = viewModel::onEditLimit,
         onLimitChosen = viewModel::onLimitChosen,
         onLimitDismissed = viewModel::onLimitDismissed,
+        onAddWebsite = viewModel::onAddWebsite,
+        onWebsiteEntered = viewModel::onWebsiteEntered,
+        onWebsiteDismissed = viewModel::onWebsiteDismissed,
     )
 }
 
@@ -46,6 +51,9 @@ fun AppsScreen(
     onEditLimit: (AppEntry) -> Unit,
     onLimitChosen: (Int?) -> Unit,
     onLimitDismissed: () -> Unit,
+    onAddWebsite: () -> Unit,
+    onWebsiteEntered: (String) -> Unit,
+    onWebsiteDismissed: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.apps_title)) {
         Text(
@@ -55,6 +63,29 @@ fun AppsScreen(
             modifier = Modifier.padding(bottom = 8.dp),
         )
         LazyColumn {
+            item(key = "websites") {
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    Text(text = stringResource(R.string.apps_websites), style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = stringResource(R.string.apps_websites_explainer),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            items(state.websites, key = { it.app.packageName }) { row ->
+                AppKindRow(row = row, kinds = WEBSITE_KINDS, onKindChosen = { onKindChosen(row.app, it) }, onEditLimit = {})
+            }
+            item(key = "add_website") {
+                TextButton(onClick = onAddWebsite) { Text(stringResource(R.string.apps_add_website), style = MaterialTheme.typography.titleMedium) }
+            }
+            item(key = "apps") {
+                Text(
+                    text = stringResource(R.string.apps_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                )
+            }
             items(state.rows, key = { it.app.packageName }) { row ->
                 AppKindRow(row = row, onKindChosen = { onKindChosen(row.app, it) }, onEditLimit = { onEditLimit(row.app) })
             }
@@ -63,15 +94,27 @@ fun AppsScreen(
     state.editingLimit?.let { app ->
         OpenLimitDialog(app = app, onChosen = onLimitChosen, onDismiss = onLimitDismissed)
     }
+    if (state.addingWebsite) {
+        AddWebsiteDialog(invalid = state.websiteInvalid, onEntered = onWebsiteEntered, onDismiss = onWebsiteDismissed)
+    }
 }
 
+/** Hidden means nothing for a website, which never shows in the launcher anyway. */
+private val WEBSITE_KINDS = listOf(AppKind.TOOL, AppKind.VAULT)
+
 @Composable
-private fun AppKindRow(row: AppRow, onKindChosen: (AppKind) -> Unit, onEditLimit: () -> Unit) {
+private fun AppKindRow(
+    row: AppRow,
+    onKindChosen: (AppKind) -> Unit,
+    onEditLimit: () -> Unit,
+    kinds: List<AppKind> = AppKind.entries,
+) {
     val app = row.app
+    val isWebsite = WebTarget.isWebTarget(app.packageName)
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
         Text(text = app.label, style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp), modifier = Modifier.padding(top = 4.dp)) {
-            AppKind.entries.forEach { kind ->
+            kinds.forEach { kind ->
                 KindChoice(kind = kind, selected = app.kind == kind, onClick = { onKindChosen(kind) })
             }
         }
@@ -86,7 +129,7 @@ private fun AppKindRow(row: AppRow, onKindChosen: (AppKind) -> Unit, onEditLimit
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        if (app.kind == AppKind.VAULT) {
+        if (app.kind == AppKind.VAULT && !isWebsite) {
             Text(
                 text = app.openLimit?.let { stringResource(R.string.apps_open_limit, it) }
                     ?: stringResource(R.string.apps_open_limit_none),

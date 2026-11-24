@@ -18,6 +18,7 @@ import app.minimise.settings.permissions.PermissionStatus
 import app.minimise.tasks.domain.TaskRepository
 import app.minimise.tasks.domain.TodayPrompt
 import app.minimise.tasks.domain.TodayTask
+import app.minimise.usage.domain.EarnIt
 import app.minimise.usage.domain.TodayUsageProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
@@ -49,6 +50,7 @@ class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val todayPrompt: TodayPrompt,
     private val accessibilityActions: AccessibilityActions,
+    private val earnIt: EarnIt,
     dayBoundary: DayBoundary,
     todayUsage: TodayUsageProvider,
     homeSlotsInitializer: HomeSlotsInitializer,
@@ -110,7 +112,10 @@ class HomeViewModel @Inject constructor(
     fun homeRoleRequestIntent(): Intent = homeRole.requestIntent()
 
     fun onTaskTapped(task: TodayTask) {
-        viewModelScope.launch { taskRepository.setDone(task.id, !task.done) }
+        viewModelScope.launch {
+            taskRepository.setDone(task.id, !task.done)
+            if (!task.done) earnIt.onTaskDone(task.id)
+        }
     }
 
     fun onSlotTapped(slot: HomeSlot) {

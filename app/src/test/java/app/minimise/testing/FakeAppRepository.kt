@@ -12,6 +12,8 @@ class FakeAppRepository(initial: List<AppEntry> = emptyList()) : AppRepository {
 
     override val apps: Flow<List<AppEntry>> = state
 
+    override val webTargets: Flow<List<AppEntry>> = state.map { list -> list.filter { it.packageName.startsWith("web:") } }
+
     override val kinds: Flow<Map<String, AppKind>> = state.map { list -> list.associate { it.packageName to it.kind } }
 
     override suspend fun entry(packageName: String): AppEntry? = state.value.firstOrNull { it.packageName == packageName }

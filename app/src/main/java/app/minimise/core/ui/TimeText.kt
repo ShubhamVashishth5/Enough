@@ -1,5 +1,6 @@
 package app.minimise.core.ui
 
+import android.content.Context
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -8,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import app.minimise.R
 import app.minimise.core.time.WeeklyWindow
 import java.time.DayOfWeek
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -33,3 +35,14 @@ fun windowText(window: WeeklyWindow): String {
 }
 
 fun dayName(day: DayOfWeek): String = day.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+
+/** "Tue 3 Dec, 14:00", for when a lock ends. Usable outside composition (a toast). */
+fun dateTimeText(context: Context, at: LocalDateTime): String {
+    val locale = Locale.getDefault()
+    val date = DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEdMMM"), locale)
+    val time = DateTimeFormatter.ofPattern(if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a", locale)
+    return "${at.format(date)}, ${at.format(time)}"
+}
+
+@Composable
+fun dateTimeText(at: LocalDateTime): String = dateTimeText(LocalContext.current, at)

@@ -100,7 +100,7 @@
     <string name="onboarding_home_title">Home apps</string>
     <string name="onboarding_home_body">Pick up to %2$d tools for the home screen, in order. %1$d picked.</string>
     <string name="onboarding_vault_title">The Vault</string>
-    <string name="onboarding_vault_body">Tick the apps that eat your time. Common ones are already ticked. You can add more later in Settings, at once; taking one out waits 24 hours.</string>
+    <string name="onboarding_vault_body">Tick the apps that eat your time. Common ones are already ticked, and their websites go in the Vault with them. You can add more later in Settings, at once; taking one out waits 24 hours.</string>
     <string name="onboarding_budget_body">How many minutes a day, across all Vault apps together? You can lower it at any time. Raising it later waits 24 hours.</string>
     <string name="onboarding_start">Get started</string>
     <string name="onboarding_next">Next</string>
@@ -124,6 +124,12 @@
     <string name="apps_open_limit_none">Open limit: none</string>
     <string name="apps_pending_limit">Limit changes to %1$d a day in %2$s</string>
     <string name="apps_pending_limit_none">Limit comes off in %s</string>
+    <string name="apps_websites">Websites</string>
+    <string name="apps_websites_explainer">A website in the Vault gets the same pause, budget and rules in Chrome, Firefox, Samsung Internet, Brave and other browsers, so switching to the browser isn\'t a way round. Adding one applies at once; taking one out waits 24 hours.</string>
+    <string name="apps_add_website">Add a website</string>
+    <string name="website_hint">instagram.com</string>
+    <string name="website_add">Add to the Vault</string>
+    <string name="website_invalid">That isn\'t a web address. Try something like youtube.com.</string>
     <string name="open_limit_title">Open limit for %s</string>
     <string name="open_limit_hint">Opens a day</string>
     <string name="open_limit_save">Save</string>
@@ -295,7 +301,7 @@
     <string name="permission_allow">Allow</string>
     <string name="permission_open_app_info">Open app info</string>
     <string name="permission_accessibility">Accessibility</string>
-    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads only the app\'s name, never what\'s on screen, and nothing leaves the phone.</string>
+    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed, a browser\'s address bar while a website is in the Vault, and Settings pages during a lock period. Nothing is stored or leaves the phone.</string>
     <string name="permission_accessibility_restricted">Installed outside the Play Store? Android 13 and later grey out this setting until you open app info, tap ⋮ and choose Allow restricted settings.</string>
     <string name="permission_home">Default home app</string>
     <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
@@ -317,7 +323,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>
-    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Only the app\'s name is read. Nothing on screen is read and nothing leaves the phone.</string>
+    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Screen content is read only where a rule you switched on needs it, such as a blocked feed inside YouTube, a browser\'s address bar for a Vault website, or Settings during a lock period. Nothing is stored and nothing leaves the phone.</string>
 
     <!-- Pending changes -->
     <string name="settings_pending">Pending changes</string>
@@ -342,6 +348,286 @@
     <string name="pending_key_removed">Remove %s</string>
     <string name="pending_mode_switch">Mode → %s</string>
     <string name="pending_mode_edit">Changes to %s mode</string>
+
+    <!-- Feed blocking -->
+    <string name="settings_feeds">Feed blocking</string>
+    <string name="settings_feeds_summary">Shut the endless parts of apps, keep the useful ones</string>
+    <string name="feeds_title">Feed blocking</string>
+    <string name="feeds_explainer">When a blocked feed comes on screen, the app steps back out of it. Search, messages and the rest keep working. Switching a block on applies at once; switching it off waits 24 hours. Apps change their screens now and then, so a block can stop working until it\'s updated.</string>
+    <string name="feed_on">On</string>
+    <string name="feed_off">Off. Tap to block it.</string>
+    <string name="feed_off_in">Switches off in %s. Tap to keep it on.</string>
+    <string name="feed_blocked_title">Feed blocked</string>
+    <string name="feed_blocked_body">%s is switched off. The rest of the app still works.</string>
+    <string name="feed_blocked_ok">OK</string>
+    <string name="pending_feed_on">Block %s</string>
+    <string name="pending_feed_off">Stop blocking %s</string>
+    <string name="debug_dump_screen">Debug: dump screen in 5 s</string>
+    <string name="debug_dump_screen_summary">Switch to the app; its node tree goes to logcat (tag ScreenDump)</string>
+
+    <!-- Lock period, friend key, typing penance -->
+    <string name="lock_title">Lock period</string>
+    <string name="settings_lock_summary">Lock every setting for 7, 30 or 90 days</string>
+    <string name="lock_explainer">During a lock nothing can be loosened at all: no bigger budget, no apps out of the Vault, no rules switched off, and no skipping waits with a friend code, typing or a key. Tightening still works. Changes already waiting apply only once the lock ends. A lock can be made longer but never shorter.</string>
+    <string name="lock_locked_until">Locked until %s</string>
+    <string name="lock_for_days">Lock for %d days</string>
+    <string name="lock_extend_days">Extend to %d days from now</string>
+    <string name="lock_confirm_title">Lock for %d days?</string>
+    <string name="lock_confirm_body">Until %s nothing can be loosened. This can\'t be undone or shortened.</string>
+    <string name="lock_confirm">Lock</string>
+    <string name="lock_refused">Locked until %s. Nothing can be loosened until then.</string>
+    <string name="lock_refused_short">Not saved: a lock period is on.</string>
+    <string name="pending_locked">Locked until %s. These wait until the lock ends.</string>
+    <string name="pending_after_lock">Applies when the lock ends</string>
+    <string name="pending_apply_now">Apply now</string>
+    <string name="apply_now_title">Apply now</string>
+    <string name="apply_now_explainer">Skip the rest of the wait with one of these. Each is meant to take some effort, so a weak moment still costs something.</string>
+    <string name="friend_key_title">Friend key</string>
+    <string name="settings_friend_key_summary">Codes a friend keeps, to skip a wait</string>
+    <string name="friend_key_explainer">Make 10 one-time codes and send them to a friend. When you want a waiting change to apply now, ask them to read you one. Each code works once. The app keeps only fingerprints of them, and this screen can\'t be screenshotted.</string>
+    <string name="friend_key_none">No codes yet.</string>
+    <plurals name="friend_key_left">
+        <item quantity="one">%d code left</item>
+        <item quantity="other">%d codes left</item>
+    </plurals>
+    <string name="friend_key_make">Make 10 codes</string>
+    <string name="friend_key_remake">Make 10 new codes (the old ones stop working)</string>
+    <string name="friend_key_once">These are shown only once. Send them to your friend now.</string>
+    <string name="friend_key_share">Send to a friend</string>
+    <string name="friend_key_share_title">Send the codes</string>
+    <string name="friend_key_share_text">Please keep these codes for me. When I ask, read me one, but only if you think I really mean it. Each works once.</string>
+    <string name="friend_key_done">Done, they\'re sent</string>
+    <string name="friend_code_ask">Ask your friend to read you one of the codes.</string>
+    <string name="friend_code_check">Check</string>
+    <string name="friend_code_wrong">That isn\'t one of the codes, or it was used already.</string>
+    <plurals name="override_friend_code">
+        <item quantity="one">A friend\'s code (%d left)</item>
+        <item quantity="other">A friend\'s code (%d left)</item>
+    </plurals>
+    <string name="override_typing">Type out a passage</string>
+    <string name="typing_progress">%1$d of %2$d</string>
+    <string name="typing_mistake">Mistake at character %d</string>
+    <!-- Typing penance passages are random words from this list. -->
+    <string-array name="typing_words">
+        <item>apple</item>
+        <item>river</item>
+        <item>window</item>
+        <item>garden</item>
+        <item>pencil</item>
+        <item>morning</item>
+        <item>quiet</item>
+        <item>yellow</item>
+        <item>bridge</item>
+        <item>candle</item>
+        <item>forest</item>
+        <item>mountain</item>
+        <item>silver</item>
+        <item>paper</item>
+        <item>basket</item>
+        <item>wooden</item>
+        <item>orange</item>
+        <item>letter</item>
+        <item>summer</item>
+        <item>winter</item>
+        <item>number</item>
+        <item>simple</item>
+        <item>honest</item>
+        <item>gentle</item>
+        <item>market</item>
+        <item>pocket</item>
+        <item>button</item>
+        <item>ladder</item>
+        <item>kettle</item>
+        <item>carpet</item>
+        <item>island</item>
+        <item>meadow</item>
+        <item>harbor</item>
+        <item>engine</item>
+        <item>planet</item>
+        <item>rocket</item>
+        <item>butter</item>
+        <item>cotton</item>
+        <item>marble</item>
+        <item>violin</item>
+        <item>turtle</item>
+        <item>rabbit</item>
+        <item>monkey</item>
+        <item>spider</item>
+        <item>lemon</item>
+        <item>cherry</item>
+        <item>tomato</item>
+        <item>potato</item>
+        <item>carrot</item>
+        <item>onion</item>
+        <item>pepper</item>
+        <item>ginger</item>
+        <item>noodle</item>
+        <item>biscuit</item>
+        <item>blanket</item>
+        <item>pillow</item>
+        <item>mirror</item>
+        <item>shadow</item>
+        <item>thunder</item>
+        <item>rainbow</item>
+        <item>pebble</item>
+        <item>canyon</item>
+        <item>desert</item>
+        <item>valley</item>
+        <item>stream</item>
+        <item>breeze</item>
+        <item>cloud</item>
+        <item>ocean</item>
+        <item>shell</item>
+        <item>anchor</item>
+        <item>sailor</item>
+        <item>compass</item>
+        <item>lantern</item>
+        <item>chimney</item>
+        <item>cottage</item>
+        <item>village</item>
+        <item>castle</item>
+        <item>tower</item>
+        <item>clock</item>
+        <item>calendar</item>
+        <item>journey</item>
+        <item>ticket</item>
+        <item>station</item>
+        <item>platform</item>
+        <item>puzzle</item>
+        <item>riddle</item>
+        <item>story</item>
+        <item>chapter</item>
+        <item>poem</item>
+        <item>song</item>
+        <item>melody</item>
+        <item>rhythm</item>
+        <item>drum</item>
+        <item>flute</item>
+        <item>guitar</item>
+        <item>piano</item>
+        <item>circle</item>
+        <item>square</item>
+        <item>triangle</item>
+        <item>corner</item>
+        <item>middle</item>
+        <item>center</item>
+        <item>border</item>
+        <item>edge</item>
+        <item>surface</item>
+        <item>layer</item>
+    </string-array>
+
+    <!-- Uninstall guard and honest limits -->
+    <string name="admin_label">Enough: uninstall guard</string>
+    <string name="admin_explanation">While this is on, Android won\'t uninstall Enough until you switch it off. Enough asks for no other device controls.</string>
+    <string name="admin_disable_warning">Switching this off lets Enough be uninstalled. During a lock period, this page is blocked.</string>
+    <string name="permission_device_admin">Uninstall guard (optional)</string>
+    <string name="permission_device_admin_why">Android won\'t uninstall the app while this is on. During a lock period the app also keeps you out of its own App info, device admin and accessibility pages, so it can\'t be switched off from there.</string>
+    <string name="guard_title">Locked</string>
+    <string name="honest_limits_title">Honest limits</string>
+    <string name="honest_limits_intro">Enough makes cheating take effort. It can\'t make it impossible, and it won\'t pretend to:</string>
+    <string name="honest_limits_safe_mode">Safe mode starts the phone without any downloaded app, this one included.</string>
+    <string name="honest_limits_reset">A factory reset wipes everything, rules and all.</string>
+    <string name="honest_limits_adb">A computer with USB debugging can switch off or uninstall any app.</string>
+    <string name="honest_limits_clock">Changing the phone\'s clock is ignored while the phone stays on, but not across a restart.</string>
+    <string name="honest_limits_screens">Feed blocking, website rules and the uninstall guard read other apps\' screens. When those apps change their design, a rule can stop working until it\'s updated.</string>
+    <string name="honest_limits_battery">Some phones stop background apps to save battery. Allowing unrestricted battery on the next screen helps.</string>
+    <string name="honest_limits_aim">The point is a pause between the urge and the app, not a cage.</string>
+
+    <!-- Stats -->
+    <string name="trigger_question">What pulled you in?</string>
+    <string name="trigger_notification">A notification</string>
+    <string name="trigger_boredom">Boredom</string>
+    <string name="trigger_stress">Stress</string>
+    <string name="trigger_app_hop">Hopped from another app</string>
+    <string name="trigger_skip">Skip</string>
+    <string name="stats_title">Weekly report</string>
+    <string name="settings_stats_summary">This week against last. Opens once a day.</string>
+    <string name="stats_tomorrow">Come back tomorrow. The report opens once a day, so checking it doesn\'t become a habit of its own.</string>
+    <string name="stats_this_week_vs_last">This week so far, with last week in brackets.</string>
+    <string name="stats_vault">Vault: %1$s (%2$s)</string>
+    <string name="stats_unlocks">Unlocks: %1$d (%2$d)</string>
+    <string name="stats_focus">Focus: %1$s (%2$s)</string>
+    <string name="stats_tasks">Tasks done: %1$d (%2$d)</string>
+    <string name="stats_top_sinks">Most time: %s</string>
+    <string name="stats_no_slips">No slips past the budget this week.</string>
+    <string name="stats_slips">Most slips %1$s–%2$s</string>
+    <string name="stats_trigger">Most often pulled in by %s</string>
+    <string name="stats_days_under">%1$d of %2$d days under budget this month</string>
+    <string name="report_channel">Weekly report</string>
+    <string name="report_ready">Your week</string>
+    <string name="report_ready_text">This week against last, on one screen.</string>
+    <string name="settings_export">Export data</string>
+    <string name="settings_export_summary">The whole event log as a CSV file, saved where you choose</string>
+    <plurals name="export_done">
+        <item quantity="one">Exported %d event</item>
+        <item quantity="other">Exported %d events</item>
+    </plurals>
+    <string name="export_failed">Couldn\'t write the file.</string>
+
+    <!-- Taper, auto-tighten, earn-it -->
+    <string name="taper_title">Taper</string>
+    <string name="taper_off">Off. Lowers the budget by 5% each week until it reaches a floor you choose.</string>
+    <string name="taper_on">On: 5% less each week, stopping at %d min a day.</string>
+    <string name="taper_floor">Floor %d min</string>
+    <string name="taper_start">Start tapering</string>
+    <string name="taper_save">Save floor</string>
+    <string name="taper_stop">Stop tapering</string>
+    <string name="taper_pending_floor">Floor changes to %1$d min in %2$s</string>
+    <string name="taper_pending_off">Taper stops in %s</string>
+    <string name="earn_it_title">Earn-it</string>
+    <string name="earn_it_off">Off. When on, a finished task earns 5 Vault minutes and a full focus session 10, up to 30 a day.</string>
+    <string name="earn_it_on">On: finished tasks and focus sessions add Vault minutes, up to 30 a day. Tap to switch off.</string>
+    <string name="earn_it_on_in">Switches on in %s. Tap to cancel.</string>
+    <string name="tighten_offer">Three days in a row over budget. Want to try %d min a day? It\'s only an offer.</string>
+    <string name="tighten_accept">Use %d min</string>
+    <string name="tighten_decline">No thanks</string>
+    <string name="pending_taper_floor">Taper floor → %d min</string>
+    <string name="pending_taper_off">Taper → off</string>
+    <string name="pending_earn_it_on">Earn-it → on</string>
+    <string name="pending_earn_it_off">Earn-it → off</string>
+
+    <!-- Wind-down and calendar focus -->
+    <string name="wind_down_title">Wind-down</string>
+    <string name="settings_wind_down_summary">Bedtime: Sleep mode, grey screen, only calls, alarm and a book</string>
+    <string name="wind_down_explainer">From 30 minutes before bedtime until you wake, the Sleep mode is on: no Vault apps, the screen goes grey (if grayscale is set up), and only calls, the alarm clock and an e-book app open. The first unlock after waking lands on Today. Setting it up applies at once; switching it off or loosening it waits 24 hours.</string>
+    <string name="wind_down_on">On every night</string>
+    <string name="wind_down_off">Off</string>
+    <string name="wind_down_bedtime">Bedtime</string>
+    <string name="wind_down_wake">Wake</string>
+    <string name="wind_down_ebook">E-book app</string>
+    <string name="wind_down_ebook_none">None</string>
+    <string name="wind_down_start">Start wind-down</string>
+    <string name="wind_down_save">Save</string>
+    <string name="wind_down_stop">Switch off</string>
+    <string name="wind_down_saved">Saved. It applies now.</string>
+    <string name="wind_down_pending">That makes bedtime looser, so it applies in %s. See Pending changes.</string>
+    <string name="calendar_focus_title">Calendar focus</string>
+    <string name="calendar_focus_on">On: calendar events with \u201cfocus\u201d in the title start a session for their length</string>
+    <string name="calendar_focus_off">Off. Tap so events with \u201cfocus\u201d in the title start a session.</string>
+    <string name="calendar_focus_off_in">Switches off in %s. Tap to keep it on.</string>
+    <string name="calendar_focus_needs_calendar">Needs calendar access. Tap to allow it.</string>
+    <string name="pending_calendar_focus_on">Calendar focus → on</string>
+    <string name="pending_calendar_focus_off">Calendar focus → off</string>
+
+    <!-- Private space -->
+    <string name="private_space_title">Private space</string>
+    <string name="private_space_explainer">Android 15 can keep apps in a Private space that the system itself locks behind your screen lock. For a hard, OS-level lock, install your worst Vault apps there (from the Private space\'s own Play Store). While it\'s locked, its apps are hidden everywhere in Enough.</string>
+    <string name="private_space_none">There\'s no Private space on this phone. Set one up in the phone\'s Settings under Security and privacy, then come back.</string>
+    <string name="private_space_locked">Locked</string>
+    <string name="private_space_unlocked">Unlocked</string>
+    <string name="private_space_lock">Lock it</string>
+    <string name="private_space_unlock">Unlock</string>
+
+    <!-- Accessibility disclosure (shown before the system setting) -->
+    <string name="disclosure_title">How Enough uses accessibility</string>
+    <string name="disclosure_intro">Enough uses Android\'s accessibility service to put a pause in front of the apps you chose. It isn\'t an accessibility tool for disabilities.</string>
+    <string name="disclosure_apps">It sees which app is in front, so a Vault app opened from a notification, recents or a link still gets the pause screen, and its time counts against your budget.</string>
+    <string name="disclosure_screen">It reads what\'s on screen only where a rule you switched on needs it: the endless feed inside an app you blocked it in, a browser\'s address bar while a website is in the Vault, and this app\'s own Settings pages during a lock period. It looks only for those, and keeps none of what it reads.</string>
+    <string name="disclosure_actions">It can press Back or Home to leave a blocked feed or page, and lock the screen when you double-tap home.</string>
+    <string name="disclosure_private">Nothing it sees is stored beyond which app was open and for how long, and nothing leaves the phone: Enough has no internet access.</string>
+    <string name="disclosure_agree">Agree and continue</string>
+    <string name="disclosure_decline">Not now</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

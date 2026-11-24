@@ -26,6 +26,7 @@ import app.minimise.gate.rules.FocusRule
 import app.minimise.gate.rules.ModeAllowlistRule
 import app.minimise.gate.rules.OpenLimitRule
 import app.minimise.gate.rules.ScheduleRule
+import app.minimise.intervention.domain.Trigger
 import app.minimise.unlock.domain.UnlockMethodId
 import kotlin.time.Duration
 
@@ -35,6 +36,7 @@ typealias VerifyContent = @Composable (method: UnlockMethodId, onVerified: () ->
 @Composable
 fun BlockedScreen(
     state: BlockedUiState,
+    onTriggerChosen: (Trigger?) -> Unit,
     onOverrideChosen: (UnlockMethodId) -> Unit,
     onVerified: (UnlockMethodId) -> Unit,
     onTimeBoxChosen: (Duration) -> Unit,
@@ -51,6 +53,7 @@ fun BlockedScreen(
             .padding(32.dp),
     ) {
         when (val step = state.step) {
+            BlockedStep.Trigger -> TriggerQuestion(onTriggerChosen)
             BlockedStep.Choose -> Choose(state, onOverrideChosen, onGoHome)
             is BlockedStep.Verify -> {
                 verifyContent(step.method) { onVerified(step.method) }
@@ -77,6 +80,31 @@ fun BlockedScreen(
             }
         }
     }
+}
+
+@Composable
+private fun TriggerQuestion(onTriggerChosen: (Trigger?) -> Unit) {
+    Text(text = stringResource(R.string.blocked_budget_title), style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center)
+    Text(text = stringResource(R.string.trigger_question), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+    Trigger.entries.forEach { trigger ->
+        Text(
+            text = stringResource(trigger.labelRes()),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onTriggerChosen(trigger) }
+                .padding(vertical = 12.dp),
+        )
+    }
+    TextButton(onClick = { onTriggerChosen(null) }) { Text(stringResource(R.string.trigger_skip)) }
+}
+
+fun Trigger.labelRes(): Int = when (this) {
+    Trigger.NOTIFICATION -> R.string.trigger_notification
+    Trigger.BOREDOM -> R.string.trigger_boredom
+    Trigger.STRESS -> R.string.trigger_stress
+    Trigger.APP_HOP -> R.string.trigger_app_hop
 }
 
 @Composable
@@ -107,7 +135,8 @@ private fun overrideLabel(option: OverrideOption): String = when (option.method)
     UnlockMethodId.NFC_KEY -> stringResource(R.string.override_nfc_key)
     UnlockMethodId.QR_KEY -> stringResource(R.string.override_qr_key)
     UnlockMethodId.WAIT -> stringResource(R.string.override_wait)
-    UnlockMethodId.FRIEND_CODE, UnlockMethodId.TYPING -> option.method.name
+    UnlockMethodId.FRIEND_CODE -> pluralStringResource(R.plurals.override_friend_code, option.usesLeft ?: 0, option.usesLeft ?: 0)
+    UnlockMethodId.TYPING -> stringResource(R.string.override_typing)
 }
 
 @Composable

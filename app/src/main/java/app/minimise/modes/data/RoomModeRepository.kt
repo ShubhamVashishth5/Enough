@@ -89,5 +89,6 @@ class RoomModeRepository @Inject constructor(
             allowlist = allowlist?.split(',')?.filter { it.isNotBlank() }?.toSet(),
         ),
         schedule = if (scheduleDays == 0) null else WeeklyWindow.fromStored(scheduleDays, scheduleStartMinute, scheduleEndMinute),
+        presetKey = presetKey,
     )
 }

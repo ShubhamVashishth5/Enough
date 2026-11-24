@@ -9,6 +9,7 @@ import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.BufferedNotificationDao
 import app.minimise.core.db.EventDao
 import app.minimise.core.db.FocusSessionDao
+import app.minimise.core.db.FriendCodeDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.KeyDao
 import app.minimise.core.db.ModeDao
@@ -19,7 +20,7 @@ import app.minimise.core.db.SwapDao
 import app.minimise.core.db.TaskDao
 import app.minimise.core.prefs.DataStoreSettingsStore
 import app.minimise.core.prefs.SettingsStore
-import app.minimise.core.time.SystemTimeSource
+import app.minimise.core.time.TamperAwareTimeSource
 import app.minimise.core.time.TimeSource
 import app.minimise.usage.data.RoomEventLog
 import app.minimise.usage.domain.EventLog
@@ -38,7 +39,7 @@ import kotlinx.coroutines.SupervisorJob
 @InstallIn(SingletonComponent::class)
 abstract class CoreBindings {
     @Binds
-    abstract fun timeSource(impl: SystemTimeSource): TimeSource
+    abstract fun timeSource(impl: TamperAwareTimeSource): TimeSource
 
     @Binds
     abstract fun settingsStore(impl: DataStoreSettingsStore): SettingsStore
@@ -93,6 +94,9 @@ object CoreProviders {
 
     @Provides
     fun noteDao(db: AppDatabase): NoteDao = db.noteDao()
+
+    @Provides
+    fun friendCodeDao(db: AppDatabase): FriendCodeDao = db.friendCodeDao()
 
     @Provides
     @Singleton

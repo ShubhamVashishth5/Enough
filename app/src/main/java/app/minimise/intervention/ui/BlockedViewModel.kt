@@ -10,6 +10,8 @@ import app.minimise.core.Defaults
 import app.minimise.core.time.TimeSource
 import app.minimise.intervention.domain.GateOutcomes
 import app.minimise.intervention.domain.TimeBoxOptions
+import app.minimise.intervention.domain.Trigger
+import app.minimise.gate.rules.BudgetRule
 import app.minimise.keys.domain.NfcKeyMethod
 import app.minimise.keys.domain.QrKeyMethod
 import app.minimise.unlock.domain.UnlockMethod
@@ -46,6 +48,9 @@ data class BlockedUiState(
 data class OverrideOption(val method: UnlockMethodId, val usesLeft: Int?)
 
 sealed interface BlockedStep {
+    /** Budget blocks first ask "What pulled you in?", for the weekly report. */
+    data object Trigger : BlockedStep
+
     /** The block's reason and the overrides on offer. */
     data object Choose : BlockedStep
 
@@ -58,7 +63,7 @@ sealed interface BlockedStep {
 
 @HiltViewModel
 class BlockedViewModel @Inject constructor(
-    savedState: SavedStateHandle,
+    private val savedState: SavedStateHandle,
     private val appRepository: AppRepository,
     private val methods: Map<UnlockMethodId, @JvmSuppressWildcards UnlockMethod>,
     private val dailyBudget: DailyBudget,
@@ -77,13 +82,18 @@ class BlockedViewModel @Inject constructor(
         ?.mapNotNull { name -> UnlockMethodId.entries.firstOrNull { it.name == name } }
         .orEmpty()
 
-    private val _uiState = MutableStateFlow(BlockedUiState(reason = savedState[BlockedActivity.EXTRA_REASON] ?: ""))
+    private val reason: String = savedState[BlockedActivity.EXTRA_REASON] ?: ""
+    private val askTrigger = reason == BudgetRule.REASON && savedState.get<Boolean>(KEY_TRIGGER_ANSWERED) != true
+    private val _uiState = MutableStateFlow(BlockedUiState(reason = reason, step = if (askTrigger) BlockedStep.Trigger else BlockedStep.Choose))
     val uiState: StateFlow<BlockedUiState> = _uiState.asStateFlow()
 
     private var decided = false
 
     init {
+        val logShown = savedState.get<Boolean>(KEY_SHOWN_LOGGED) != true
+        savedState[KEY_SHOWN_LOGGED] = true
         viewModelScope.launch {
+            if (logShown) outcomes.blockShown(packageName, reason)
             val app = appRepository.entry(packageName)
             val label = app?.label ?: packageName
             // Only Vault apps spend the budget, so only they have their time box capped by it.
@@ -96,6 +106,14 @@ class BlockedViewModel @Inject constructor(
                 it.copy(appLabel = label, options = options, timeBoxOptions = timeBoxes)
             }
         }
+    }
+
+    /** Null skips the question. Either way, on to the block itself. */
+    fun onTriggerChosen(trigger: Trigger?) {
+        if (_uiState.value.step != BlockedStep.Trigger) return
+        savedState[KEY_TRIGGER_ANSWERED] = true
+        _uiState.update { it.copy(step = BlockedStep.Choose) }
+        if (trigger != null) viewModelScope.launch { outcomes.trigger(packageName, trigger) }
     }
 
     fun onOverrideChosen(method: UnlockMethodId) {
@@ -160,7 +178,10 @@ class BlockedViewModel @Inject constructor(
     fun onBack() {
         if (decided) return
         waitJob?.cancel()
-        if (_uiState.value.step == BlockedStep.Choose) onGoHome() else _uiState.update { it.copy(step = BlockedStep.Choose) }
+        when (_uiState.value.step) {
+            BlockedStep.Choose, BlockedStep.Trigger -> onGoHome()
+            else -> _uiState.update { it.copy(step = BlockedStep.Choose) }
+        }
     }
 
     fun onGoHome() {
@@ -170,6 +191,9 @@ class BlockedViewModel @Inject constructor(
     }
 
     private companion object {
+        const val KEY_SHOWN_LOGGED = "shown_logged"
+        const val KEY_TRIGGER_ANSWERED = "trigger_answered"
+
         /** Methods with a check of their own before the time box. An emergency pass needs none. */
         val VERIFIED_METHODS = setOf(UnlockMethodId.NFC_KEY, UnlockMethodId.QR_KEY, UnlockMethodId.WAIT)
         val TICK = 200.milliseconds

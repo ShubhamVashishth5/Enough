@@ -6,8 +6,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [EventEntity::class, AppEntity::class, PendingChangeEntity::class, GrantEntity::class, TaskEntity::class, SwapEntity::class, ScheduleEntity::class, KeyEntity::class, FocusSessionEntity::class, ModeEntity::class, BufferedNotificationEntity::class, NoteEntity::class],
-    version = 13,
+    entities = [EventEntity::class, AppEntity::class, PendingChangeEntity::class, GrantEntity::class, TaskEntity::class, SwapEntity::class, ScheduleEntity::class, KeyEntity::class, FocusSessionEntity::class, ModeEntity::class, BufferedNotificationEntity::class, NoteEntity::class, FriendCodeEntity::class],
+    version = 14,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
@@ -22,6 +22,7 @@ import androidx.room.TypeConverters
         AutoMigration(from = 10, to = 11),
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
+        AutoMigration(from = 13, to = 14),
     ],
 )
 @TypeConverters(Converters::class)
@@ -49,6 +50,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bufferedNotificationDao(): BufferedNotificationDao
 
     abstract fun noteDao(): NoteDao
+
+    abstract fun friendCodeDao(): FriendCodeDao
 
     companion object {
         const val NAME = "minimise.db"

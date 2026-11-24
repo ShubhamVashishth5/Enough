@@ -8,6 +8,7 @@ import app.minimise.settings.domain.SettingsGuard
 import app.minimise.testing.FakeAppRepository
 import app.minimise.testing.FakeEventLog
 import app.minimise.testing.FakePendingChangeStore
+import app.minimise.testing.NoLockPeriod
 import app.minimise.testing.FakeSettingsStore
 import app.minimise.testing.app
 import app.minimise.usage.domain.Event
@@ -33,6 +34,7 @@ class AutoVaultTest {
             override suspend fun current(): Duration = 24.hours
         },
         events,
+        NoLockPeriod,
     )
     private val autoVault = AutoVault(apps, guard, settings, events, clock, object : AutoVaultNotice {
         override fun show(appLabel: String) {

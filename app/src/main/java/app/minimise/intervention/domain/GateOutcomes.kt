@@ -79,6 +79,29 @@ class GateOutcomes @Inject constructor(
         )
     }
 
+    /** A Block decision reached the screen. A budget block is a slip in the weekly report. */
+    suspend fun blockShown(packageName: String, reason: String) {
+        eventLog.log(
+            Event(
+                type = EventType.BLOCK_SHOWN,
+                startAt = timeSource.now(),
+                packageName = packageName,
+                data = buildJsonObject { put("reason", reason) }.toString(),
+            ),
+        )
+    }
+
+    suspend fun trigger(packageName: String, trigger: Trigger) {
+        eventLog.log(
+            Event(
+                type = EventType.TRIGGER,
+                startAt = timeSource.now(),
+                packageName = packageName,
+                data = buildJsonObject { put("trigger", trigger.name) }.toString(),
+            ),
+        )
+    }
+
     suspend fun cancelled(packageName: String) {
         eventLog.log(Event(type = EventType.GATE_CANCELLED, startAt = timeSource.now(), packageName = packageName))
     }

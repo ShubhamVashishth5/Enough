@@ -17,6 +17,7 @@ data class PermissionsUiState(
     val doNotDisturb: Boolean = false,
     val calendar: Boolean = false,
     val grayscale: Boolean = false,
+    val deviceAdmin: Boolean = false,
     val grayscaleCommand: String = "",
 )
 
@@ -38,6 +39,7 @@ class PermissionsViewModel @Inject constructor(
             doNotDisturb = status.hasDoNotDisturbAccess(),
             calendar = status.canReadCalendar(),
             grayscale = status.canWriteSecureSettings(),
+            deviceAdmin = status.isDeviceAdmin(),
             grayscaleCommand = status.grayscaleGrantCommand(),
         )
     }
@@ -57,4 +59,6 @@ class PermissionsViewModel @Inject constructor(
     fun notificationAccessIntent(): Intent = status.notificationAccessIntent()
 
     fun appNotificationSettingsIntent(): Intent = status.appNotificationSettingsIntent()
+
+    fun deviceAdminIntent(): Intent = status.deviceAdminIntent()
 }

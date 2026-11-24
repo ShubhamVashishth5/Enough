@@ -1,0 +1,1 @@
+First release: the launcher, the Vault and pause screen, shared budget, schedules, focus sessions, modes, the notification digest, feed and website blocking, lock periods, friend codes, typing penance, physical keys, the weekly report, taper, wind-down and calendar focus.

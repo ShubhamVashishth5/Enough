@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,6 +9,22 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
 }
+
+/**
+ * Release signing comes from environment variables (CI) or a keystore.properties file next to
+ * settings.gradle.kts (local builds). Neither is in the repo. Without them, assembleRelease still works
+ * and produces app-release-unsigned.apk.
+ *
+ * keystore.properties:  storeFile=/path/to/release.jks  storePassword=...  keyAlias=...  keyPassword=...
+ */
+val keystoreProperties = Properties().apply {
+    rootProject.file("keystore.properties").takeIf { it.isFile }?.inputStream()?.use { load(it) }
+}
+
+fun signing(env: String, property: String): String? =
+    System.getenv(env)?.takeIf { it.isNotBlank() } ?: keystoreProperties.getProperty(property)?.takeIf { it.isNotBlank() }
+
+val releaseStoreFile = signing("ENOUGH_KEYSTORE_FILE", "storeFile")
 
 android {
     namespace = "app.minimise"
@@ -23,8 +40,20 @@ android {
         versionName = "0.1.0"
     }
 
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = file(releaseStoreFile)
+                storePassword = signing("ENOUGH_KEYSTORE_PASSWORD", "storePassword")
+                keyAlias = signing("ENOUGH_KEY_ALIAS", "keyAlias")
+                keyPassword = signing("ENOUGH_KEY_PASSWORD", "keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -39,6 +68,12 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    // F-Droid: no Google-signed dependency metadata blob in the APK or bundle.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 

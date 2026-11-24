@@ -30,6 +30,9 @@
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- Android 15 Private space: the home app may list, lock and unlock it. -->
+    <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
+
     <!-- Lets LauncherApps and PackageManager see every app with a launcher icon, plus other home apps. -->
     <queries>
         <intent>
@@ -39,6 +42,10 @@
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.HOME" />
+        </intent>
+        <!-- The alarm clock, which wind-down and focus sessions always let open. -->
+        <intent>
+            <action android:name="android.intent.action.SHOW_ALARMS" />
         </intent>
     </queries>
 
@@ -90,6 +97,13 @@
             android:launchMode="singleTask"
             android:taskAffinity="app.minimise.intervention" />
 
+        <activity
+            android:name=".intervention.ui.NoticeActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
         <!-- The QR scanner, allowed to turn with the phone. -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
@@ -115,6 +129,44 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".stats.WeeklyReportAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".stats.WeeklyReportBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".calendar.CalendarFocusAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".calendar.CalendarFocusBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- The uninstall guard: an active admin can't be uninstalled. It asks for no policies. -->
+        <receiver
+            android:name=".guard.GuardAdminReceiver"
+            android:exported="true"
+            android:label="@string/admin_label"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
 
