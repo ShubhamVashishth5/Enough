@@ -32,6 +32,14 @@
     <string name="protection_level_full">Protection is Full: every Vault open is paused, and feed, website and lock rules work.</string>
     <string name="protection_level_lite">Protection is Lite: every Vault open is paused, but feed blocking, website rules and the lock guard need accessibility.</string>
     <string name="protection_level_launcher_only">Protection covers only opens from this home screen. Turn on accessibility, or usage access and display over other apps, so Vault apps opened from anywhere else are paused too.</string>
+    <plurals name="home_app_lock_add">
+        <item quantity="one">Put %d Vault app behind the phone\'s app lock</item>
+        <item quantity="other">Put %d Vault apps behind the phone\'s app lock</item>
+    </plurals>
+    <plurals name="home_app_lock_remove">
+        <item quantity="one">Take the phone\'s app lock off %d app</item>
+        <item quantity="other">Take the phone\'s app lock off %d apps</item>
+    </plurals>
     <string name="needs_full_protection">Off for now: this needs accessibility, and protection is Lite or off.</string>
     <string name="lock_guard_needs_full_protection">Keeping you out of this app\'s system pages during a lock needs accessibility.</string>
 

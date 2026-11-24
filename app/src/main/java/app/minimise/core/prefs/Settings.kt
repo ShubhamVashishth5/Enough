@@ -44,6 +44,8 @@ data class Settings(
     val calendarFocusStartedKey: String? = null,
     /** While a lock period runs, nothing can be loosened; null when there never was one. */
     val lockedUntil: Instant? = null,
+    /** Apps Enough put behind the system app lock, so it only ever takes off its own locks. */
+    val appsLockedByEnough: Set<String> = emptySet(),
     /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */
     val swapsSeeded: Boolean = false,
     /** Debug builds only: shifts the wall clock, for testing day resets. */

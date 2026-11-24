@@ -56,6 +56,7 @@ class DataStoreSettingsStore @Inject constructor(
             grayscaleMode = this[Keys.GRAYSCALE_MODE]?.let { name -> GrayscaleMode.entries.firstOrNull { it.name == name } }
                 ?: defaults.grayscaleMode,
             blockedFeeds = this[Keys.BLOCKED_FEEDS] ?: defaults.blockedFeeds,
+            appsLockedByEnough = this[Keys.APPS_LOCKED_BY_ENOUGH] ?: defaults.appsLockedByEnough,
             lockedUntil = this[Keys.LOCKED_UNTIL_MILLIS]?.let(Instant::ofEpochMilli),
             taperFloorMinutes = this[Keys.TAPER_FLOOR_MINUTES]?.toInt(),
             taperWeek = this[Keys.TAPER_WEEK_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
@@ -81,6 +82,7 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.DIGEST_ENABLED] = settings.digestEnabled
         this[Keys.DIGEST_EXEMPT] = settings.digestExempt
         this[Keys.BLOCKED_FEEDS] = settings.blockedFeeds
+        this[Keys.APPS_LOCKED_BY_ENOUGH] = settings.appsLockedByEnough
         settings.lockedUntil?.let { this[Keys.LOCKED_UNTIL_MILLIS] = it.toEpochMilli() } ?: remove(Keys.LOCKED_UNTIL_MILLIS)
         settings.taperFloorMinutes?.let { this[Keys.TAPER_FLOOR_MINUTES] = it.toLong() } ?: remove(Keys.TAPER_FLOOR_MINUTES)
         settings.taperWeek?.let { this[Keys.TAPER_WEEK_EPOCH_DAY] = it.toEpochDay() } ?: remove(Keys.TAPER_WEEK_EPOCH_DAY)
@@ -109,6 +111,7 @@ class DataStoreSettingsStore @Inject constructor(
         val DIGEST_ENABLED = booleanPreferencesKey("digest_enabled")
         val DIGEST_EXEMPT = stringSetPreferencesKey("digest_exempt")
         val BLOCKED_FEEDS = stringSetPreferencesKey("blocked_feeds")
+        val APPS_LOCKED_BY_ENOUGH = stringSetPreferencesKey("apps_locked_by_enough")
         val LOCKED_UNTIL_MILLIS = longPreferencesKey("locked_until_millis")
         val TAPER_FLOOR_MINUTES = longPreferencesKey("taper_floor_minutes")
         val TAPER_WEEK_EPOCH_DAY = longPreferencesKey("taper_week_epoch_day")
