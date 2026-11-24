@@ -40,6 +40,10 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.HOME" />
         </intent>
+        <!-- The alarm clock, which wind-down and focus sessions always let open. -->
+        <intent>
+            <action android:name="android.intent.action.SHOW_ALARMS" />
+        </intent>
     </queries>
 
     <application
@@ -131,6 +135,18 @@
 
         <receiver
             android:name=".stats.WeeklyReportBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".calendar.CalendarFocusAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".calendar.CalendarFocusBootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

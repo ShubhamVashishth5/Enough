@@ -38,6 +38,10 @@ data class Settings(
     val earnIt: Boolean = false,
     /** The day the auto-tighten offer was last answered, so it isn't repeated for the same run of days. */
     val tightenAnsweredDay: LocalDate? = null,
+    /** Calendar events with "focus" in the title start focus sessions. */
+    val calendarFocus: Boolean = false,
+    /** The calendar event a session was last started for, so it isn't started twice. */
+    val calendarFocusStartedKey: String? = null,
     /** While a lock period runs, nothing can be loosened; null when there never was one. */
     val lockedUntil: Instant? = null,
     /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */

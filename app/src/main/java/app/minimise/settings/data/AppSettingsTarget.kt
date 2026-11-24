@@ -25,6 +25,7 @@ import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetTaper
 import app.minimise.settings.domain.SetEarnIt
+import app.minimise.settings.domain.SetCalendarFocus
 import app.minimise.core.time.DayBoundary
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetManualMode
@@ -66,6 +67,7 @@ class AppSettingsTarget @Inject constructor(
         // A floor behaves like a limit: adding or lowering one tightens, raising or removing one loosens.
         is SetTaper -> openLimitChangeDirection(from = settingsStore.current().taperFloorMinutes, to = change.floorMinutes)
         is SetEarnIt -> switchDirection(from = !settingsStore.current().earnIt, to = !change.enabled)
+        is SetCalendarFocus -> switchDirection(from = settingsStore.current().calendarFocus, to = change.enabled)
         // Only ever lengthens a lock; anything else is no change at all.
         is StartLock -> {
             val current = settingsStore.current().lockedUntil?.toEpochMilli() ?: Long.MIN_VALUE
@@ -101,6 +103,7 @@ class AppSettingsTarget @Inject constructor(
             }
         }
         is SetEarnIt -> settingsStore.update { it.copy(earnIt = change.enabled) }
+        is SetCalendarFocus -> settingsStore.update { it.copy(calendarFocus = change.enabled) }
         is SetFeedBlocked -> settingsStore.update {
             it.copy(blockedFeeds = if (change.blocked) it.blockedFeeds + change.feedId else it.blockedFeeds - change.feedId)
         }

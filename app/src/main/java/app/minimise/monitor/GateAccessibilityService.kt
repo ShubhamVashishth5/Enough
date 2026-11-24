@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
+import app.minimise.calendar.domain.CalendarFocus
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
 import app.minimise.display.GrayscaleController
@@ -58,6 +59,7 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var timeSource: TimeSource
     @Inject lateinit var todayPrompt: TodayPrompt
     @Inject lateinit var taper: Taper
+    @Inject lateinit var calendarFocus: CalendarFocus
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     private val scope = CoroutineScope(
@@ -163,6 +165,7 @@ class GateAccessibilityService : AccessibilityService() {
             settingsGuard.applyDue()
             taper.applyIfDue()
             focusSessions.finishIfDue()
+            calendarFocus.startIfDue()
             if (todayPrompt.claim()) startActivity(HomeActivity.todayIntent(this@GateAccessibilityService))
         }
         // The app that was in front before the screen went off is in front again, and no window

@@ -104,6 +104,15 @@ object Defaults {
     /** How far back earn-it looks for a task or session that already earned. */
     const val EARN_IT_LOOKBACK_DAYS: Long = 7
 
+    /** Wind-down starts this long before bedtime. */
+    val WIND_DOWN_LEAD: Duration = 30.minutes
+
+    /** A calendar event with this in its title starts a focus session. */
+    const val CALENDAR_FOCUS_WORD: String = "focus"
+
+    /** Calendar focus looks this far ahead for the next event, and re-arms at least this often. */
+    val CALENDAR_FOCUS_LOOKAHEAD: Duration = 24.hours
+
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(
         ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),

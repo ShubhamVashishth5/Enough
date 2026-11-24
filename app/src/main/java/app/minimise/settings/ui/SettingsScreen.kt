@@ -30,6 +30,7 @@ fun SettingsRoute(
     onOpenFeeds: () -> Unit,
     onOpenLock: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenWindDown: () -> Unit,
     onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -61,6 +62,7 @@ fun SettingsRoute(
         onOpenFeeds = onOpenFeeds,
         onOpenLock = onOpenLock,
         onOpenStats = onOpenStats,
+        onOpenWindDown = onOpenWindDown,
         onExport = { exportFile.launch(EXPORT_FILE_NAME) },
         onOpenFriendKey = onOpenFriendKey,
         onOpenPendingChanges = onOpenPendingChanges,
@@ -86,6 +88,7 @@ fun SettingsScreen(
     onOpenFeeds: () -> Unit,
     onOpenLock: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenWindDown: () -> Unit,
     onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -111,6 +114,11 @@ fun SettingsScreen(
             summary = state.activeModeName?.let { stringResource(R.string.settings_modes_now, it) }
                 ?: stringResource(R.string.settings_modes_none),
             onClick = onOpenModes,
+        )
+        SettingsRow(
+            title = stringResource(R.string.wind_down_title),
+            summary = stringResource(R.string.settings_wind_down_summary),
+            onClick = onOpenWindDown,
         )
         SettingsRow(
             title = stringResource(R.string.settings_schedules),

@@ -118,6 +118,13 @@ data class SetEarnIt(val enabled: Boolean) : SettingChange {
     override val key: String get() = "earn_it"
 }
 
+/** Calendar focus: events with "focus" in the title start sessions. On is tightening. */
+@Serializable
+@SerialName("set_calendar_focus")
+data class SetCalendarFocus(val enabled: Boolean) : SettingChange {
+    override val key: String get() = "calendar_focus"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {
