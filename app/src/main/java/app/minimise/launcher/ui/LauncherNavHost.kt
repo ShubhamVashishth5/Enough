@@ -29,6 +29,9 @@ import app.minimise.modes.ui.ModeEditRoute
 import app.minimise.modes.ui.ModesRoute
 import app.minimise.digest.ui.DigestRoute
 import app.minimise.digest.ui.DigestSettingsRoute
+import app.minimise.capture.ui.CaptureRoute
+import app.minimise.capture.ui.InboxLink
+import app.minimise.capture.ui.InboxRoute
 import app.minimise.tasks.ui.TodayRoute
 import kotlinx.coroutines.flow.Flow
 
@@ -81,6 +84,8 @@ fun LauncherNavHost(
                 onOpenPermissions = { navController.navigate(Destination.Permissions) { launchSingleTop = true } },
                 onOpenToday = openToday,
                 onOpenDigest = { navController.navigate(Destination.Digest) { launchSingleTop = true } },
+                onOpenCapture = { navController.navigate(Destination.Capture) { launchSingleTop = true } },
+                onOpenInbox = { navController.navigate(Destination.Inbox) { launchSingleTop = true } },
             )
         }
         composable<Destination.Today> {
@@ -126,7 +131,13 @@ fun LauncherNavHost(
             ModesRoute(onEdit = { navController.navigate(Destination.ModeEdit(it)) })
         }
         composable<Destination.Digest> {
-            DigestRoute()
+            DigestRoute(extra = { InboxLink(onOpenInbox = { navController.navigate(Destination.Inbox) }) })
+        }
+        composable<Destination.Capture> {
+            CaptureRoute(onDone = { navController.popBackStack(Destination.Home, inclusive = false) })
+        }
+        composable<Destination.Inbox> {
+            InboxRoute()
         }
         composable<Destination.DigestSettings> {
             DigestSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })

@@ -12,6 +12,7 @@ import app.minimise.core.db.FocusSessionDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.KeyDao
 import app.minimise.core.db.ModeDao
+import app.minimise.core.db.NoteDao
 import app.minimise.core.db.PendingChangeDao
 import app.minimise.core.db.ScheduleDao
 import app.minimise.core.db.SwapDao
@@ -89,6 +90,9 @@ object CoreProviders {
 
     @Provides
     fun bufferedNotificationDao(db: AppDatabase): BufferedNotificationDao = db.bufferedNotificationDao()
+
+    @Provides
+    fun noteDao(db: AppDatabase): NoteDao = db.noteDao()
 
     @Provides
     @Singleton
