@@ -68,6 +68,7 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
         onRequestDoNotDisturb = { open(viewModel.doNotDisturbIntent()) },
         onRequestNotificationAccess = { open(viewModel.notificationAccessIntent()) },
         onRequestCalendar = { calendarRequest.launch(Manifest.permission.READ_CALENDAR) },
+        onRequestDeviceAdmin = { open(viewModel.deviceAdminIntent()) },
         onRequestPostNotifications = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 notificationRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -89,6 +90,7 @@ fun PermissionsScreen(
     onRequestNotificationAccess: () -> Unit,
     onRequestPostNotifications: () -> Unit,
     onRequestCalendar: () -> Unit,
+    onRequestDeviceAdmin: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.permissions_title)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -150,6 +152,13 @@ fun PermissionsScreen(
                 granted = state.calendar,
                 action = stringResource(R.string.permission_allow),
                 onAction = onRequestCalendar,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_device_admin),
+                why = stringResource(R.string.permission_device_admin_why),
+                granted = state.deviceAdmin,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestDeviceAdmin,
             )
             GrayscaleItem(granted = state.grayscale, command = state.grayscaleCommand)
         }

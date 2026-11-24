@@ -125,6 +125,20 @@
             </intent-filter>
         </receiver>
 
+        <!-- The uninstall guard: an active admin can't be uninstalled. It asks for no policies. -->
+        <receiver
+            android:name=".guard.GuardAdminReceiver"
+            android:exported="true"
+            android:label="@string/admin_label"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".monitor.GateAccessibilityService"
             android:exported="true"

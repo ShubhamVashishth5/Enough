@@ -11,6 +11,10 @@ import app.minimise.core.time.TimeSource
 import app.minimise.feeds.domain.FeedAction
 import app.minimise.feeds.domain.FeedBlocker
 import app.minimise.feeds.domain.FeedRule
+import app.minimise.guard.domain.LockGuard
+import app.minimise.core.prefs.SettingsStore
+import app.minimise.core.prefs.current
+import app.minimise.core.ui.dateTimeText
 import app.minimise.intervention.ui.NoticeActivity
 import app.minimise.monitor.data.AccessibilityForegroundSource
 import app.minimise.monitor.data.AccessibilityScreenNode
@@ -30,7 +34,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * Reads the screen of the few apps that need it (those with a blocked feed, browsers while a website
- * is in the Vault) and acts on what it finds. A thin adapter: what counts as a match is decided in
+ * is in the Vault, Settings during a lock period) and acts on what it finds. A thin adapter: what counts as a match is decided in
  * domain classes.
  *
  * Content changes arrive many times a second; checks run at most once per
@@ -40,6 +44,8 @@ class ScreenWatcher @Inject constructor(
     @ApplicationContext private val context: Context,
     private val feedBlocker: FeedBlocker,
     private val browserCoverage: BrowserCoverage,
+    private val lockGuard: LockGuard,
+    private val settingsStore: SettingsStore,
     private val foregroundSource: AccessibilityForegroundSource,
     private val timeSource: TimeSource,
 ) {
@@ -53,7 +59,15 @@ class ScreenWatcher @Inject constructor(
     @Volatile
     var watched: Set<String> = emptySet()
 
-    val watchedPackages: Flow<Set<String>> get() = combine(feedBlocker.watchedPackages, browserCoverage.watchedPackages) { a, b -> a + b }
+    val watchedPackages: Flow<Set<String>>
+        get() = combine(feedBlocker.watchedPackages, browserCoverage.watchedPackages, lockGuard.watchedPackages) { a, b, c -> a + b + c }
+
+    private val labels: Map<String, String> by lazy {
+        mapOf(
+            "app_label" to context.getString(R.string.app_name),
+            "service_label" to context.getString(R.string.accessibility_service_label),
+        )
+    }
 
     /**
      * True while a website read from [packageName] is in front. A window change inside that browser
@@ -76,6 +90,10 @@ class ScreenWatcher @Inject constructor(
         val root = service.rootInActiveWindow ?: return
         if (root.packageName?.toString() != packageName) return
         val node: ScreenNode = AccessibilityScreenNode(root)
+        if (withContext(Dispatchers.Default) { lockGuard.check(packageName, node, labels) } != null) {
+            keepOut(service)
+            return
+        }
         if (browserCoverage.isBrowser(packageName)) {
             val read = withContext(Dispatchers.Default) { browserCoverage.read(packageName, node) }
             if (read is AddressBarRead.Page) {
@@ -87,6 +105,21 @@ class ScreenWatcher @Inject constructor(
         // Walking the tree is one call to the other app per node: keep it off the main thread.
         val feed = withContext(Dispatchers.Default) { feedBlocker.check(packageName, node) }
         feed?.let { act(service, it) }
+    }
+
+    /** A page that could switch the app off, during a lock: home, and say why. */
+    private suspend fun keepOut(service: AccessibilityService) {
+        service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
+        val until = settingsStore.current().lockedUntil ?: return
+        context.startActivity(
+            NoticeActivity.intent(
+                context,
+                title = context.getString(R.string.guard_title),
+                body = context.getString(R.string.lock_refused, dateTimeText(context, until.atZone(timeSource.zone()).toLocalDateTime())),
+                action = context.getString(R.string.time_up_go_home),
+                goHome = true,
+            ),
+        )
     }
 
     private fun act(service: AccessibilityService, feed: FeedRule) {

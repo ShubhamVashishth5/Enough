@@ -6,6 +6,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.app.NotificationManager
+import android.app.admin.DevicePolicyManager
+import app.minimise.R
+import app.minimise.guard.GuardAdminReceiver
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -60,6 +63,14 @@ class PermissionStatus @Inject constructor(
 
     /** Run once from a computer with USB debugging on. */
     fun grayscaleGrantCommand(): String = "adb shell pm grant ${context.packageName} ${Manifest.permission.WRITE_SECURE_SETTINGS}"
+
+    fun isDeviceAdmin(): Boolean =
+        context.getSystemService(DevicePolicyManager::class.java).isAdminActive(GuardAdminReceiver.component(context))
+
+    /** The system screen that turns on the uninstall guard. */
+    fun deviceAdminIntent(): Intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+        .putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, GuardAdminReceiver.component(context))
+        .putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, context.getString(R.string.admin_explanation))
 
     fun accessibilitySettingsIntent(): Intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
 
