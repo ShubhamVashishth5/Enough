@@ -32,7 +32,16 @@ Builds:
     gradle:
       - yes
 
+  - versionName: 0.2.0
+    versionCode: 2
+    commit: v0.2.0
+    subdir: app
+    sudo:
+      - sdkmanager 'platforms;android-37.2' 'build-tools;37.0.0'
+    gradle:
+      - yes
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 0.1.0
-CurrentVersionCode: 1
+CurrentVersion: 0.2.0
+CurrentVersionCode: 2

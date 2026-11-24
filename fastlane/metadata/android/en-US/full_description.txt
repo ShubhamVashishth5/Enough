@@ -2,9 +2,11 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 
 <b>A quiet home screen</b>
 <ul>
-<li>Up to six tool apps as plain words. No icons, badges or app grid.</li>
-<li>Today's one to three tasks under the clock, plus your next calendar item.</li>
-<li>Type to find an app. Distracting apps never auto-launch.</li>
+<li>Up to six apps as plain words. No icons, badges or app grid.</li>
+<li>Today's top three tasks under the clock, plus your next calendar item. Add more and put them in order.</li>
+<li>Battery, next alarm, what's playing, and the weather and air quality, as plain text. Each can be switched off.</li>
+<li>A lock button, swipe down for notifications, and an option to hide the status bar.</li>
+<li>Type to find an app. Distracting apps never auto-launch. Long-press one to uninstall it.</li>
 </ul>
 
 <b>The Vault, behind a pause</b>
@@ -14,6 +16,7 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 <li>One shared daily budget across every Vault app, so hopping between them doesn't dodge it.</li>
 <li>Websites in the Vault get the same rules in Chrome, Firefox, Samsung Internet, Brave and others.</li>
 <li>Block just the endless parts: YouTube Shorts, Instagram Reels and Explore.</li>
+<li>Or make an app a Breathe app: it stays on home, and just pauses for a breath before every open.</li>
 </ul>
 
 <b>Commitment</b>
@@ -30,8 +33,8 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 <li>One weekly report, which opens once a day. CSV export of everything.</li>
 </ul>
 
-<b>Private and offline</b>
-Enough has no internet permission. Usage data never leaves the phone and no account is needed.
+<b>Private</b>
+Usage data never leaves the phone and no account is needed. The only thing that goes online is the optional weather and air quality line, which is off until you switch it on and sends Open-Meteo nothing but a rough location.
 
 <b>Honest limits</b>
 Safe mode, a factory reset or a computer with USB debugging can get around everything. The aim is to make cheating take effort, not to make it impossible.

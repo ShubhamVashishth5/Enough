@@ -7,13 +7,23 @@ the **Vault**: they leave the home screen and search, and every open starts with
 grows through the day. One daily budget covers all of them. Making a rule stricter is instant; making it
 looser waits 24 hours, so a weak moment can't undo a calm decision.
 
-It's Android only, works fully offline and has no internet permission. Nothing you do leaves the phone.
+It's Android only and works offline. Nothing you do leaves the phone: the one thing that goes online is
+the optional weather and air quality line on home, which is off until you switch it on and sends only a
+rough location.
 
 ## What it does
 
-- **A quiet home screen.** Up to six tool apps as plain words, today's one to three tasks, the next
-  calendar item, and two numbers: Vault minutes and unlocks today. No icons, badges or app grid; you type
-  to find an app.
+- **A quiet home screen.** Up to six apps as plain words, today's top three tasks (add as many as ten
+  and put them in order; the next one moves up as you tick one off), the next calendar item, and two
+  numbers: Vault minutes and unlocks today. No icons, badges or app grid; you type to find an app, and
+  long-press a result to see its info or uninstall it.
+- **Small lines under the clock, each one switchable.** Battery, the next alarm, what's playing (with
+  previous, play/pause and next; tap the song to open the player), and the weather and US air quality
+  index for where you are. A lock button by the clock, swipe down for notifications, and an option to
+  hide the status bar on home. Settings → Home screen lists every tap and swipe and what it does.
+- **Breathe apps.** For apps you want to notice reaching for but not ration: they stay on home and in
+  search, and every open starts with a short breathing pause. No reason asked, no time box, nothing
+  taken from the budget.
 - **The Vault.** A pause screen ("What are you here for?"), an escalating wait, a 2, 5 or 10 minute time
   box, and a shared daily budget. Answer *bored* or *habit* and it offers something from your Instead list
   first.
@@ -75,7 +85,10 @@ apps) or **home screen only**.
 | Usage access and display over other apps | **Lite protection**, for when accessibility is off or Android takes it away (Android 17's Advanced Protection does). Enough checks once a second which app is in front and shows the pause over a Vault app, from a foreground service with one quiet notification. It reads no screen content, so feed blocking, website rules and the lock guard are off at this level. |
 | Default home app | Every unlock lands on Enough, so Vault apps aren't one tap away. Also lets it list and lock Private space (`ACCESS_HIDDEN_PROFILES`), and on Android 17 QPR2 put apps behind the system app lock (`LOCK_APPS`). |
 | Unrestricted battery | Stops the system pausing the service, which would switch protection off. |
-| Notification access | The digest: holds non-urgent notifications and releases them at 9:00, 14:00 and 20:00. |
+| Notification access | The digest: holds non-urgent notifications and releases them at 9:00, 14:00 and 20:00. Also what's playing on home, since Android shows other apps' media sessions only to an app with notification access. |
+| Approximate location and internet | Home's weather and air quality lines, off by default. See below. |
+| Expand status bar | Swipe down on home for notifications, when the accessibility service is off. |
+| Request delete packages | Uninstall from a long-press on an app. Android still asks you to confirm. |
 | Post notifications | The digest summary, the weekly report, and "an app went into the Vault". |
 | Do Not Disturb access | Turned on during focus sessions and put back afterwards. |
 | Calendar | The next event on the home screen, and calendar focus. |
@@ -84,7 +97,12 @@ apps) or **home screen only**.
 | Write secure settings | Grayscale. Only ADB can grant it. |
 | Boot completed, set alarm | Re-arming the digest, weekly report and calendar focus alarms after a restart; opening the timer from home. |
 
-There is no `INTERNET` permission, now or later. The app uses no Google Play Services, Firebase or
+The `INTERNET` permission is there for one thing: home's weather and air quality lines. They are off
+until you switch them on in Settings → Home screen. Then, when home is shown and the last reading is
+over half an hour old, the app asks [Open-Meteo](https://open-meteo.com) (free, open source, no account
+or key) for the current weather and US AQI. The request carries the phone's coarse location rounded to
+two decimal places (about a kilometre) and a User-Agent of `Enough`, and nothing else: no usage data, no
+identifiers. Nothing else in the app uses the network. It uses no Google Play Services, Firebase or
 analytics.
 
 ## Honest limits
@@ -172,7 +190,7 @@ translating too, so the passage is in the user's language.
 The launcher replaces the home screen for everyone who installs it, TalkBack users included. Every home
 row, the pause countdown, the time box choices and the Blocked screen's overrides have labels and roles.
 TalkBack takes over swipes and double taps, so the home gestures (search, settings, capture, camera,
-lock) are also custom actions on the clock. The breathing circle holds still when *Remove animations* is
+lock, notifications) are also custom actions on the clock. The breathing circle holds still when *Remove animations* is
 on.
 
 ## Keeping the screen rules up to date
@@ -223,7 +241,9 @@ nothing leaves the phone) and continues only on *Agree*, as Google Play's
 [accessibility policy](https://support.google.com/googleplay/android-developer/answer/10964491) requires.
 Publishing there also needs the accessibility declaration filled in on Play Console, and, for personal
 developer accounts created after 13 November 2023, a closed test with 12 testers for 14 days first.
-Grayscale still needs the ADB grant on Play installs.
+Grayscale still needs the ADB grant on Play installs. In the data safety form, declare approximate
+location as collected and shared with a third party (Open-Meteo), optional, for app functionality, not
+stored by the app.
 
 ## Licence
 
