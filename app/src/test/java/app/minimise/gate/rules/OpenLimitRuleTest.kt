@@ -7,6 +7,7 @@ import app.minimise.testing.app
 import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.usage.domain.TodayUsage
 import java.time.Instant
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -38,5 +39,12 @@ class OpenLimitRuleTest {
     fun `other apps' opens don't count`() {
         val today = TodayUsage(proceededOpensByPackage = mapOf("pkg.instagram" to 10))
         assertEquals(Decision.Allow, OpenLimitRule.evaluate(GateContext(whatsapp, today, Instant.EPOCH)))
+    }
+
+    @Test
+    fun `the Rule the GateEngine calls gives the same answer`() = runTest {
+        val rule = OpenLimitRule()
+        assertEquals(Decision.Allow, rule.evaluate(ctx(opens = 2)))
+        assertEquals(OpenLimitRule.evaluate(ctx(opens = 3)), rule.evaluate(ctx(opens = 3)))
     }
 }

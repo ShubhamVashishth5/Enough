@@ -14,7 +14,8 @@ import javax.inject.Inject
 class OpenLimitRule @Inject constructor() : Rule {
     override val id: String = "open_limit"
 
-    override suspend fun evaluate(ctx: GateContext): Decision = evaluate(ctx)
+    // Qualified: a bare evaluate(ctx) resolves to this member, not the companion, and recurses forever.
+    override suspend fun evaluate(ctx: GateContext): Decision = Companion.evaluate(ctx)
 
     companion object {
         /** Shown by the Blocked screen as "Open limit reached". */
