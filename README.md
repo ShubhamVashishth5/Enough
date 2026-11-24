@@ -201,8 +201,20 @@ plain Kotlin and carry the unit tests.
 ## F-Droid
 
 The app uses no proprietary libraries and embeds no build timestamps or dependency metadata. Store-listing
-text lives in `fastlane/metadata/android/en-US`. Submitting it means opening a merge request against
-F-Droid's [fdroiddata](https://gitlab.com/fdroid/fdroiddata) repository.
+text lives in `fastlane/metadata/android/en-US`. A draft of the metadata file F-Droid needs is in
+`fdroid/app.minimise.yml`: once a release is tagged, fill in the release key's certificate fingerprint,
+copy it to `metadata/` in F-Droid's [fdroiddata](https://gitlab.com/fdroid/fdroiddata) repository and open a
+merge request. It asks for a reproducible build, so F-Droid ships the APK from the GitHub release with
+the developer's signature after checking it matches its own build.
+
+To check the build is reproducible, build the same tag twice from two clean checkouts in different
+folders and compare the unsigned APKs:
+
+```sh
+git clone --branch v0.1.0 <repo> a && git clone --branch v0.1.0 <repo> b
+(cd a && ./gradlew --no-build-cache assembleRelease) && (cd b && ./gradlew --no-build-cache assembleRelease)
+sha256sum {a,b}/app/build/outputs/apk/release/app-release-unsigned.apk
+```
 
 ## Play Store
 
