@@ -14,6 +14,7 @@ datastore = "1.3.0"
 coroutines = "1.11.0"
 serialization = "1.13.0"
 timber = "5.0.1"
+zxingEmbedded = "4.3.0"
 junit = "4.13.2"
 
 [libraries]
@@ -45,6 +46,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingEmbedded" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]

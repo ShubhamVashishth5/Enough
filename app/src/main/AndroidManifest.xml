@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- No INTERNET permission, now or later: usage data never leaves the phone. -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Lets LauncherApps and PackageManager see every app that has a launcher icon (Android 11+). -->
     <!-- Opens the system dialog that exempts the app from battery optimisation. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- Physical key: read an NFC sticker's ID. The QR scanner library adds CAMERA. Neither is required. -->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Lets LauncherApps and PackageManager see every app with a launcher icon, plus other home apps. -->
     <queries>
@@ -65,6 +71,12 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:taskAffinity="app.minimise.intervention" />
+
+        <!-- The QR scanner, allowed to turn with the phone. -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation" />
 
         <service
             android:name=".monitor.GateAccessibilityService"

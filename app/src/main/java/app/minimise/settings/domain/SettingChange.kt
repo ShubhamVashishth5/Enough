@@ -56,6 +56,19 @@ data class SetFirstHourRule(val enabled: Boolean) : SettingChange {
     override val key: String get() = "first_hour_rule"
 }
 
+/** Pairs a physical key. [secretHash] is the SHA-256 of the sticker ID or the QR text. */
+@Serializable
+@SerialName("add_key")
+data class AddKey(val type: String, val label: String, val secretHash: String) : SettingChange {
+    override val key: String get() = "key:add:$secretHash"
+}
+
+@Serializable
+@SerialName("remove_key")
+data class RemoveKey(val id: Long) : SettingChange {
+    override val key: String get() = "key:$id"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {

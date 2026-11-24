@@ -113,6 +113,8 @@
 
     <string name="settings_schedules">Schedules</string>
     <string name="settings_schedules_summary">Hours when Vault apps don\'t open at all</string>
+    <string name="settings_keys">Physical key</string>
+    <string name="settings_keys_summary">A sticker or printed code that ends a block</string>
     <string name="settings_swaps">Instead list</string>
     <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
 
@@ -136,6 +138,27 @@
     <string name="window_summary">%1$s · %2$s–%3$s</string>
     <string name="days_every_day">Every day</string>
     <string name="days_none">No days</string>
+
+    <!-- Physical keys -->
+    <string name="keys_title">Physical key</string>
+    <string name="keys_explainer">Pair a cheap NFC sticker or print a code, then leave it in another room or at work. A scheduled block or a locked focus session ends early only with a tap or a scan. Adding a key applies at once; removing one waits 24 hours.</string>
+    <string name="keys_pair_nfc">Pair an NFC sticker</string>
+    <string name="keys_make_qr">Make a code to print</string>
+    <string name="key_label_sticker">NFC sticker</string>
+    <string name="key_label_code">Printed code</string>
+    <string name="key_type_nfc">Tap to remove</string>
+    <string name="key_type_qr">Tap to remove</string>
+    <string name="key_removed_in">Removed in %s</string>
+    <string name="key_hold_sticker">Hold the sticker to the back of the phone.</string>
+    <string name="key_nfc_off">Turn on NFC in the phone\'s settings, then hold your sticker to the back of the phone.</string>
+    <string name="key_already_paired">That sticker is already paired. Try another one.</string>
+    <string name="key_scan_code">Scan your printed code.</string>
+    <string name="key_scan">Scan</string>
+    <string name="key_not_yours">That isn\'t a paired key.</string>
+    <string name="key_qr_explainer">Print this or save a screenshot, then keep it out of reach. It\'s shown only once; the app keeps only a fingerprint of it.</string>
+    <string name="key_qr_saved">I\'ve saved it</string>
+    <string name="key_remove">Remove</string>
+    <string name="key_remove_body">This key stops working in 24 hours. You can cancel that under Pending changes.</string>
 
     <!-- Instead list -->
     <string name="swaps_title">Instead list</string>
@@ -203,6 +226,8 @@
     <string name="pending_schedule_removed">Schedule %s is removed</string>
     <string name="pending_first_hour_on">First hour → on</string>
     <string name="pending_first_hour_off">First hour → off</string>
+    <string name="pending_key_added">Pair %s</string>
+    <string name="pending_key_removed">Remove %s</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

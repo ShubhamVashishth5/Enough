@@ -20,6 +20,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.core.ui.theme.MinimiseTheme
 import app.minimise.intervention.ActivityInterventionLauncher
+import app.minimise.keys.ui.KeyCheck
 import app.minimise.unlock.domain.UnlockMethodId
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
@@ -32,6 +33,9 @@ import java.util.UUID
 class BlockedActivity : ComponentActivity() {
     private var requestId by mutableStateOf("")
 
+    /** The QR scanner is open on top, so stopping doesn't mean the user left. */
+    private var scanning = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,7 +43,9 @@ class BlockedActivity : ComponentActivity() {
         setContent {
             MinimiseTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    key(requestId) { BlockedRoute(requestId = requestId, onFinish = ::onFinish) }
+                    key(requestId) {
+                        BlockedRoute(requestId = requestId, onFinish = ::onFinish, onScanStarting = { scanning = true })
+                    }
                 }
             }
         }
@@ -51,10 +57,15 @@ class BlockedActivity : ComponentActivity() {
         requestId = intent.getStringExtra(EXTRA_REQUEST_ID).orEmpty()
     }
 
+    override fun onResume() {
+        super.onResume()
+        scanning = false
+    }
+
     override fun onStop() {
         super.onStop()
         // Leaving without passing an override ends the attempt. Coming back to the app means a new gate check.
-        if (!isChangingConfigurations && !isFinishing) finish()
+        if (!isChangingConfigurations && !isFinishing && !scanning) finish()
     }
 
     private fun onFinish(finish: PauseFinish) {
@@ -87,7 +98,7 @@ class BlockedActivity : ComponentActivity() {
 }
 
 @Composable
-private fun BlockedRoute(requestId: String, onFinish: (PauseFinish) -> Unit) {
+private fun BlockedRoute(requestId: String, onFinish: (PauseFinish) -> Unit, onScanStarting: () -> Unit) {
     val viewModel: BlockedViewModel = hiltViewModel(key = requestId)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(state.finish) { state.finish?.let(onFinish) }
@@ -99,6 +110,14 @@ private fun BlockedRoute(requestId: String, onFinish: (PauseFinish) -> Unit) {
         onTimeBoxChosen = viewModel::onTimeBoxChosen,
         onBack = viewModel::onBack,
         onGoHome = viewModel::onGoHome,
-        verifyContent = { _, _ -> },
+        verifyContent = { method, _ ->
+            KeyCheck(
+                method = method,
+                failed = state.verifyFailed,
+                onNfcTag = viewModel::onNfcTag,
+                onQrScanned = viewModel::onQrScanned,
+                onScanStarting = onScanStarting,
+            )
+        },
     )
 }
