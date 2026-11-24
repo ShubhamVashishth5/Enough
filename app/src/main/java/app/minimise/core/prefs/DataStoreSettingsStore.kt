@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import app.minimise.display.domain.GrayscaleMode
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
@@ -45,6 +47,9 @@ class DataStoreSettingsStore @Inject constructor(
             todayPromptedDay = this[Keys.TODAY_PROMPTED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             swapsSeeded = this[Keys.SWAPS_SEEDED] ?: defaults.swapsSeeded,
             firstHourRule = this[Keys.FIRST_HOUR_RULE] ?: defaults.firstHourRule,
+            grayscaleMode = this[Keys.GRAYSCALE_MODE]?.let { name -> GrayscaleMode.entries.firstOrNull { it.name == name } }
+                ?: defaults.grayscaleMode,
+            savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
         )
@@ -58,6 +63,9 @@ class DataStoreSettingsStore @Inject constructor(
             ?: remove(Keys.TODAY_PROMPTED_EPOCH_DAY)
         this[Keys.SWAPS_SEEDED] = settings.swapsSeeded
         this[Keys.FIRST_HOUR_RULE] = settings.firstHourRule
+        this[Keys.GRAYSCALE_MODE] = settings.grayscaleMode.name
+        settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
+            ?: remove(Keys.SAVED_COLOUR_CORRECTION)
         this[Keys.DEBUG_TIME_OFFSET_SECONDS] = settings.debugTimeOffset.inWholeSeconds
         this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
@@ -69,6 +77,8 @@ class DataStoreSettingsStore @Inject constructor(
         val TODAY_PROMPTED_EPOCH_DAY = longPreferencesKey("today_prompted_epoch_day")
         val SWAPS_SEEDED = booleanPreferencesKey("swaps_seeded")
         val FIRST_HOUR_RULE = booleanPreferencesKey("first_hour_rule")
+        val GRAYSCALE_MODE = stringPreferencesKey("grayscale_mode")
+        val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")
     }

@@ -184,6 +184,12 @@
         <item>Call someone</item>
     </string-array>
 
+    <string name="settings_grayscale">Grayscale</string>
+    <string name="grayscale_off">Off</string>
+    <string name="grayscale_vault">While a Vault app is open</string>
+    <string name="grayscale_always">Always</string>
+    <string name="grayscale_needs_grant">Needs a one-time grant from a computer. Tap for how.</string>
+
     <string name="settings_permissions">Permissions</string>
     <string name="settings_permissions_summary">What the app needs and why</string>
 
@@ -202,6 +208,10 @@
     <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
     <string name="permission_battery">Unrestricted battery</string>
     <string name="permission_battery_why">Stops the system from pausing the app in the background, which would switch protection off.</string>
+
+    <string name="permission_grayscale">Grayscale (optional)</string>
+    <string name="permission_grayscale_why">Turns the screen grey while a Vault app is open, which makes feeds less gripping. Android lets only a computer grant this: turn on USB debugging, connect the phone and run the command below once.</string>
+    <string name="permission_copy_command">Copy command</string>
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>

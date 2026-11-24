@@ -12,6 +12,11 @@
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Grayscale: changes Android's colour correction. Only ADB or Shizuku can grant it. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
     <!-- Lets LauncherApps and PackageManager see every app with a launcher icon, plus other home apps. -->
     <queries>
         <intent>
