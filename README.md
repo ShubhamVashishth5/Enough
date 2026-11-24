@@ -31,6 +31,9 @@ It's Android only, works fully offline and has no internet permission. Nothing y
   three days over, or (off by default) earn minutes by finishing tasks and focus sessions.
 - **Stats that don't become a habit.** One weekly report (this week against last, top time sinks, when
   you slip and why), which opens once a day, and a CSV export of the whole event log.
+- **The system app lock.** On Android 17 QPR2 and later, while protection is below Full, home offers to
+  put Vault apps behind the phone's own fingerprint lock, and to take it off again once it's back. Android
+  asks you to confirm each one. Enough only ever removes locks it added.
 - **Private space.** On Android 15+, lock and unlock Private space from the launcher; its apps are hidden
   everywhere while it's locked.
 
@@ -67,7 +70,7 @@ apps) or **home screen only**.
 | --- | --- |
 | Accessibility service | Sees which app comes to the front, so a Vault app opened from a notification, recents or a link still gets the pause screen. Reads screen content only where a rule you switched on needs it: inside an app with a blocked feed, a browser's address bar while a website is in the Vault, and this app's own Settings pages during a lock period. Nothing is stored or sent anywhere. |
 | Usage access and display over other apps | **Lite protection**, for when accessibility is off or Android takes it away (Android 17's Advanced Protection does). Enough checks once a second which app is in front and shows the pause over a Vault app, from a foreground service with one quiet notification. It reads no screen content, so feed blocking, website rules and the lock guard are off at this level. |
-| Default home app | Every unlock lands on Enough, so Vault apps aren't one tap away. Also lets it list and lock Private space (`ACCESS_HIDDEN_PROFILES`). |
+| Default home app | Every unlock lands on Enough, so Vault apps aren't one tap away. Also lets it list and lock Private space (`ACCESS_HIDDEN_PROFILES`), and on Android 17 QPR2 put apps behind the system app lock (`LOCK_APPS`). |
 | Unrestricted battery | Stops the system pausing the service, which would switch protection off. |
 | Notification access | The digest: holds non-urgent notifications and releases them at 9:00, 14:00 and 20:00. |
 | Post notifications | The digest summary, the weekly report, and "an app went into the Vault". |

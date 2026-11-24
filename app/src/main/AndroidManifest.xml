@@ -41,6 +41,12 @@
     <!-- Tells whether Android's Advanced Protection took accessibility away, to say so on the Permissions screen. -->
     <uses-permission android:name="android.permission.QUERY_ADVANCED_PROTECTION_MODE" />
 
+    <!-- Android 17 QPR2 app lock: granted to the default home app. Vault apps go behind the system's
+         fingerprint lock while the gate can't see every open; each change is confirmed by the user. -->
+    <uses-permission
+        android:name="android.permission.LOCK_APPS"
+        tools:ignore="ProtectedPermissions" />
+
     <!-- Android 15 Private space: the home app may list, lock and unlock it. -->
     <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
 

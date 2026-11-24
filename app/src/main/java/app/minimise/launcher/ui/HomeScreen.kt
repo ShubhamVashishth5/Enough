@@ -55,6 +55,7 @@ fun HomeScreen(
     focusSection: @Composable () -> Unit = {},
     digestLine: @Composable () -> Unit = {},
     eventLine: @Composable () -> Unit = {},
+    appLockLine: @Composable () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -93,6 +94,7 @@ fun HomeScreen(
                     .combinedClickable(onClick = onFixProtection),
             )
         }
+        appLockLine()
         Spacer(Modifier.weight(1f))
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             state.slots.forEach { slot ->

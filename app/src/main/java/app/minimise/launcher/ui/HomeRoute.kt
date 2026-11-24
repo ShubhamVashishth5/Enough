@@ -15,6 +15,7 @@ import app.minimise.launcher.QuickTools
 import app.minimise.calendar.ui.NextEventLine
 import app.minimise.digest.ui.DigestHomeLine
 import app.minimise.focus.ui.FocusSection
+import app.minimise.protection.ui.AppLockHomeLine
 import kotlinx.coroutines.flow.Flow
 
 /** Connects [HomeScreen] to its ViewModel and to the activity (role request, Back, Home presses). */
@@ -67,5 +68,6 @@ fun HomeRoute(
         focusSection = { FocusSection(onOpenInbox = onOpenInbox) },
         digestLine = { DigestHomeLine(onOpenDigest = onOpenDigest) },
         eventLine = { NextEventLine() },
+        appLockLine = { AppLockHomeLine() },
     )
 }
