@@ -104,6 +104,20 @@ data class StartLock(val untilEpochMillis: Long) : SettingChange {
     override val key: String get() = "lock"
 }
 
+/** Taper down to [floorMinutes] a day; null stops tapering. A lower floor is tightening, like a lower limit. */
+@Serializable
+@SerialName("set_taper")
+data class SetTaper(val floorMinutes: Int?) : SettingChange {
+    override val key: String get() = "taper"
+}
+
+/** Earn-it adds minutes to the budget, so switching it on is loosening and off is tightening. */
+@Serializable
+@SerialName("set_earn_it")
+data class SetEarnIt(val enabled: Boolean) : SettingChange {
+    override val key: String get() = "earn_it"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {

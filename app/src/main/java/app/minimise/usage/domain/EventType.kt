@@ -24,4 +24,7 @@ enum class EventType {
 
     /** The stats screen was opened; it opens once per usage day. */
     STATS_VIEWED,
+
+    /** Earn-it: minutes added to today's budget. data: minutes, source (task or focus), ref. */
+    BUDGET_BONUS,
 }

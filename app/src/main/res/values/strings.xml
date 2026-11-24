@@ -565,6 +565,28 @@
     </plurals>
     <string name="export_failed">Couldn\'t write the file.</string>
 
+    <!-- Taper, auto-tighten, earn-it -->
+    <string name="taper_title">Taper</string>
+    <string name="taper_off">Off. Lowers the budget by 5% each week until it reaches a floor you choose.</string>
+    <string name="taper_on">On: 5% less each week, stopping at %d min a day.</string>
+    <string name="taper_floor">Floor %d min</string>
+    <string name="taper_start">Start tapering</string>
+    <string name="taper_save">Save floor</string>
+    <string name="taper_stop">Stop tapering</string>
+    <string name="taper_pending_floor">Floor changes to %1$d min in %2$s</string>
+    <string name="taper_pending_off">Taper stops in %s</string>
+    <string name="earn_it_title">Earn-it</string>
+    <string name="earn_it_off">Off. When on, a finished task earns 5 Vault minutes and a full focus session 10, up to 30 a day.</string>
+    <string name="earn_it_on">On: finished tasks and focus sessions add Vault minutes, up to 30 a day. Tap to switch off.</string>
+    <string name="earn_it_on_in">Switches on in %s. Tap to cancel.</string>
+    <string name="tighten_offer">Three days in a row over budget. Want to try %d min a day? It\'s only an offer.</string>
+    <string name="tighten_accept">Use %d min</string>
+    <string name="tighten_decline">No thanks</string>
+    <string name="pending_taper_floor">Taper floor → %d min</string>
+    <string name="pending_taper_off">Taper → off</string>
+    <string name="pending_earn_it_on">Earn-it → on</string>
+    <string name="pending_earn_it_off">Earn-it → off</string>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>

@@ -10,6 +10,7 @@ import app.minimise.stats.domain.WeeklyReportScheduler
 import app.minimise.focus.domain.FocusSessions
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.swaps.domain.SwapRepository
+import app.minimise.usage.domain.Taper
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var digestScheduler: DigestScheduler
     @Inject lateinit var weeklyReportScheduler: WeeklyReportScheduler
     @Inject lateinit var autoVaultWatcher: AutoVaultWatcher
+    @Inject lateinit var taper: Taper
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -37,7 +39,10 @@ class MinimiseApp : Application() {
             followDebugClockOffset()
         }
         // Also runs on every screen unlock, from GateAccessibilityService.
-        appScope.launch { settingsGuard.applyDue() }
+        appScope.launch {
+            settingsGuard.applyDue()
+            taper.applyIfDue()
+        }
         appScope.launch { swapRepository.seedDefaultsOnce() }
         appScope.launch { focusSessions.finishIfDue() }
         digestScheduler.scheduleNext()

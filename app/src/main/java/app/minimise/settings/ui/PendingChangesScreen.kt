@@ -103,6 +103,10 @@ private fun describe(description: PendingDescription): String = when (descriptio
         stringResource(R.string.pending_mode_switch, description.modeName ?: stringResource(R.string.modes_follow))
     is PendingDescription.ModeEdit -> stringResource(R.string.pending_mode_edit, description.modeName)
     PendingDescription.LockChange -> stringResource(R.string.lock_title)
+    is PendingDescription.TaperChange -> description.floorMinutes
+        ?.let { stringResource(R.string.pending_taper_floor, it) }
+        ?: stringResource(R.string.pending_taper_off)
+    is PendingDescription.EarnItChange -> stringResource(if (description.enabled) R.string.pending_earn_it_on else R.string.pending_earn_it_off)
     is PendingDescription.FeedChange ->
         stringResource(if (description.blocked) R.string.pending_feed_on else R.string.pending_feed_off, description.feedName)
 }

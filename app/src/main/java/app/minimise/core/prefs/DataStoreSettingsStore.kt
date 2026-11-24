@@ -57,6 +57,10 @@ class DataStoreSettingsStore @Inject constructor(
                 ?: defaults.grayscaleMode,
             blockedFeeds = this[Keys.BLOCKED_FEEDS] ?: defaults.blockedFeeds,
             lockedUntil = this[Keys.LOCKED_UNTIL_MILLIS]?.let(Instant::ofEpochMilli),
+            taperFloorMinutes = this[Keys.TAPER_FLOOR_MINUTES]?.toInt(),
+            taperWeek = this[Keys.TAPER_WEEK_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
+            earnIt = this[Keys.EARN_IT] ?: defaults.earnIt,
+            tightenAnsweredDay = this[Keys.TIGHTEN_ANSWERED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
@@ -76,6 +80,10 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.DIGEST_EXEMPT] = settings.digestExempt
         this[Keys.BLOCKED_FEEDS] = settings.blockedFeeds
         settings.lockedUntil?.let { this[Keys.LOCKED_UNTIL_MILLIS] = it.toEpochMilli() } ?: remove(Keys.LOCKED_UNTIL_MILLIS)
+        settings.taperFloorMinutes?.let { this[Keys.TAPER_FLOOR_MINUTES] = it.toLong() } ?: remove(Keys.TAPER_FLOOR_MINUTES)
+        settings.taperWeek?.let { this[Keys.TAPER_WEEK_EPOCH_DAY] = it.toEpochDay() } ?: remove(Keys.TAPER_WEEK_EPOCH_DAY)
+        this[Keys.EARN_IT] = settings.earnIt
+        settings.tightenAnsweredDay?.let { this[Keys.TIGHTEN_ANSWERED_EPOCH_DAY] = it.toEpochDay() } ?: remove(Keys.TIGHTEN_ANSWERED_EPOCH_DAY)
         settings.manualModeId?.let { this[Keys.MANUAL_MODE_ID] = it } ?: remove(Keys.MANUAL_MODE_ID)
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
         settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
@@ -98,6 +106,10 @@ class DataStoreSettingsStore @Inject constructor(
         val DIGEST_EXEMPT = stringSetPreferencesKey("digest_exempt")
         val BLOCKED_FEEDS = stringSetPreferencesKey("blocked_feeds")
         val LOCKED_UNTIL_MILLIS = longPreferencesKey("locked_until_millis")
+        val TAPER_FLOOR_MINUTES = longPreferencesKey("taper_floor_minutes")
+        val TAPER_WEEK_EPOCH_DAY = longPreferencesKey("taper_week_epoch_day")
+        val EARN_IT = booleanPreferencesKey("earn_it")
+        val TIGHTEN_ANSWERED_EPOCH_DAY = longPreferencesKey("tighten_answered_epoch_day")
         val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")

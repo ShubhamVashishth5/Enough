@@ -14,6 +14,8 @@ import app.minimise.settings.domain.SetManualMode
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
+import app.minimise.settings.domain.SetTaper
+import app.minimise.settings.domain.SetEarnIt
 import app.minimise.settings.domain.LockPeriod
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetOpenLimit
@@ -39,6 +41,8 @@ class FakeSettingsTarget : SettingsTarget {
     var manualModeId: Long? = null
     val blockedFeeds = mutableSetOf<String>()
     var lockedUntil: Instant? = null
+    var taperFloor: Int? = null
+    var earnIt = false
 
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
@@ -54,6 +58,8 @@ class FakeSettingsTarget : SettingsTarget {
         is SetManualMode -> if (change.modeId == manualModeId) null else Direction.TIGHTEN
         is SaveMode -> Direction.LOOSEN
         is SetFeedBlocked -> switchDirection(change.feedId in blockedFeeds, change.blocked)
+        is SetTaper -> openLimitChangeDirection(taperFloor, change.floorMinutes)
+        is SetEarnIt -> switchDirection(!earnIt, !change.enabled)
         is StartLock -> if (change.untilEpochMillis > (lockedUntil?.toEpochMilli() ?: Long.MIN_VALUE)) Direction.TIGHTEN else null
     }
 
@@ -70,6 +76,8 @@ class FakeSettingsTarget : SettingsTarget {
             is SetManualMode -> manualModeId = change.modeId
             is SaveMode -> Unit
             is SetFeedBlocked -> if (change.blocked) blockedFeeds += change.feedId else blockedFeeds -= change.feedId
+            is SetTaper -> taperFloor = change.floorMinutes
+            is SetEarnIt -> earnIt = change.enabled
             is StartLock -> lockedUntil = Instant.ofEpochMilli(change.untilEpochMillis)
         }
     }

@@ -89,6 +89,21 @@ object Defaults {
     val WEEKLY_REPORT_TIME: LocalTime = LocalTime.of(20, 0)
     val WEEKLY_REPORT_WINDOW: Duration = 10.minutes
 
+    /** Taper: the budget drops this much each week, down to the floor the user sets. */
+    const val TAPER_PERCENT: Int = 5
+
+    /** Auto-tighten: after this many days in a row over budget, offer a budget this much smaller. */
+    const val AUTO_TIGHTEN_DAYS: Int = 3
+    const val AUTO_TIGHTEN_PERCENT: Int = 10
+
+    /** Earn-it: minutes for a finished task or a full focus session, and the most a day can earn. */
+    const val EARN_IT_TASK_MINUTES: Int = 5
+    const val EARN_IT_FOCUS_MINUTES: Int = 10
+    const val EARN_IT_DAILY_CAP: Int = 30
+
+    /** How far back earn-it looks for a task or session that already earned. */
+    const val EARN_IT_LOOKBACK_DAYS: Long = 7
+
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(
         ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),

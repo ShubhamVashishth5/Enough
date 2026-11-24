@@ -21,6 +21,8 @@ import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
+import app.minimise.settings.domain.SetTaper
+import app.minimise.settings.domain.SetEarnIt
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetOpenLimit
@@ -66,6 +68,11 @@ sealed interface PendingDescription {
 
     /** Never pending in practice (a lock only tightens), but every change needs a description. */
     data object LockChange : PendingDescription
+
+    /** @property floorMinutes null when taper stops. */
+    data class TaperChange(val floorMinutes: Int?) : PendingDescription
+
+    data class EarnItChange(val enabled: Boolean) : PendingDescription
 }
 
 @HiltViewModel
@@ -123,6 +130,8 @@ class PendingChangesViewModel @Inject constructor(
                     is SetManualMode -> PendingDescription.ModeSwitch(change.modeId?.let { names.modes[it] })
                     is SaveMode -> PendingDescription.ModeEdit(names.modes[change.id].orEmpty())
                     is StartLock -> PendingDescription.LockChange
+                    is SetTaper -> PendingDescription.TaperChange(change.floorMinutes)
+                    is SetEarnIt -> PendingDescription.EarnItChange(change.enabled)
                     is SetFeedBlocked -> PendingDescription.FeedChange(feedNames[change.feedId] ?: change.feedId, change.blocked)
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))
