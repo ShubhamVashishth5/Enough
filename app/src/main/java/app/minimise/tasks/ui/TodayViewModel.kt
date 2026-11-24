@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.minimise.core.Defaults
 import app.minimise.core.time.DayBoundary
 import app.minimise.tasks.domain.TaskRepository
+import app.minimise.usage.domain.AutoTighten
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +18,14 @@ data class TodayUiState(
     val drafts: List<String> = List(Defaults.MAX_TODAY_TASKS) { "" },
     val loaded: Boolean = false,
     val finished: Boolean = false,
+    /** After three days over budget: a smaller budget on offer (minutes), until answered. */
+    val tightenOffer: Int? = null,
 )
 
 @HiltViewModel
 class TodayViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
+    private val autoTighten: AutoTighten,
     dayBoundary: DayBoundary,
 ) : ViewModel() {
     private val day = dayBoundary.today()
@@ -37,7 +41,21 @@ class TodayViewModel @Inject constructor(
                     loaded = true,
                 )
             }
+            val offer = autoTighten.offer()
+            _uiState.update { it.copy(tightenOffer = offer) }
         }
+    }
+
+    /** Only ever offered: the smaller budget applies only if the user says so. */
+    fun onTightenAccepted() {
+        val minutes = _uiState.value.tightenOffer ?: return
+        _uiState.update { it.copy(tightenOffer = null) }
+        viewModelScope.launch { autoTighten.accept(minutes) }
+    }
+
+    fun onTightenDeclined() {
+        _uiState.update { it.copy(tightenOffer = null) }
+        viewModelScope.launch { autoTighten.decline() }
     }
 
     fun onDraftChange(index: Int, text: String) {

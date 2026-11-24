@@ -30,6 +30,14 @@ data class Settings(
     val blockedFeeds: Set<String> = emptySet(),
     /** The user's colour correction (enabled, mode) from before grayscale first went on; null when not saved. */
     val savedColourCorrection: List<Int>? = null,
+    /** Taper's floor in minutes; null when taper is off. */
+    val taperFloorMinutes: Int? = null,
+    /** The usage week taper last ran in (or was switched on in). */
+    val taperWeek: LocalDate? = null,
+    /** Finishing tasks and focus sessions earns Vault minutes. Off by default. */
+    val earnIt: Boolean = false,
+    /** The day the auto-tighten offer was last answered, so it isn't repeated for the same run of days. */
+    val tightenAnsweredDay: LocalDate? = null,
     /** While a lock period runs, nothing can be loosened; null when there never was one. */
     val lockedUntil: Instant? = null,
     /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */

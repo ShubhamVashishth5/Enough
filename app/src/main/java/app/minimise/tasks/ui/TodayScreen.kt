@@ -31,7 +31,14 @@ import app.minimise.core.ui.ScreenScaffold
 fun TodayRoute(onClose: () -> Unit, viewModel: TodayViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(state.finished) { if (state.finished) onClose() }
-    TodayScreen(state = state, onDraftChange = viewModel::onDraftChange, onSave = viewModel::onSave, onSkip = viewModel::onSkip)
+    TodayScreen(
+        state = state,
+        onDraftChange = viewModel::onDraftChange,
+        onSave = viewModel::onSave,
+        onSkip = viewModel::onSkip,
+        onTightenAccepted = viewModel::onTightenAccepted,
+        onTightenDeclined = viewModel::onTightenDeclined,
+    )
 }
 
 @Composable
@@ -40,8 +47,17 @@ fun TodayScreen(
     onDraftChange: (Int, String) -> Unit,
     onSave: () -> Unit,
     onSkip: () -> Unit,
+    onTightenAccepted: () -> Unit = {},
+    onTightenDeclined: () -> Unit = {},
 ) {
     ScreenScaffold(title = stringResource(R.string.today_title), modifier = Modifier.imePadding()) {
+        state.tightenOffer?.let { minutes ->
+            Text(text = stringResource(R.string.tighten_offer, minutes), style = MaterialTheme.typography.bodyLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)) {
+                OutlinedButton(onClick = onTightenAccepted) { Text(stringResource(R.string.tighten_accept, minutes)) }
+                TextButton(onClick = onTightenDeclined) { Text(stringResource(R.string.tighten_decline)) }
+            }
+        }
         Text(
             text = stringResource(R.string.today_question),
             style = MaterialTheme.typography.bodyLarge,

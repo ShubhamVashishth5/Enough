@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import app.minimise.core.ui.SettingsRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,7 +26,15 @@ import app.minimise.settings.domain.GuardResult
 @Composable
 fun BudgetRoute(viewModel: BudgetViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    BudgetScreen(state = state, onStep = viewModel::onStep, onSave = viewModel::onSave)
+    BudgetScreen(
+        state = state,
+        onStep = viewModel::onStep,
+        onSave = viewModel::onSave,
+        onTaperStep = viewModel::onTaperStep,
+        onTaperSave = viewModel::onTaperSave,
+        onTaperStop = viewModel::onTaperStop,
+        onEarnItTapped = viewModel::onEarnItTapped,
+    )
 }
 
 @Composable
@@ -30,8 +42,12 @@ fun BudgetScreen(
     state: BudgetUiState,
     onStep: (Int) -> Unit,
     onSave: () -> Unit,
+    onTaperStep: (Int) -> Unit = {},
+    onTaperSave: () -> Unit = {},
+    onTaperStop: () -> Unit = {},
+    onEarnItTapped: () -> Unit = {},
 ) {
-    ScreenScaffold(title = stringResource(R.string.budget_title)) {
+    ScreenScaffold(title = stringResource(R.string.budget_title), modifier = Modifier.verticalScroll(rememberScrollState())) {
         val muted = MaterialTheme.colorScheme.onSurfaceVariant
         Text(
             text = stringResource(R.string.budget_explainer),
@@ -68,5 +84,55 @@ fun BudgetScreen(
             is GuardResult.Refused -> Text(stringResource(R.string.lock_refused_short), style = MaterialTheme.typography.bodyLarge)
             null -> Unit
         }
+        Taper(state, onTaperStep, onTaperSave, onTaperStop)
+        SettingsRow(
+            title = stringResource(R.string.earn_it_title),
+            summary = when {
+                state.earnItOnIn != null -> stringResource(R.string.earn_it_on_in, durationText(state.earnItOnIn))
+                state.earnIt -> stringResource(R.string.earn_it_on)
+                else -> stringResource(R.string.earn_it_off)
+            },
+            onClick = onEarnItTapped,
+            modifier = Modifier.padding(top = 16.dp),
+        )
+    }
+}
+
+/** Taper: the budget drops 5% a week until it reaches a floor. */
+@Composable
+private fun Taper(state: BudgetUiState, onStep: (Int) -> Unit, onSave: () -> Unit, onStop: () -> Unit) {
+    val muted = MaterialTheme.colorScheme.onSurfaceVariant
+    Text(
+        text = stringResource(R.string.taper_title),
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(top = 32.dp),
+    )
+    Text(
+        text = state.taperFloor?.let { stringResource(R.string.taper_on, it) } ?: stringResource(R.string.taper_off),
+        style = MaterialTheme.typography.bodyMedium,
+        color = muted,
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(vertical = 12.dp),
+    ) {
+        OutlinedButton(onClick = { onStep(-BudgetViewModel.STEP_MINUTES) }) { Text("−") }
+        Text(text = stringResource(R.string.taper_floor, state.taperDraft), style = MaterialTheme.typography.titleLarge)
+        OutlinedButton(onClick = { onStep(BudgetViewModel.STEP_MINUTES) }) { Text("+") }
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        OutlinedButton(onClick = onSave, enabled = state.taperDraft != state.taperFloor) {
+            Text(stringResource(if (state.taperFloor == null) R.string.taper_start else R.string.taper_save))
+        }
+        if (state.taperFloor != null) TextButton(onClick = onStop) { Text(stringResource(R.string.taper_stop)) }
+    }
+    state.taperPending?.let { (floor, left) ->
+        Text(
+            text = floor?.let { stringResource(R.string.taper_pending_floor, it, durationText(left)) }
+                ?: stringResource(R.string.taper_pending_off, durationText(left)),
+            style = MaterialTheme.typography.bodyMedium,
+            color = muted,
+        )
     }
 }

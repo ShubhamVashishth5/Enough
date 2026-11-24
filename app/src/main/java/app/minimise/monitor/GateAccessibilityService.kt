@@ -23,6 +23,7 @@ import app.minimise.tasks.domain.TodayPrompt
 import app.minimise.usage.domain.Event
 import app.minimise.usage.domain.EventLog
 import app.minimise.usage.domain.EventType
+import app.minimise.usage.domain.Taper
 import app.minimise.usage.domain.UsageTracker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -56,6 +57,7 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var settingsGuard: SettingsGuard
     @Inject lateinit var timeSource: TimeSource
     @Inject lateinit var todayPrompt: TodayPrompt
+    @Inject lateinit var taper: Taper
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     private val scope = CoroutineScope(
@@ -159,6 +161,7 @@ class GateAccessibilityService : AccessibilityService() {
         scope.launch {
             eventLog.log(Event(type = EventType.SCREEN_UNLOCK, startAt = now))
             settingsGuard.applyDue()
+            taper.applyIfDue()
             focusSessions.finishIfDue()
             if (todayPrompt.claim()) startActivity(HomeActivity.todayIntent(this@GateAccessibilityService))
         }

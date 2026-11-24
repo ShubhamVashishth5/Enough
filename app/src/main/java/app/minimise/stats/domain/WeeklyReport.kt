@@ -1,17 +1,16 @@
 package app.minimise.stats.domain
 
 import app.minimise.core.time.durationBetween
-import app.minimise.gate.rules.BudgetRule
 import app.minimise.intervention.domain.Trigger
+import app.minimise.usage.domain.BudgetDays
+import app.minimise.usage.domain.BudgetDays.field
+import app.minimise.usage.domain.BudgetDays.isSlip
 import app.minimise.usage.domain.Event
 import app.minimise.usage.domain.EventType
 import app.minimise.usage.domain.SpanTime
 import java.time.Instant
 import java.time.ZoneId
 import kotlin.time.Duration
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 /** One week's headline numbers. */
 data class WeekNumbers(val vaultTime: Duration, val unlocks: Int, val focusTime: Duration, val tasksDone: Int)
@@ -77,8 +76,7 @@ object WeeklyReports {
     }
 
     /** The day saw the budget run out: a budget block, or a time box cut short by it. */
-    fun ranOutOfBudget(events: List<Event>, day: Period): Boolean =
-        events.any { it.startAt in day && (it.isSlip() || it.isBudgetTimeUp()) }
+    fun ranOutOfBudget(events: List<Event>, day: Period): Boolean = BudgetDays.ranOut(events, day.start, day.end)
 
     /** The start hour of the [SLIP_WINDOW_HOURS]-hour stretch (wrapping past midnight) with the most [hours]. */
     fun busiestWindow(hours: List<Int>): Int? {
@@ -101,12 +99,5 @@ object WeeklyReports {
 
     private operator fun Period.contains(instant: Instant): Boolean = !instant.isBefore(start) && instant.isBefore(end)
 
-    private fun Event.isSlip(): Boolean = type == EventType.BLOCK_SHOWN && field("reason") == BudgetRule.REASON
-
-    private fun Event.isBudgetTimeUp(): Boolean = type == EventType.TIME_UP && field("budgetUsed") == "true"
-
     private fun Event.trigger(): Trigger? = field("trigger")?.let { name -> Trigger.entries.firstOrNull { it.name == name } }
-
-    private fun Event.field(name: String): String? =
-        data?.let { runCatching { Json.parseToJsonElement(it).jsonObject[name]?.jsonPrimitive?.content }.getOrNull() }
 }
