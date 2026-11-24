@@ -619,6 +619,16 @@
     <string name="private_space_lock">Lock it</string>
     <string name="private_space_unlock">Unlock</string>
 
+    <!-- Accessibility disclosure (shown before the system setting) -->
+    <string name="disclosure_title">How Enough uses accessibility</string>
+    <string name="disclosure_intro">Enough uses Android\'s accessibility service to put a pause in front of the apps you chose. It isn\'t an accessibility tool for disabilities.</string>
+    <string name="disclosure_apps">It sees which app is in front, so a Vault app opened from a notification, recents or a link still gets the pause screen, and its time counts against your budget.</string>
+    <string name="disclosure_screen">It reads what\'s on screen only where a rule you switched on needs it: the endless feed inside an app you blocked it in, a browser\'s address bar while a website is in the Vault, and this app\'s own Settings pages during a lock period. It looks only for those, and keeps none of what it reads.</string>
+    <string name="disclosure_actions">It can press Back or Home to leave a blocked feed or page, and lock the screen when you double-tap home.</string>
+    <string name="disclosure_private">Nothing it sees is stored beyond which app was open and for how long, and nothing leaves the phone: Enough has no internet access.</string>
+    <string name="disclosure_agree">Agree and continue</string>
+    <string name="disclosure_decline">Not now</string>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>

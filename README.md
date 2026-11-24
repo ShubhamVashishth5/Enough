@@ -176,6 +176,15 @@ The app uses no proprietary libraries and embeds no build timestamps or dependen
 text lives in `fastlane/metadata/android/en-US`. Submitting it means opening a merge request against
 F-Droid's [fdroiddata](https://gitlab.com/fdroid/fdroiddata) repository.
 
+## Play Store
+
+Before the accessibility setting opens, the app shows a prominent disclosure (what is read, why, and that
+nothing leaves the phone) and continues only on *Agree*, as Google Play's
+[accessibility policy](https://support.google.com/googleplay/android-developer/answer/10964491) requires.
+Publishing there also needs the accessibility declaration filled in on Play Console, and, for personal
+developer accounts created after 13 November 2023, a closed test with 12 testers for 14 days first.
+Grayscale still needs the ADB grant on Play installs.
+
 ## Licence
 
 [Apache License 2.0](LICENSE).
