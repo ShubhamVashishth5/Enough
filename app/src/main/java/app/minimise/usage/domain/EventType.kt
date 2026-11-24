@@ -12,4 +12,7 @@ enum class EventType {
     SETTING_CHANGED,
     SWAP_TAKEN,
     FOCUS_SESSION,
+
+    /** A blocked feed came on screen and was left. data: the feed's id. */
+    FEED_BLOCKED,
 }

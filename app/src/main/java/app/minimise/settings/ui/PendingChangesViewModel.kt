@@ -7,6 +7,7 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
+import app.minimise.feeds.domain.FeedRuleSource
 import app.minimise.keys.domain.KeyRepository
 import app.minimise.modes.domain.ModeRepository
 import app.minimise.settings.domain.SaveMode
@@ -17,6 +18,7 @@ import app.minimise.settings.domain.RemoveKey
 import app.minimise.settings.domain.RemoveSchedule
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
+import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetOpenLimit
@@ -55,6 +57,8 @@ sealed interface PendingDescription {
     data class ModeSwitch(val modeName: String?) : PendingDescription
 
     data class ModeEdit(val modeName: String) : PendingDescription
+
+    data class FeedChange(val feedName: String, val blocked: Boolean) : PendingDescription
 }
 
 @HiltViewModel
@@ -63,10 +67,13 @@ class PendingChangesViewModel @Inject constructor(
     scheduleRepository: ScheduleRepository,
     keyRepository: KeyRepository,
     modeRepository: ModeRepository,
+    feedRules: FeedRuleSource,
     private val settingsGuard: SettingsGuard,
     private val timeSource: TimeSource,
 ) : ViewModel() {
     /** Names of the things pending changes refer to. */
+    private val feedNames: Map<String, String> = feedRules.rules().associate { it.id to it.name }
+
     private val names: Flow<Names> = combine(
         appRepository.apps,
         scheduleRepository.schedules,
@@ -107,6 +114,7 @@ class PendingChangesViewModel @Inject constructor(
                     is RemoveKey -> PendingDescription.KeyChange(names.keys[change.id].orEmpty(), removed = true)
                     is SetManualMode -> PendingDescription.ModeSwitch(change.modeId?.let { names.modes[it] })
                     is SaveMode -> PendingDescription.ModeEdit(names.modes[change.id].orEmpty())
+                    is SetFeedBlocked -> PendingDescription.FeedChange(feedNames[change.feedId] ?: change.feedId, change.blocked)
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))
             },

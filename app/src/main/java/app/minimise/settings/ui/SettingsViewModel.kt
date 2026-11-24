@@ -8,6 +8,7 @@ import app.minimise.display.GrayscaleController
 import app.minimise.display.domain.DisplayFilter
 import app.minimise.display.domain.GrayscaleMode
 import app.minimise.modes.domain.ActiveModeProvider
+import app.minimise.monitor.AccessibilityActions
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -36,6 +37,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val displayFilter: Provider<DisplayFilter>,
     private val activeMode: ActiveModeProvider,
+    private val accessibilityActions: AccessibilityActions,
 ) : ViewModel() {
     val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings) { pending, settings ->
         SettingsUiState(
@@ -61,5 +63,9 @@ class SettingsViewModel @Inject constructor(
     fun onDebugShortLoosenDelayToggled() {
         if (!BuildConfig.DEBUG) return
         viewModelScope.launch { settingsStore.update { it.copy(debugShortLoosenDelay = !it.debugShortLoosenDelay) } }
+    }
+
+    fun onDebugDumpScreen() {
+        accessibilityActions.dumpScreenSoon()
     }
 }

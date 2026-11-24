@@ -90,6 +90,13 @@
             android:launchMode="singleTask"
             android:taskAffinity="app.minimise.intervention" />
 
+        <activity
+            android:name=".intervention.ui.NoticeActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.minimise.intervention" />
+
         <!-- The QR scanner, allowed to turn with the phone. -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

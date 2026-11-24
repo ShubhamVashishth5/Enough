@@ -295,7 +295,7 @@
     <string name="permission_allow">Allow</string>
     <string name="permission_open_app_info">Open app info</string>
     <string name="permission_accessibility">Accessibility</string>
-    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads only the app\'s name, never what\'s on screen, and nothing leaves the phone.</string>
+    <string name="permission_accessibility_why">Sees which app comes to the front, so a Vault app opened from a notification, recents or another app still gets the pause screen. It reads what\'s on screen only where a rule you switched on needs it: inside an app with a blocked feed. Nothing is stored or leaves the phone.</string>
     <string name="permission_accessibility_restricted">Installed outside the Play Store? Android 13 and later grey out this setting until you open app info, tap ⋮ and choose Allow restricted settings.</string>
     <string name="permission_home">Default home app</string>
     <string name="permission_home_why">Every unlock lands here, so Vault apps aren\'t one tap away.</string>
@@ -317,7 +317,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>
-    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Only the app\'s name is read. Nothing on screen is read and nothing leaves the phone.</string>
+    <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Screen content is read only where a rule you switched on needs it, such as a blocked feed inside YouTube. Nothing is stored and nothing leaves the phone.</string>
 
     <!-- Pending changes -->
     <string name="settings_pending">Pending changes</string>
@@ -342,6 +342,22 @@
     <string name="pending_key_removed">Remove %s</string>
     <string name="pending_mode_switch">Mode → %s</string>
     <string name="pending_mode_edit">Changes to %s mode</string>
+
+    <!-- Feed blocking -->
+    <string name="settings_feeds">Feed blocking</string>
+    <string name="settings_feeds_summary">Shut the endless parts of apps, keep the useful ones</string>
+    <string name="feeds_title">Feed blocking</string>
+    <string name="feeds_explainer">When a blocked feed comes on screen, the app steps back out of it. Search, messages and the rest keep working. Switching a block on applies at once; switching it off waits 24 hours. Apps change their screens now and then, so a block can stop working until it\'s updated.</string>
+    <string name="feed_on">On</string>
+    <string name="feed_off">Off. Tap to block it.</string>
+    <string name="feed_off_in">Switches off in %s. Tap to keep it on.</string>
+    <string name="feed_blocked_title">Feed blocked</string>
+    <string name="feed_blocked_body">%s is switched off. The rest of the app still works.</string>
+    <string name="feed_blocked_ok">OK</string>
+    <string name="pending_feed_on">Block %s</string>
+    <string name="pending_feed_off">Stop blocking %s</string>
+    <string name="debug_dump_screen">Debug: dump screen in 5 s</string>
+    <string name="debug_dump_screen_summary">Switch to the app; its node tree goes to logcat (tag ScreenDump)</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

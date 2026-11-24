@@ -21,6 +21,7 @@ fun SettingsRoute(
     onOpenFocus: () -> Unit,
     onOpenModes: () -> Unit,
     onOpenDigest: () -> Unit,
+    onOpenFeeds: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -37,11 +38,13 @@ fun SettingsRoute(
         onOpenFocus = onOpenFocus,
         onOpenModes = onOpenModes,
         onOpenDigest = onOpenDigest,
+        onOpenFeeds = onOpenFeeds,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
         onGrayscaleTapped = viewModel::onGrayscaleTapped,
         onDebugShortLoosenDelayToggled = viewModel::onDebugShortLoosenDelayToggled,
+        onDebugDumpScreen = viewModel::onDebugDumpScreen,
     )
 }
 
@@ -56,11 +59,13 @@ fun SettingsScreen(
     onOpenFocus: () -> Unit,
     onOpenModes: () -> Unit,
     onOpenDigest: () -> Unit,
+    onOpenFeeds: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
     onGrayscaleTapped: () -> Unit,
     onDebugShortLoosenDelayToggled: () -> Unit,
+    onDebugDumpScreen: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title)) {
         SettingsRow(
@@ -93,6 +98,11 @@ fun SettingsScreen(
             title = stringResource(R.string.settings_keys),
             summary = stringResource(R.string.settings_keys_summary),
             onClick = onOpenKeys,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_feeds),
+            summary = stringResource(R.string.settings_feeds_summary),
+            onClick = onOpenFeeds,
         )
         SettingsRow(
             title = stringResource(R.string.settings_swaps),
@@ -142,6 +152,11 @@ fun SettingsScreen(
                 title = stringResource(R.string.debug_short_loosen_delay),
                 summary = stringResource(if (state.debugShortLoosenDelay) R.string.debug_on else R.string.debug_off),
                 onClick = onDebugShortLoosenDelayToggled,
+            )
+            SettingsRow(
+                title = stringResource(R.string.debug_dump_screen),
+                summary = stringResource(R.string.debug_dump_screen_summary),
+                onClick = onDebugDumpScreen,
             )
         }
     }

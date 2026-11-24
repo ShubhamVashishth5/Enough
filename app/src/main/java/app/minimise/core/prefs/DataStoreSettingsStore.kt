@@ -54,6 +54,7 @@ class DataStoreSettingsStore @Inject constructor(
             digestExempt = this[Keys.DIGEST_EXEMPT] ?: defaults.digestExempt,
             grayscaleMode = this[Keys.GRAYSCALE_MODE]?.let { name -> GrayscaleMode.entries.firstOrNull { it.name == name } }
                 ?: defaults.grayscaleMode,
+            blockedFeeds = this[Keys.BLOCKED_FEEDS] ?: defaults.blockedFeeds,
             savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
@@ -71,6 +72,7 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.GRAYSCALE_MODE] = settings.grayscaleMode.name
         this[Keys.DIGEST_ENABLED] = settings.digestEnabled
         this[Keys.DIGEST_EXEMPT] = settings.digestExempt
+        this[Keys.BLOCKED_FEEDS] = settings.blockedFeeds
         settings.manualModeId?.let { this[Keys.MANUAL_MODE_ID] = it } ?: remove(Keys.MANUAL_MODE_ID)
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
         settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
@@ -91,6 +93,7 @@ class DataStoreSettingsStore @Inject constructor(
         val MANUAL_MODE_ID = longPreferencesKey("manual_mode_id")
         val DIGEST_ENABLED = booleanPreferencesKey("digest_enabled")
         val DIGEST_EXEMPT = stringSetPreferencesKey("digest_exempt")
+        val BLOCKED_FEEDS = stringSetPreferencesKey("blocked_feeds")
         val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")

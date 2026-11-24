@@ -25,6 +25,8 @@ data class Settings(
     /** Apps whose notifications always come through live (the VIP list). */
     val digestExempt: Set<String> = emptySet(),
     val grayscaleMode: GrayscaleMode = GrayscaleMode.OFF,
+    /** Feed rules (assets/feed_rules.json ids) that are switched on. */
+    val blockedFeeds: Set<String> = emptySet(),
     /** The user's colour correction (enabled, mode) from before grayscale first went on; null when not saved. */
     val savedColourCorrection: List<Int>? = null,
     /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */
