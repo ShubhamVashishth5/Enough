@@ -64,7 +64,14 @@ data class WeatherNow(val celsius: Double, val sky: Sky) {
     }
 }
 
-/** The US AQI bands, the scale most weather apps show. */
+/**
+ * Open-Meteo's air quality: a forecast model's estimate (CAMS, about 45 km across outside Europe), not
+ * a sensor reading. [usAqi] uses 24-hour averages for particles, as the US scale does; [pm25] is the
+ * latest value, in µg/m³.
+ */
+data class AirQuality(val usAqi: Int, val pm25: Int?)
+
+/** The US AQI bands, the scale most weather apps (and aqi.in) show. */
 enum class AqiLevel {
     GOOD,
     MODERATE,
@@ -98,7 +105,7 @@ object OpenMeteo {
 
     fun airQualityUrl(latitude: Double, longitude: Double): String =
         "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${coordinate(latitude)}&longitude=${coordinate(longitude)}" +
-            "&current=us_aqi"
+            "&current=us_aqi,pm2_5"
 
     /** Two decimal places, about a kilometre: close enough for the weather, and no closer. */
     fun coordinate(value: Double): String = String.format(Locale.ROOT, "%.2f", value)
@@ -111,9 +118,11 @@ object OpenMeteo {
         WeatherNow(celsius = temperature, sky = Sky.fromWmo(code.toInt()))
     }.getOrNull()
 
-    /** Null when the answer isn't the shape asked for, or there's no reading for the place. */
-    fun parseUsAqi(json: String): Int? = runCatching {
-        current(json)?.get("us_aqi")?.jsonPrimitive?.doubleOrNull?.roundToInt()
+    /** Null when the answer isn't the shape asked for, or there's no AQI for the place. */
+    fun parseAirQuality(json: String): AirQuality? = runCatching {
+        val current = current(json) ?: return null
+        val aqi = current["us_aqi"]?.jsonPrimitive?.doubleOrNull ?: return null
+        AirQuality(usAqi = aqi.roundToInt(), pm25 = current["pm2_5"]?.jsonPrimitive?.doubleOrNull?.roundToInt())
     }.getOrNull()
 
     private fun current(json: String): JsonObject? = Json.parseToJsonElement(json).jsonObject["current"]?.jsonObject

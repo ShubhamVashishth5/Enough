@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,6 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -38,6 +42,7 @@ fun TodayRoute(onClose: () -> Unit, viewModel: TodayViewModel = hiltViewModel())
     TodayScreen(
         state = state,
         onDraftChange = viewModel::onDraftChange,
+        onDoneToggled = viewModel::onDoneToggled,
         onSave = viewModel::onSave,
         onCancel = viewModel::onCancel,
         onAdd = viewModel::onAdd,
@@ -59,6 +64,7 @@ fun TodayScreen(
     onAdd: () -> Unit = {},
     onMove: (index: Int, up: Boolean) -> Unit = { _, _ -> },
     onRemove: (Int) -> Unit = {},
+    onDoneToggled: (Int) -> Unit = {},
 ) {
     ScreenScaffold(title = stringResource(R.string.today_title), modifier = Modifier.imePadding(), scrollable = true) {
         state.tightenOffer?.let { minutes ->
@@ -75,7 +81,7 @@ fun TodayScreen(
             modifier = Modifier.padding(bottom = 16.dp),
         )
         if (!state.loaded) return@ScreenScaffold
-        state.drafts.forEachIndexed { index, text ->
+        state.drafts.forEachIndexed { index, draft ->
             if (index == Defaults.HOME_TASKS) {
                 Text(
                     text = stringResource(R.string.today_later),
@@ -85,7 +91,9 @@ fun TodayScreen(
                 )
             }
             TaskField(
-                text = text,
+                text = draft.text,
+                done = draft.done,
+                onDoneToggled = { onDoneToggled(index) },
                 hint = stringResource(R.string.today_hint, index + 1),
                 onChange = { onDraftChange(index, it) },
                 last = index == state.drafts.lastIndex,
@@ -112,6 +120,8 @@ fun TodayScreen(
 @Composable
 private fun TaskField(
     text: String,
+    done: Boolean,
+    onDoneToggled: () -> Unit,
     hint: String,
     onChange: (String) -> Unit,
     last: Boolean,
@@ -123,12 +133,20 @@ private fun TaskField(
 ) {
     val style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface)
     val label = text.ifBlank { hint }
+    val doneLabel = stringResource(R.string.a11y_task_done, label)
     Row(verticalAlignment = Alignment.CenterVertically) {
+        // Blank lines have nothing to tick yet.
+        Checkbox(
+            checked = done,
+            onCheckedChange = { onDoneToggled() },
+            enabled = text.isNotBlank(),
+            modifier = Modifier.semantics { contentDescription = doneLabel },
+        )
         BasicTextField(
             value = text,
             onValueChange = onChange,
             singleLine = true,
-            textStyle = style,
+            textStyle = if (done) style.copy(color = MaterialTheme.colorScheme.outline, textDecoration = TextDecoration.LineThrough) else style,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,

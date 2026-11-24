@@ -33,7 +33,8 @@
     <!-- Home: the lines under the clock (Settings → Home screen) -->
     <string name="home_weather">%1$d° %2$s</string>
     <string name="home_weather_temperature_only">%d°</string>
-    <string name="home_aqi">AQI %1$d (%2$s)</string>
+    <string name="home_aqi">Est. AQI %1$d (%2$s), PM2.5 %3$d µg/m³</string>
+    <string name="home_aqi_no_pm">Est. AQI %1$d (%2$s)</string>
     <string name="home_battery">Battery %d%%</string>
     <string name="home_battery_charging">Charging %d%%</string>
     <string name="home_alarm">Alarm %s</string>
@@ -771,7 +772,7 @@
     <string name="temperature_celsius">Celsius</string>
     <string name="temperature_fahrenheit">Fahrenheit</string>
     <string name="home_option_aqi">Air quality</string>
-    <string name="home_option_aqi_summary">The air quality index (US AQI) where you are, and what it means for you. Tap it on home to refresh.</string>
+    <string name="home_option_aqi_summary">An estimate of the US air quality index and PM2.5 where you are. It comes from a forecast model (CAMS, through Open-Meteo) that covers about 45 km and averages over 24 hours, so it can read well below sensor sites such as aqi.in, especially in Indian cities. Tap it on home to refresh.</string>
     <string name="home_option_needs_location">Weather and air quality need your location. Tap to allow it.</string>
     <string name="home_option_internet_note">Weather and air quality are the only parts of Enough that use the internet. They come from Open-Meteo, which is sent your rough location, rounded to about a kilometre, and nothing else. Both stay off until you switch them on.</string>
     <string name="home_gestures_title">Taps and swipes on home</string>
@@ -780,7 +781,7 @@
     <string name="gesture_long_press_app">Long-press an app</string>
     <string name="gesture_long_press_app_does">Choose a different app for that row, or leave it empty.</string>
     <string name="gesture_tap_task">Tap a task</string>
-    <string name="gesture_tap_task_does">Ticks it off. Tap it again to undo.</string>
+    <string name="gesture_tap_task_does">Ticks it off. Tap it again to undo, or untick it on the Today screen once it has made way for the next one.</string>
     <string name="gesture_long_press_task">Long-press a task</string>
     <string name="gesture_long_press_task_does">Edit today\'s tasks: add more, put them in order, remove some. Home shows the top three still to do.</string>
     <string name="gesture_swipe_up">Swipe up</string>
@@ -815,6 +816,7 @@
     <string name="a11y_task_up">Move %s up</string>
     <string name="a11y_task_down">Move %s down</string>
     <string name="a11y_task_remove">Remove %s</string>
+    <string name="a11y_task_done">%s done</string>
     <string name="a11y_fewer_minutes">Fewer minutes</string>
     <string name="a11y_more_minutes">More minutes</string>
     <plurals name="a11y_vault_minutes">

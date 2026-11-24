@@ -1,6 +1,7 @@
 package app.minimise.widgets.data
 
 import app.minimise.core.time.TimeSource
+import app.minimise.widgets.domain.AirQuality
 import app.minimise.widgets.domain.OpenMeteo
 import app.minimise.widgets.domain.WeatherNow
 import app.minimise.widgets.domain.WeatherRefresh
@@ -32,7 +33,7 @@ enum class WeatherProblem {
  */
 data class WeatherState(
     val weather: WeatherNow? = null,
-    val usAqi: Int? = null,
+    val airQuality: AirQuality? = null,
     val problem: WeatherProblem? = null,
 )
 
@@ -67,7 +68,7 @@ class WeatherRepository @Inject constructor(
 
     private suspend fun fetch(weather: Boolean, airQuality: Boolean, forced: Boolean) {
         val before = _state.value
-        val missing = (weather && before.weather == null) || (airQuality && before.usAqi == null)
+        val missing = (weather && before.weather == null) || (airQuality && before.airQuality == null)
         val now = timeSource.elapsed()
         if (!WeatherRefresh.due(now, lastAttempt, lastSuccess, missing, forced)) return
         lastAttempt = now
@@ -82,7 +83,7 @@ class WeatherRepository @Inject constructor(
                 if (weather) client.get(OpenMeteo.forecastUrl(place.latitude, place.longitude))?.let(OpenMeteo::parseWeather) else null
             }
             val air = async {
-                if (airQuality) client.get(OpenMeteo.airQualityUrl(place.latitude, place.longitude))?.let(OpenMeteo::parseUsAqi) else null
+                if (airQuality) client.get(OpenMeteo.airQualityUrl(place.latitude, place.longitude))?.let(OpenMeteo::parseAirQuality) else null
             }
             forecast.await() to air.await()
         }
@@ -90,7 +91,7 @@ class WeatherRepository @Inject constructor(
         if (complete) lastSuccess = now
         _state.value = WeatherState(
             weather = newWeather ?: before.weather,
-            usAqi = newAqi ?: before.usAqi,
+            airQuality = newAqi ?: before.airQuality,
             problem = if (complete) null else WeatherProblem.OFFLINE,
         )
     }

@@ -23,17 +23,17 @@ class WeatherTest {
     }
 
     @Test
-    fun `reads the US AQI, and none when there's no reading`() {
-        assertEquals(42, OpenMeteo.parseUsAqi("""{"current":{"time":"2026-11-25T10:00","us_aqi":42}}"""))
-        assertEquals(157, OpenMeteo.parseUsAqi("""{"current":{"us_aqi":156.6}}"""))
-        assertNull(OpenMeteo.parseUsAqi("""{"current":{"us_aqi":null}}"""))
+    fun `reads the US AQI and PM2_5, and nothing when there's no AQI`() {
+        assertEquals(AirQuality(42, 18), OpenMeteo.parseAirQuality("""{"current":{"time":"2026-11-25T10:00","us_aqi":42,"pm2_5":17.6}}"""))
+        assertEquals(AirQuality(157, null), OpenMeteo.parseAirQuality("""{"current":{"us_aqi":156.6}}"""))
+        assertNull(OpenMeteo.parseAirQuality("""{"current":{"us_aqi":null,"pm2_5":40.0}}"""))
     }
 
     @Test
     fun `an unexpected answer is no reading, not a crash`() {
         assertNull(OpenMeteo.parseWeather("""{"error":true,"reason":"Latitude must be in range"}"""))
         assertNull(OpenMeteo.parseWeather("<html>busy</html>"))
-        assertNull(OpenMeteo.parseUsAqi(""))
+        assertNull(OpenMeteo.parseAirQuality(""))
     }
 
     @Test
@@ -43,7 +43,7 @@ class WeatherTest {
         assertTrue("latitude=12.97&longitude=-77.59" in url)
         assertFalse("temperature_unit" in url)
         assertFalse("12.9715" in url)
-        assertTrue("latitude=12.97&longitude=-77.59&current=us_aqi" in OpenMeteo.airQualityUrl(12.971599, -77.594566))
+        assertTrue("latitude=12.97&longitude=-77.59&current=us_aqi,pm2_5" in OpenMeteo.airQualityUrl(12.971599, -77.594566))
     }
 
     @Test

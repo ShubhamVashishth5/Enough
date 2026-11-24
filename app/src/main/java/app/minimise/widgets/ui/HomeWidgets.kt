@@ -32,6 +32,7 @@ import app.minimise.launcher.QuickTools
 import app.minimise.widgets.data.BatteryState
 import app.minimise.widgets.data.Track
 import app.minimise.widgets.data.WeatherProblem
+import app.minimise.widgets.domain.AirQuality
 import app.minimise.widgets.domain.AqiLevel
 import app.minimise.widgets.domain.Sky
 import java.time.LocalDateTime
@@ -56,8 +57,8 @@ fun HomeWidgets(viewModel: HomeWidgetsViewModel = hiltViewModel()) {
             if (options.weather) {
                 weather.weather?.let { add(Item(weatherText(it.temperatureIn(state.temperatureUnit), it.sky), viewModel::onWeatherTapped)) }
             }
-            if (options.airQuality) weather.usAqi?.let { add(Item(aqiText(it), viewModel::onWeatherTapped)) }
-            val nothingToShow = (!options.weather || weather.weather == null) && (!options.airQuality || weather.usAqi == null)
+            if (options.airQuality) weather.airQuality?.let { add(Item(aqiText(it), viewModel::onWeatherTapped)) }
+            val nothingToShow = (!options.weather || weather.weather == null) && (!options.airQuality || weather.airQuality == null)
             if (nothingToShow) {
                 when (weather.problem) {
                     WeatherProblem.NO_PERMISSION -> add(
@@ -143,8 +144,13 @@ private fun weatherText(temperature: Int, sky: Sky): String =
     sky.labelRes()?.let { stringResource(R.string.home_weather, temperature, stringResource(it)) }
         ?: stringResource(R.string.home_weather_temperature_only, temperature)
 
+/** Marked as an estimate, since it's a model's, and with PM2.5 so it can be set against a sensor's. */
 @Composable
-private fun aqiText(aqi: Int): String = stringResource(R.string.home_aqi, aqi, stringResource(AqiLevel.ofUsAqi(aqi).labelRes()))
+private fun aqiText(air: AirQuality): String {
+    val level = stringResource(AqiLevel.ofUsAqi(air.usAqi).labelRes())
+    return air.pm25?.let { stringResource(R.string.home_aqi, air.usAqi, level, it) }
+        ?: stringResource(R.string.home_aqi_no_pm, air.usAqi, level)
+}
 
 @Composable
 private fun batteryText(battery: BatteryState): String =
