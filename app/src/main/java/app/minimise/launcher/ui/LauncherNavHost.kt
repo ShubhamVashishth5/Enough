@@ -33,6 +33,8 @@ import app.minimise.capture.ui.CaptureRoute
 import app.minimise.capture.ui.InboxLink
 import app.minimise.capture.ui.InboxRoute
 import app.minimise.tasks.ui.TodayRoute
+import app.minimise.feeds.ui.FeedsRoute
+import app.minimise.BuildConfig
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -104,6 +106,7 @@ fun LauncherNavHost(
                 onOpenFocus = { navController.navigate(Destination.Focus) },
                 onOpenModes = { navController.navigate(Destination.Modes) },
                 onOpenDigest = { navController.navigate(Destination.DigestSettings) },
+                onOpenFeeds = { navController.navigate(Destination.Feeds) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
@@ -145,14 +148,20 @@ fun LauncherNavHost(
         composable<Destination.ModeEdit> {
             ModeEditRoute(onSaved = { navController.popBackStack() })
         }
+        composable<Destination.Feeds> {
+            FeedsRoute()
+        }
         composable<Destination.PendingChanges> {
             PendingChangesRoute()
         }
         composable<Destination.Permissions> {
             PermissionsRoute()
         }
-        composable<Destination.DebugUsage> {
-            DebugUsageRoute()
+        // Debug screens aren't registered at all in release builds, so R8 strips them.
+        if (BuildConfig.DEBUG) {
+            composable<Destination.DebugUsage> {
+                DebugUsageRoute()
+            }
         }
     }
 }

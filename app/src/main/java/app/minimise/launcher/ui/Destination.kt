@@ -56,6 +56,9 @@ sealed interface Destination {
     data object Inbox : Destination
 
     @Serializable
+    data object Feeds : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable

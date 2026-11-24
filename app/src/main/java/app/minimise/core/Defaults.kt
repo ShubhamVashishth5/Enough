@@ -3,6 +3,7 @@ package app.minimise.core
 import java.time.LocalTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,6 +55,16 @@ object Defaults {
 
     /** How late a digest may come, so the system can batch the alarm. */
     val DIGEST_WINDOW: Duration = 10.minutes
+
+    /** Reading another app's screen: how deep and how many nodes at most, so a huge screen can't stall the service. */
+    const val SCREEN_MAX_DEPTH: Int = 60
+    const val SCREEN_MAX_NODES: Int = 3000
+
+    /** At most one screen read per app this often, however fast its content changes. */
+    val SCREEN_CHECK_INTERVAL: Duration = 300.milliseconds
+
+    /** After stepping out of a blocked feed, give the app this long to leave it before acting again. */
+    val FEED_ACTION_COOLDOWN: Duration = 1500.milliseconds
 
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(

@@ -21,6 +21,7 @@ import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetManualMode
 import app.minimise.settings.domain.SetOpenLimit
@@ -55,6 +56,7 @@ class AppSettingsTarget @Inject constructor(
         }
         is RemoveSchedule -> if (scheduleRepository.get(change.id) != null) Direction.LOOSEN else null
         is SetFirstHourRule -> switchDirection(from = settingsStore.current().firstHourRule, to = change.enabled)
+        is SetFeedBlocked -> switchDirection(from = change.feedId in settingsStore.current().blockedFeeds, to = change.blocked)
         // As the plan has it: a key is what ends locked sessions, so adding one is tightening.
         is AddKey -> if (keyRepository.all().any { it.secretHash == change.secretHash }) null else Direction.TIGHTEN
         is RemoveKey -> if (keyRepository.get(change.id) != null) Direction.LOOSEN else null
@@ -76,6 +78,9 @@ class AppSettingsTarget @Inject constructor(
         is SaveSchedule -> scheduleRepository.save(Schedule(change.id, change.name, change.window()))
         is RemoveSchedule -> scheduleRepository.delete(change.id)
         is SetFirstHourRule -> settingsStore.update { it.copy(firstHourRule = change.enabled) }
+        is SetFeedBlocked -> settingsStore.update {
+            it.copy(blockedFeeds = if (change.blocked) it.blockedFeeds + change.feedId else it.blockedFeeds - change.feedId)
+        }
         is AddKey -> keyRepository.add(KeyType.valueOf(change.type), change.label, change.secretHash)
         is RemoveKey -> keyRepository.delete(change.id)
         is SetManualMode -> settingsStore.update { it.copy(manualModeId = change.modeId) }

@@ -50,6 +50,7 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var focusController: FocusController
     @Inject lateinit var focusSessions: FocusSessions
     @Inject lateinit var accessibilityActions: AccessibilityActions
+    @Inject lateinit var screenWatcher: ScreenWatcher
     @Inject lateinit var usageTracker: UsageTracker
     @Inject lateinit var eventLog: EventLog
     @Inject lateinit var settingsGuard: SettingsGuard
@@ -91,6 +92,12 @@ class GateAccessibilityService : AccessibilityService() {
             scope.launch { grayscaleController.run() }
             scope.launch { focusController.run() }
             scope.launch {
+                screenWatcher.watchedPackages.collect { packages ->
+                    screenWatcher.watched = packages
+                    readContentChanges(packages.isNotEmpty())
+                }
+            }
+            scope.launch {
                 while (isActive) {
                     delay(CHECKPOINT_INTERVAL)
                     usageTracker.checkpoint()
@@ -101,16 +108,34 @@ class GateAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         safely("accessibility event") {
-            if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
             val packageName = event.packageName?.toString() ?: return
-            val verdict = filter?.classify(packageName, event.className?.toString()) ?: return
-            val now = timeSource.now()
-            when (verdict) {
-                ForegroundPackageFilter.Verdict.Ignore -> Unit
-                ForegroundPackageFilter.Verdict.NoApp -> foregroundSource.emit(ForegroundEvent(null, now))
-                is ForegroundPackageFilter.Verdict.App -> foregroundSource.emit(ForegroundEvent(verdict.packageName, now))
+            when (event.eventType) {
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                    onWindowChanged(packageName, event.className?.toString())
+                    screenWatcher.onScreenChanged(this, scope, packageName)
+                }
+                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> screenWatcher.onScreenChanged(this, scope, packageName)
             }
         }
+    }
+
+    private fun onWindowChanged(packageName: String, className: String?) {
+        val verdict = filter?.classify(packageName, className) ?: return
+        val now = timeSource.now()
+        when (verdict) {
+            ForegroundPackageFilter.Verdict.Ignore -> Unit
+            ForegroundPackageFilter.Verdict.NoApp -> foregroundSource.emit(ForegroundEvent(null, now))
+            is ForegroundPackageFilter.Verdict.App -> foregroundSource.emit(ForegroundEvent(verdict.packageName, now))
+        }
+    }
+
+    /** Content changes come many times a second from every app, so they're only asked for while a screen is watched. */
+    private fun readContentChanges(on: Boolean) {
+        val info = serviceInfo ?: return
+        val wanted = if (on) WINDOW_EVENTS or AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED else WINDOW_EVENTS
+        if (info.eventTypes == wanted) return
+        info.eventTypes = wanted
+        serviceInfo = info
     }
 
     override fun onInterrupt() = Unit
@@ -147,5 +172,6 @@ class GateAccessibilityService : AccessibilityService() {
 
     private companion object {
         val CHECKPOINT_INTERVAL = 30.seconds
+        const val WINDOW_EVENTS = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
     }
 }

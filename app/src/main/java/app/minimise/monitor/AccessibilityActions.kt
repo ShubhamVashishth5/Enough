@@ -1,6 +1,10 @@
 package app.minimise.monitor
 
 import android.accessibilityservice.AccessibilityService
+import android.os.Handler
+import android.os.Looper
+import app.minimise.BuildConfig
+import app.minimise.monitor.data.ScreenDump
 import javax.inject.Inject
 import javax.inject.Singleton
 import timber.log.Timber
@@ -16,4 +20,18 @@ class AccessibilityActions @Inject constructor() {
         runCatching { service?.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN) == true }
             .onFailure { Timber.w(it, "Could not lock the screen") }
             .getOrDefault(false)
+
+    /** Debug builds: in 5 seconds, log whatever window is in front. False when the service isn't running. */
+    fun dumpScreenSoon(): Boolean {
+        if (!BuildConfig.DEBUG || service == null) return false
+        Handler(Looper.getMainLooper()).postDelayed(
+            { runCatching { service?.rootInActiveWindow?.let(ScreenDump::log) }.onFailure { Timber.w(it, "Dump failed") } },
+            DUMP_DELAY_MILLIS,
+        )
+        return true
+    }
+
+    private companion object {
+        const val DUMP_DELAY_MILLIS = 5_000L
+    }
 }

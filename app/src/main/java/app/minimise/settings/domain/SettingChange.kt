@@ -90,6 +90,13 @@ data class SaveMode(
     override val key: String get() = "mode:$id"
 }
 
+/** Switches the block on one feed (assets/feed_rules.json) on or off. */
+@Serializable
+@SerialName("set_feed_blocked")
+data class SetFeedBlocked(val feedId: String, val blocked: Boolean) : SettingChange {
+    override val key: String get() = "feed:$feedId"
+}
+
 /** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
 private val AppKind.strictness: Int
     get() = when (this) {
