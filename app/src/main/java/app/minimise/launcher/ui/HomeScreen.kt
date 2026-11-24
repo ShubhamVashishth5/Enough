@@ -47,6 +47,7 @@ fun HomeScreen(
     onEditTasks: () -> Unit,
     modifier: Modifier = Modifier,
     focusSection: @Composable () -> Unit = {},
+    digestLine: @Composable () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -59,6 +60,7 @@ fun HomeScreen(
         Spacer(Modifier.height(32.dp))
         state.now?.let { Clock(it) }
         TodayTaskList(tasks = state.tasks, onTaskTapped = onTaskTapped, onEditTasks = onEditTasks)
+        digestLine()
         if (!state.isDefaultHome) {
             Text(
                 text = stringResource(R.string.home_make_default),

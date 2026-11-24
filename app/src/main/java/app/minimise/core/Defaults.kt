@@ -49,6 +49,12 @@ object Defaults {
     /** How long home shows "Focus done" after a session ends. */
     val FOCUS_SUMMARY_SHOWN_FOR: Duration = 30.minutes
 
+    /** When held notifications come out together. */
+    val DIGEST_TIMES: List<LocalTime> = listOf(LocalTime.of(9, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
+
+    /** How late a digest may come, so the system can batch the alarm. */
+    val DIGEST_WINDOW: Duration = 10.minutes
+
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(
         ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),

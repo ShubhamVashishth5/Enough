@@ -12,6 +12,8 @@ data class PermissionsUiState(
     val accessibility: Boolean = false,
     val defaultHome: Boolean = false,
     val batteryUnrestricted: Boolean = false,
+    val notificationAccess: Boolean = false,
+    val postNotifications: Boolean = false,
     val doNotDisturb: Boolean = false,
     val grayscale: Boolean = false,
     val grayscaleCommand: String = "",
@@ -30,6 +32,8 @@ class PermissionsViewModel @Inject constructor(
             accessibility = status.isAccessibilityEnabled(),
             defaultHome = status.isDefaultHome(),
             batteryUnrestricted = status.isIgnoringBatteryOptimizations(),
+            notificationAccess = status.hasNotificationAccess(),
+            postNotifications = status.canPostNotifications(),
             doNotDisturb = status.hasDoNotDisturbAccess(),
             grayscale = status.canWriteSecureSettings(),
             grayscaleCommand = status.grayscaleGrantCommand(),
@@ -47,4 +51,8 @@ class PermissionsViewModel @Inject constructor(
     fun batteryIntent(): Intent = status.batteryOptimizationIntent()
 
     fun doNotDisturbIntent(): Intent = status.doNotDisturbIntent()
+
+    fun notificationAccessIntent(): Intent = status.notificationAccessIntent()
+
+    fun appNotificationSettingsIntent(): Intent = status.appNotificationSettingsIntent()
 }

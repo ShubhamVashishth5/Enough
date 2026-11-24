@@ -9,6 +9,14 @@
     <string name="home_pick_app_title">Choose an app</string>
     <string name="home_pick_app_clear">Leave empty</string>
     <string name="home_numbers">Vault %1$d min · Unlock %2$d</string>
+    <plurals name="home_updates_waiting">
+        <item quantity="one">%d update waiting</item>
+        <item quantity="other">%d updates waiting</item>
+    </plurals>
+    <plurals name="home_digest_ready">
+        <item quantity="one">Digest ready · %d update</item>
+        <item quantity="other">Digest ready · %d updates</item>
+    </plurals>
     <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
 
     <!-- Search -->
@@ -128,6 +136,27 @@
     <string name="settings_swaps">Instead list</string>
     <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
 
+    <!-- Digest -->
+    <string name="digest_title">Digest</string>
+    <string name="digest_empty">Nothing here. Updates held since the last digest come out at the next one.</string>
+    <string name="digest_clear">Clear all</string>
+    <string name="digest_channel">Digest</string>
+    <string name="digest_listener_label">Enough: notification digest</string>
+    <plurals name="digest_summary_updates">
+        <item quantity="one">%d update</item>
+        <item quantity="other">%d updates</item>
+    </plurals>
+    <plurals name="digest_summary_apps">
+        <item quantity="one">from %d app</item>
+        <item quantity="other">from %d apps</item>
+    </plurals>
+    <string name="digest_summary_text">Tap to see them.</string>
+    <string name="digest_settings_title">Notification digest</string>
+    <string name="digest_settings_explainer">Non-urgent notifications wait and arrive together three times a day, at 9:00, 14:00 and 20:00. Calls, alarms and the apps you tick below always come through straight away.</string>
+    <string name="digest_settings_enabled">Hold notifications for the digest</string>
+    <string name="digest_settings_permissions">Needs notification access, and permission to post the summary</string>
+    <string name="digest_settings_exempt">Always come through</string>
+
     <!-- Modes -->
     <string name="mode_work">Work</string>
     <string name="mode_study">Study</string>
@@ -229,6 +258,8 @@
         <item>Call someone</item>
     </string-array>
 
+    <string name="settings_digest">Notification digest</string>
+    <string name="settings_digest_summary">Updates arrive together at 9:00, 14:00 and 20:00</string>
     <string name="settings_grayscale">Grayscale</string>
     <string name="grayscale_off">Off</string>
     <string name="grayscale_vault">While a Vault app is open</string>
@@ -258,6 +289,10 @@
     <string name="permission_grayscale_why">Turns the screen grey while a Vault app is open, which makes feeds less gripping. Android lets only a computer grant this: turn on USB debugging, connect the phone and run the command below once.</string>
     <string name="permission_copy_command">Copy command</string>
 
+    <string name="permission_notification_access">Notification access (optional)</string>
+    <string name="permission_notification_access_why">For the digest: holds non-urgent notifications and releases them three times a day. They stay on the phone. Installed outside the Play Store? Allow restricted settings in app info first, as for accessibility.</string>
+    <string name="permission_post_notifications">Post notifications (optional)</string>
+    <string name="permission_post_notifications_why">Lets the digest post its one summary, and tells you when a new app goes into the Vault.</string>
     <string name="permission_dnd">Do Not Disturb (optional)</string>
     <string name="permission_dnd_why">Turns on Do Not Disturb during focus sessions and puts it back afterwards.</string>
 

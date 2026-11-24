@@ -8,7 +8,9 @@ import android.content.Intent
 import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.PowerManager
+import androidx.core.app.NotificationManagerCompat
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import app.minimise.launcher.HomeRole
@@ -32,6 +34,19 @@ class PermissionStatus @Inject constructor(
 
     fun isIgnoringBatteryOptimizations(): Boolean =
         context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
+
+    fun hasNotificationAccess(): Boolean = NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+
+    fun notificationAccessIntent(): Intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+
+    fun canPostNotifications(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+    } else {
+        NotificationManagerCompat.from(context).areNotificationsEnabled()
+    }
+
+    fun appNotificationSettingsIntent(): Intent =
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
 
     fun hasDoNotDisturbAccess(): Boolean = context.getSystemService(NotificationManager::class.java).isNotificationPolicyAccessGranted
 

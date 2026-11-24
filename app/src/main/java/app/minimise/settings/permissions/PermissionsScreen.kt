@@ -1,6 +1,8 @@
 package app.minimise.settings.permissions
 
+import android.Manifest
 import android.content.ActivityNotFoundException
+import android.os.Build
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +39,9 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
     val roleRequest = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.onResume()
     }
+    val notificationRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        viewModel.onResume()
+    }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
 
     fun open(intent: Intent, fallback: Intent? = null) {
@@ -58,6 +63,14 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
         },
         onRequestBattery = { open(viewModel.batteryIntent(), fallback = viewModel.appInfoIntent()) },
         onRequestDoNotDisturb = { open(viewModel.doNotDisturbIntent()) },
+        onRequestNotificationAccess = { open(viewModel.notificationAccessIntent()) },
+        onRequestPostNotifications = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notificationRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                open(viewModel.appNotificationSettingsIntent())
+            }
+        },
     )
 }
 
@@ -69,6 +82,8 @@ fun PermissionsScreen(
     onRequestHome: () -> Unit,
     onRequestBattery: () -> Unit,
     onRequestDoNotDisturb: () -> Unit,
+    onRequestNotificationAccess: () -> Unit,
+    onRequestPostNotifications: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.permissions_title)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -102,6 +117,20 @@ fun PermissionsScreen(
                 granted = state.batteryUnrestricted,
                 action = stringResource(R.string.permission_allow),
                 onAction = onRequestBattery,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_notification_access),
+                why = stringResource(R.string.permission_notification_access_why),
+                granted = state.notificationAccess,
+                action = stringResource(R.string.permission_open_settings),
+                onAction = onRequestNotificationAccess,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_post_notifications),
+                why = stringResource(R.string.permission_post_notifications_why),
+                granted = state.postNotifications,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestPostNotifications,
             )
             PermissionItem(
                 title = stringResource(R.string.permission_dnd),

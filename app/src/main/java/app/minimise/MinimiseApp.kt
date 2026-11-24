@@ -4,6 +4,7 @@ import android.app.Application
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DebugClockOffset
+import app.minimise.digest.domain.DigestScheduler
 import app.minimise.focus.domain.FocusSessions
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.swaps.domain.SwapRepository
@@ -22,6 +23,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var settingsGuard: SettingsGuard
     @Inject lateinit var swapRepository: SwapRepository
     @Inject lateinit var focusSessions: FocusSessions
+    @Inject lateinit var digestScheduler: DigestScheduler
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -34,6 +36,7 @@ class MinimiseApp : Application() {
         appScope.launch { settingsGuard.applyDue() }
         appScope.launch { swapRepository.seedDefaultsOnce() }
         appScope.launch { focusSessions.finishIfDue() }
+        digestScheduler.scheduleNext()
     }
 
     private fun followDebugClockOffset() {

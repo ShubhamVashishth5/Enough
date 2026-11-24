@@ -50,6 +50,8 @@ class DataStoreSettingsStore @Inject constructor(
             firstHourRule = this[Keys.FIRST_HOUR_RULE] ?: defaults.firstHourRule,
             manualModeId = this[Keys.MANUAL_MODE_ID],
             focusAllowlist = this[Keys.FOCUS_ALLOWLIST],
+            digestEnabled = this[Keys.DIGEST_ENABLED] ?: defaults.digestEnabled,
+            digestExempt = this[Keys.DIGEST_EXEMPT] ?: defaults.digestExempt,
             grayscaleMode = this[Keys.GRAYSCALE_MODE]?.let { name -> GrayscaleMode.entries.firstOrNull { it.name == name } }
                 ?: defaults.grayscaleMode,
             savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
@@ -67,6 +69,8 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.SWAPS_SEEDED] = settings.swapsSeeded
         this[Keys.FIRST_HOUR_RULE] = settings.firstHourRule
         this[Keys.GRAYSCALE_MODE] = settings.grayscaleMode.name
+        this[Keys.DIGEST_ENABLED] = settings.digestEnabled
+        this[Keys.DIGEST_EXEMPT] = settings.digestExempt
         settings.manualModeId?.let { this[Keys.MANUAL_MODE_ID] = it } ?: remove(Keys.MANUAL_MODE_ID)
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
         settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
@@ -85,6 +89,8 @@ class DataStoreSettingsStore @Inject constructor(
         val GRAYSCALE_MODE = stringPreferencesKey("grayscale_mode")
         val FOCUS_ALLOWLIST = stringSetPreferencesKey("focus_allowlist")
         val MANUAL_MODE_ID = longPreferencesKey("manual_mode_id")
+        val DIGEST_ENABLED = booleanPreferencesKey("digest_enabled")
+        val DIGEST_EXEMPT = stringSetPreferencesKey("digest_exempt")
         val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")

@@ -20,6 +20,7 @@ fun SettingsRoute(
     onOpenKeys: () -> Unit,
     onOpenFocus: () -> Unit,
     onOpenModes: () -> Unit,
+    onOpenDigest: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -35,6 +36,7 @@ fun SettingsRoute(
         onOpenKeys = onOpenKeys,
         onOpenFocus = onOpenFocus,
         onOpenModes = onOpenModes,
+        onOpenDigest = onOpenDigest,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
@@ -53,6 +55,7 @@ fun SettingsScreen(
     onOpenKeys: () -> Unit,
     onOpenFocus: () -> Unit,
     onOpenModes: () -> Unit,
+    onOpenDigest: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
@@ -104,6 +107,11 @@ fun SettingsScreen(
                 pluralStringResource(R.plurals.settings_pending_count, state.pendingCount, state.pendingCount)
             },
             onClick = onOpenPendingChanges,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_digest),
+            summary = stringResource(R.string.settings_digest_summary),
+            onClick = onOpenDigest,
         )
         SettingsRow(
             title = stringResource(R.string.settings_grayscale),
