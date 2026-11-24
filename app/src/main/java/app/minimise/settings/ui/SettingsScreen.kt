@@ -31,6 +31,7 @@ fun SettingsRoute(
     onOpenLock: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenWindDown: () -> Unit,
+    onOpenPrivateSpace: () -> Unit,
     onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -63,6 +64,7 @@ fun SettingsRoute(
         onOpenLock = onOpenLock,
         onOpenStats = onOpenStats,
         onOpenWindDown = onOpenWindDown,
+        onOpenPrivateSpace = onOpenPrivateSpace,
         onExport = { exportFile.launch(EXPORT_FILE_NAME) },
         onOpenFriendKey = onOpenFriendKey,
         onOpenPendingChanges = onOpenPendingChanges,
@@ -89,6 +91,7 @@ fun SettingsScreen(
     onOpenLock: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenWindDown: () -> Unit,
+    onOpenPrivateSpace: () -> Unit,
     onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -104,6 +107,14 @@ fun SettingsScreen(
             summary = stringResource(R.string.settings_apps_summary),
             onClick = onOpenApps,
         )
+        // Hidden below Android 15 and when no Private space is set up.
+        if (state.privateSpace != null) {
+            SettingsRow(
+                title = stringResource(R.string.private_space_title),
+                summary = stringResource(if (state.privateSpace) R.string.private_space_locked else R.string.private_space_unlocked),
+                onClick = onOpenPrivateSpace,
+            )
+        }
         SettingsRow(
             title = stringResource(R.string.settings_budget),
             summary = state.budgetMinutes?.let { stringResource(R.string.settings_budget_summary, it) },
