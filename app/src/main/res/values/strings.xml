@@ -43,6 +43,10 @@
     <string name="blocked_open_limit_title">Open limit reached</string>
     <string name="blocked_open_limit_body">That\'s all the opens of %s for today.</string>
     <string name="blocked_back">Back</string>
+    <string name="blocked_schedule_title">Scheduled block</string>
+    <string name="blocked_schedule_body">Vault apps are off during this schedule.</string>
+    <string name="blocked_first_hour_title">First hour</string>
+    <string name="blocked_first_hour_body">Vault apps open an hour after your first unlock of the day.</string>
     <plurals name="override_emergency_pass">
         <item quantity="one">Use an emergency pass (%d left this week)</item>
         <item quantity="other">Use an emergency pass (%d left this week)</item>
@@ -107,8 +111,31 @@
     <string name="open_limit_save">Save</string>
     <string name="open_limit_remove">No limit</string>
 
+    <string name="settings_schedules">Schedules</string>
+    <string name="settings_schedules_summary">Hours when Vault apps don\'t open at all</string>
     <string name="settings_swaps">Instead list</string>
     <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
+
+    <!-- Schedules -->
+    <string name="schedules_title">Schedules</string>
+    <string name="schedules_explainer">Inside a schedule, Vault apps are blocked. Only your physical key or an emergency pass gets past. A new or longer schedule applies at once; a shorter one, or removing it, waits 24 hours.</string>
+    <string name="schedules_add">Add a schedule</string>
+    <string name="schedule_new">New schedule</string>
+    <string name="schedule_edit">Edit schedule</string>
+    <string name="schedule_name_hint">Bedtime</string>
+    <string name="schedule_loosen_note">Shortening a schedule waits 24 hours.</string>
+    <string name="schedule_changes_in">Change applies in %s</string>
+    <string name="schedule_removed_in">Removed in %s</string>
+    <string name="first_hour_title">First hour</string>
+    <string name="first_hour_on">On: no Vault apps for an hour after the day\'s first unlock</string>
+    <string name="first_hour_off">Off. Tap to keep Vault apps shut for the first hour of each day.</string>
+    <string name="first_hour_off_in">Switches off in %s. Tap to keep it on.</string>
+    <string name="window_starts">Starts</string>
+    <string name="window_ends">Ends</string>
+    <string name="window_set">Set</string>
+    <string name="window_summary">%1$s · %2$s–%3$s</string>
+    <string name="days_every_day">Every day</string>
+    <string name="days_none">No days</string>
 
     <!-- Instead list -->
     <string name="swaps_title">Instead list</string>
@@ -172,6 +199,10 @@
     <string name="pending_budget">Daily budget → %d min</string>
     <string name="pending_open_limit">%1$s → %2$d opens a day</string>
     <string name="pending_open_limit_none">%s → no open limit</string>
+    <string name="pending_schedule_changed">Schedule %s changes</string>
+    <string name="pending_schedule_removed">Schedule %s is removed</string>
+    <string name="pending_first_hour_on">First hour → on</string>
+    <string name="pending_first_hour_off">First hour → off</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
