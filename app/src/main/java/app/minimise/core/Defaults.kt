@@ -6,6 +6,8 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+data class ModePreset(val key: String, val budget: Duration, val waitSteps: List<Duration>)
+
 /** Every tunable number in the app lives here. */
 object Defaults {
     /** Usage days start at this local time, not midnight. */
@@ -31,4 +33,33 @@ object Defaults {
 
     /** Choices offered after a pause. */
     val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)
+
+    /** Emergency passes per usage week (Monday 04:00 to Monday 04:00). Each skips one block. */
+    const val EMERGENCY_PASSES_PER_WEEK: Int = 3
+
+    /** With the first-hour rule on, Vault apps stay blocked this long after the day's first unlock. */
+    val FIRST_HOUR: Duration = 60.minutes
+
+    /** Focus session lengths offered on home. */
+    val FOCUS_LENGTHS: List<Duration> = listOf(25.minutes, 50.minutes, 90.minutes)
+
+    /** The wait that gets past an unlocked focus session for one app. */
+    val FOCUS_WAIT: Duration = 120.seconds
+
+    /** How long home shows "Focus done" after a session ends. */
+    val FOCUS_SUMMARY_SHOWN_FOR: Duration = 30.minutes
+
+    /** When held notifications come out together. */
+    val DIGEST_TIMES: List<LocalTime> = listOf(LocalTime.of(9, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
+
+    /** How late a digest may come, so the system can batch the alarm. */
+    val DIGEST_WINDOW: Duration = 10.minutes
+
+    /** The modes the app ships with. None has a schedule until the user gives it one. */
+    val MODES: List<ModePreset> = listOf(
+        ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),
+        ModePreset("study", budget = 15.minutes, waitSteps = listOf(30, 60, 120, 180, 300).map { it.seconds }),
+        ModePreset("home", budget = DAILY_BUDGET, waitSteps = WAIT_STEPS),
+        ModePreset("sleep", budget = 0.minutes, waitSteps = listOf(60, 120, 300).map { it.seconds }),
+    )
 }

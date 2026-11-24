@@ -29,7 +29,7 @@ class GateMonitor @Inject constructor(
                 when (val decision = gateEngine.check(app)) {
                     Decision.Allow -> Unit
                     is Decision.Pause -> interventions.showPause(app, decision, launchAfter = false)
-                    is Decision.Block -> interventions.showBlocked(app, decision)
+                    is Decision.Block -> interventions.showBlocked(app, decision, launchAfter = false)
                 }
             } catch (e: CancellationException) {
                 throw e

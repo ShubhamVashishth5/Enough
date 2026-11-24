@@ -10,4 +10,6 @@ data class AppEntity(
     @PrimaryKey val packageName: String,
     val kind: AppKind,
     val homeSlot: Int?,
+    /** Most proceeded opens a day, or null for no limit. */
+    val openLimit: Int? = null,
 )

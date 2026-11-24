@@ -63,4 +63,12 @@ class DayBoundaryTest {
         assertEquals(day, boundary.dayOf(end.minusMillis(1)))
         assertEquals(day.plusDays(1), boundary.dayOf(end))
     }
+
+    @Test
+    fun `usage weeks start on Monday`() {
+        val monday = java.time.LocalDate.of(2026, 11, 23)
+        assertEquals(monday, boundary.weekStartOf(monday))
+        assertEquals(monday, boundary.weekStartOf(monday.plusDays(6)))
+        assertEquals(monday.plusDays(7), boundary.weekStartOf(monday.plusDays(7)))
+    }
 }

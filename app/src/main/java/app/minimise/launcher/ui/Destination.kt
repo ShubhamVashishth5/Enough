@@ -26,6 +26,36 @@ sealed interface Destination {
     data object Budget : Destination
 
     @Serializable
+    data object Swaps : Destination
+
+    @Serializable
+    data object Schedules : Destination
+
+    @Serializable
+    data object Keys : Destination
+
+    @Serializable
+    data object Focus : Destination
+
+    @Serializable
+    data object Modes : Destination
+
+    @Serializable
+    data class ModeEdit(val id: Long) : Destination
+
+    @Serializable
+    data object Digest : Destination
+
+    @Serializable
+    data object DigestSettings : Destination
+
+    @Serializable
+    data object Capture : Destination
+
+    @Serializable
+    data object Inbox : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable

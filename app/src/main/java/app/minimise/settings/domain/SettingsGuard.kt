@@ -75,7 +75,11 @@ class SettingsGuard @Inject constructor(
             Event(
                 type = EventType.SETTING_CHANGED,
                 startAt = timeSource.now(),
-                packageName = (change as? SetAppKind)?.packageName,
+                packageName = when (change) {
+                    is SetAppKind -> change.packageName
+                    is SetOpenLimit -> change.packageName
+                    else -> null
+                },
                 data = buildJsonObject {
                     put("direction", direction.name)
                     put("change", Json.encodeToJsonElement(SettingChange.serializer(), change))

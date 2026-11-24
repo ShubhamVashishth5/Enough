@@ -49,7 +49,7 @@ class GrantWatcher @Inject constructor(
         // Only a box that is running when the app comes to the front is watched. An app that comes back
         // after its box ended goes through the gate instead.
         val grant = grantStore.get(packageName)?.takeIf { it.isActive(timeSource.now()) } ?: return
-        val usesBudget = appRepository.kindOf(packageName) == AppKind.VAULT
+        val usesBudget = appRepository.kindOf(packageName) == AppKind.VAULT && !grant.viaOverride
         while (true) {
             val boxLeft = durationBetween(timeSource.now(), grant.endAt)
             val budgetLeft = if (usesBudget) dailyBudget.remaining() else Duration.INFINITE

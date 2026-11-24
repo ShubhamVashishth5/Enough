@@ -9,6 +9,19 @@
     <string name="home_pick_app_title">Choose an app</string>
     <string name="home_pick_app_clear">Leave empty</string>
     <string name="home_numbers">Vault %1$d min · Unlock %2$d</string>
+    <plurals name="home_updates_waiting">
+        <item quantity="one">%d update waiting</item>
+        <item quantity="other">%d updates waiting</item>
+    </plurals>
+    <plurals name="home_digest_ready">
+        <item quantity="one">Digest ready · %d update</item>
+        <item quantity="other">Digest ready · %d updates</item>
+    </plurals>
+    <string name="event_next">%1$s %2$s</string>
+    <string name="event_now">Now: %s</string>
+    <string name="notice_channel">Notices</string>
+    <string name="auto_vault_notice">%s went into the Vault</string>
+    <string name="auto_vault_notice_body">New social, video, game and news apps go in by themselves. Taking one out waits 24 hours.</string>
     <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
 
     <!-- Search -->
@@ -26,6 +39,9 @@
     <string name="pause_how_long">For how long?</string>
     <string name="pause_budget_left">%s left today</string>
     <string name="pause_change_reason">Change reason</string>
+    <string name="pause_swap_question">How about this instead?</string>
+    <string name="pause_swap_take">Do this instead</string>
+    <string name="pause_swap_open_anyway">Open anyway</string>
 
     <!-- Time's up -->
     <string name="time_up_title">Time\'s up</string>
@@ -37,6 +53,25 @@
     <string name="blocked_body">This app is blocked right now.</string>
     <string name="blocked_budget_title">Daily budget used</string>
     <string name="blocked_budget_body">Vault apps open again after 04:00.</string>
+    <string name="blocked_open_limit_title">Open limit reached</string>
+    <string name="blocked_open_limit_body">That\'s all the opens of %s for today.</string>
+    <string name="blocked_back">Back</string>
+    <string name="blocked_focus_title">Focusing</string>
+    <string name="blocked_focus_body">%s isn\'t on your focus list.</string>
+    <string name="blocked_waiting">Wait</string>
+    <string name="blocked_mode_title">Not in this mode</string>
+    <string name="blocked_mode_body">%s isn\'t one of this mode\'s apps.</string>
+    <string name="blocked_schedule_title">Scheduled block</string>
+    <string name="blocked_schedule_body">Vault apps are off during this schedule.</string>
+    <string name="blocked_first_hour_title">First hour</string>
+    <string name="blocked_first_hour_body">Vault apps open an hour after your first unlock of the day.</string>
+    <plurals name="override_emergency_pass">
+        <item quantity="one">Use an emergency pass (%d left this week)</item>
+        <item quantity="other">Use an emergency pass (%d left this week)</item>
+    </plurals>
+    <string name="override_nfc_key">Tap your key</string>
+    <string name="override_qr_key">Scan your code</string>
+    <string name="override_wait">Wait 2 minutes</string>
 
     <!-- Budget -->
     <string name="settings_budget">Daily budget</string>
@@ -85,6 +120,168 @@
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
     <string name="apps_pending_move">Moves to %1$s in %2$s</string>
+    <string name="apps_open_limit">Open limit: %d a day</string>
+    <string name="apps_open_limit_none">Open limit: none</string>
+    <string name="apps_pending_limit">Limit changes to %1$d a day in %2$s</string>
+    <string name="apps_pending_limit_none">Limit comes off in %s</string>
+    <string name="open_limit_title">Open limit for %s</string>
+    <string name="open_limit_hint">Opens a day</string>
+    <string name="open_limit_save">Save</string>
+    <string name="open_limit_remove">No limit</string>
+
+    <string name="settings_modes">Modes</string>
+    <string name="settings_modes_now">Now: %s</string>
+    <string name="settings_modes_none">No mode on right now</string>
+    <string name="settings_schedules">Schedules</string>
+    <string name="settings_schedules_summary">Hours when Vault apps don\'t open at all</string>
+    <string name="settings_focus">Focus</string>
+    <string name="settings_focus_summary">Which apps open during a focus session</string>
+    <string name="settings_keys">Physical key</string>
+    <string name="settings_keys_summary">A sticker or printed code that ends a block</string>
+    <string name="settings_swaps">Instead list</string>
+    <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
+
+    <!-- Quick capture and inbox -->
+    <string name="capture_title">Later</string>
+    <string name="capture_hint">Look it up later…</string>
+    <string name="capture_explainer">Press Enter to save. It comes back in your inbox at the end of a focus session and with the evening digest.</string>
+    <string name="inbox_title">Inbox</string>
+    <string name="inbox_empty">Nothing saved for later. Swipe left on home to capture a thought.</string>
+    <string name="inbox_share">Share</string>
+    <plurals name="inbox_link">
+        <item quantity="one">Inbox · %d note</item>
+        <item quantity="other">Inbox · %d notes</item>
+    </plurals>
+
+    <!-- Digest -->
+    <string name="digest_title">Digest</string>
+    <string name="digest_empty">Nothing here. Updates held since the last digest come out at the next one.</string>
+    <string name="digest_clear">Clear all</string>
+    <string name="digest_channel">Digest</string>
+    <string name="digest_listener_label">Enough: notification digest</string>
+    <plurals name="digest_summary_updates">
+        <item quantity="one">%d update</item>
+        <item quantity="other">%d updates</item>
+    </plurals>
+    <plurals name="digest_summary_apps">
+        <item quantity="one">from %d app</item>
+        <item quantity="other">from %d apps</item>
+    </plurals>
+    <string name="digest_summary_text">Tap to see them.</string>
+    <string name="digest_settings_title">Notification digest</string>
+    <string name="digest_settings_explainer">Non-urgent notifications wait and arrive together three times a day, at 9:00, 14:00 and 20:00. Calls, alarms and the apps you tick below always come through straight away.</string>
+    <string name="digest_settings_enabled">Hold notifications for the digest</string>
+    <string name="digest_settings_permissions">Needs notification access, and permission to post the summary</string>
+    <string name="digest_settings_exempt">Always come through</string>
+
+    <!-- Modes -->
+    <string name="mode_work">Work</string>
+    <string name="mode_study">Study</string>
+    <string name="mode_home">Home</string>
+    <string name="mode_sleep">Sleep</string>
+    <string name="modes_title">Modes</string>
+    <string name="modes_explainer">Each mode has its own budget and waits, and can let only chosen apps open. Turn one on here or give it a schedule. Switching to a stricter mode applies at once; a looser one waits 24 hours.</string>
+    <string name="modes_follow">Follow schedules</string>
+    <string name="modes_follow_summary">Each mode turns on during its own hours</string>
+    <string name="modes_now">%s · on now</string>
+    <string name="modes_use">Use now</string>
+    <string name="modes_budget">%d min a day</string>
+    <string name="modes_no_schedule">no schedule</string>
+    <string name="modes_only_apps">only %d apps</string>
+    <string name="modes_switch_pending">Switching to %1$s in %2$s</string>
+    <string name="mode_budget_label">Minutes a day across all Vault apps</string>
+    <string name="mode_on_schedule">On a schedule</string>
+    <string name="mode_only_apps">Only let chosen apps open</string>
+    <string name="mode_saved_later">Saved. It makes the mode looser, so it applies in 24 hours; see Pending changes.</string>
+
+    <!-- Schedules -->
+    <string name="schedules_title">Schedules</string>
+    <string name="schedules_explainer">Inside a schedule, Vault apps are blocked. Only your physical key or an emergency pass gets past. A new or longer schedule applies at once; a shorter one, or removing it, waits 24 hours.</string>
+    <string name="schedules_add">Add a schedule</string>
+    <string name="schedule_new">New schedule</string>
+    <string name="schedule_edit">Edit schedule</string>
+    <string name="schedule_name_hint">Bedtime</string>
+    <string name="schedule_loosen_note">Shortening a schedule waits 24 hours.</string>
+    <string name="schedule_changes_in">Change applies in %s</string>
+    <string name="schedule_removed_in">Removed in %s</string>
+    <string name="first_hour_title">First hour</string>
+    <string name="first_hour_on">On: no Vault apps for an hour after the day\'s first unlock</string>
+    <string name="first_hour_off">Off. Tap to keep Vault apps shut for the first hour of each day.</string>
+    <string name="first_hour_off_in">Switches off in %s. Tap to keep it on.</string>
+    <string name="window_starts">Starts</string>
+    <string name="window_ends">Ends</string>
+    <string name="window_set">Set</string>
+    <string name="window_summary">%1$s · %2$s–%3$s</string>
+    <string name="days_every_day">Every day</string>
+    <string name="days_none">No days</string>
+
+    <!-- Focus -->
+    <string name="focus_start_line">Focus</string>
+    <string name="focus_left">Focus · %s left</string>
+    <string name="focus_done">Focus done · %d min</string>
+    <string name="focus_title">Focus</string>
+    <string name="focus_explainer">Only your focus apps open. Do Not Disturb goes on, and the screen goes grey if grayscale is set up.</string>
+    <string name="focus_lock">Lock it: ending early needs your key</string>
+    <string name="focus_end_title">End focus early?</string>
+    <string name="focus_end_body">Other apps open again straight away.</string>
+    <string name="focus_end_locked">This session is locked. Ending it early needs your key.</string>
+    <string name="focus_end_now">End now</string>
+    <string name="focus_keep_going">Keep going</string>
+    <string name="focus_settings_title">Focus apps</string>
+    <string name="focus_settings_explainer">During a focus session only these open. Anything else, Tool apps included, is blocked: an unlocked session lets you in after a 2-minute wait, a locked one only with your key. Calls always get through.</string>
+
+    <!-- Physical keys -->
+    <string name="keys_title">Physical key</string>
+    <string name="keys_explainer">Pair a cheap NFC sticker or print a code, then leave it in another room or at work. A scheduled block or a locked focus session ends early only with a tap or a scan. Adding a key applies at once; removing one waits 24 hours.</string>
+    <string name="keys_pair_nfc">Pair an NFC sticker</string>
+    <string name="keys_make_qr">Make a code to print</string>
+    <string name="key_label_sticker">NFC sticker</string>
+    <string name="key_label_code">Printed code</string>
+    <string name="key_type_nfc">Tap to remove</string>
+    <string name="key_type_qr">Tap to remove</string>
+    <string name="key_removed_in">Removed in %s</string>
+    <string name="key_hold_sticker">Hold the sticker to the back of the phone.</string>
+    <string name="key_nfc_off">Turn on NFC in the phone\'s settings, then hold your sticker to the back of the phone.</string>
+    <string name="key_already_paired">That sticker is already paired. Try another one.</string>
+    <string name="key_scan_code">Scan your printed code.</string>
+    <string name="key_scan">Scan</string>
+    <string name="key_not_yours">That isn\'t a paired key.</string>
+    <string name="key_qr_explainer">Print this or save a screenshot, then keep it out of reach. It\'s shown only once; the app keeps only a fingerprint of it.</string>
+    <string name="key_qr_saved">I\'ve saved it</string>
+    <string name="key_remove">Remove</string>
+    <string name="key_remove_body">This key stops working in 24 hours. You can cancel that under Pending changes.</string>
+
+    <!-- Instead list -->
+    <string name="swaps_title">Instead list</string>
+    <string name="swaps_explainer">When you answer Bored or Habit on the pause screen, it offers one of these first, taking turns. Link an app to open it; otherwise Do this instead goes home.</string>
+    <string name="swaps_empty">Nothing here yet, so the pause screen won\'t offer anything instead.</string>
+    <string name="swaps_add">Add a swap</string>
+    <string name="swaps_opens">Opens %s</string>
+    <string name="swaps_goes_home">Goes home</string>
+    <string name="swap_new">New swap</string>
+    <string name="swap_edit">Edit swap</string>
+    <string name="swap_hint">Read 5 pages</string>
+    <string name="swap_app">App to open</string>
+    <string name="swap_app_none">None, go home</string>
+    <string name="swap_save">Save</string>
+    <string name="swap_delete">Delete</string>
+    <string name="swap_cancel">Cancel</string>
+    <!-- The Instead list starts with these. -->
+    <string-array name="default_swaps">
+        <item>Read 5 pages</item>
+        <item>10 push-ups</item>
+        <item>Go for a walk</item>
+        <item>A language lesson</item>
+        <item>Call someone</item>
+    </string-array>
+
+    <string name="settings_digest">Notification digest</string>
+    <string name="settings_digest_summary">Updates arrive together at 9:00, 14:00 and 20:00</string>
+    <string name="settings_grayscale">Grayscale</string>
+    <string name="grayscale_off">Off</string>
+    <string name="grayscale_vault">While a Vault app is open</string>
+    <string name="grayscale_always">Always</string>
+    <string name="grayscale_needs_grant">Needs a one-time grant from a computer. Tap for how.</string>
 
     <string name="settings_permissions">Permissions</string>
     <string name="settings_permissions_summary">What the app needs and why</string>
@@ -105,6 +302,19 @@
     <string name="permission_battery">Unrestricted battery</string>
     <string name="permission_battery_why">Stops the system from pausing the app in the background, which would switch protection off.</string>
 
+    <string name="permission_grayscale">Grayscale (optional)</string>
+    <string name="permission_grayscale_why">Turns the screen grey while a Vault app is open, which makes feeds less gripping. Android lets only a computer grant this: turn on USB debugging, connect the phone and run the command below once.</string>
+    <string name="permission_copy_command">Copy command</string>
+
+    <string name="permission_notification_access">Notification access (optional)</string>
+    <string name="permission_notification_access_why">For the digest: holds non-urgent notifications and releases them three times a day. They stay on the phone. Installed outside the Play Store? Allow restricted settings in app info first, as for accessibility.</string>
+    <string name="permission_post_notifications">Post notifications (optional)</string>
+    <string name="permission_post_notifications_why">Lets the digest post its one summary, and tells you when a new app goes into the Vault.</string>
+    <string name="permission_calendar">Calendar (optional)</string>
+    <string name="permission_calendar_why">Shows your next calendar item under the clock. Nothing else is read.</string>
+    <string name="permission_dnd">Do Not Disturb (optional)</string>
+    <string name="permission_dnd_why">Turns on Do Not Disturb during focus sessions and puts it back afterwards.</string>
+
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>
     <string name="accessibility_service_description">Notices when a Vault app comes to the front so the pause screen can appear first. Only the app\'s name is read. Nothing on screen is read and nothing leaves the phone.</string>
@@ -122,6 +332,16 @@
     <string name="pending_cancel">Cancel</string>
     <string name="pending_app_kind">%1$s → %2$s</string>
     <string name="pending_budget">Daily budget → %d min</string>
+    <string name="pending_open_limit">%1$s → %2$d opens a day</string>
+    <string name="pending_open_limit_none">%s → no open limit</string>
+    <string name="pending_schedule_changed">Schedule %s changes</string>
+    <string name="pending_schedule_removed">Schedule %s is removed</string>
+    <string name="pending_first_hour_on">First hour → on</string>
+    <string name="pending_first_hour_off">First hour → off</string>
+    <string name="pending_key_added">Pair %s</string>
+    <string name="pending_key_removed">Remove %s</string>
+    <string name="pending_mode_switch">Mode → %s</string>
+    <string name="pending_mode_edit">Changes to %s mode</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

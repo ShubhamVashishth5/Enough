@@ -18,6 +18,12 @@ interface AppRepository {
     /** Writes the kind directly. Only SettingsGuard should call this. */
     suspend fun setKind(packageName: String, kind: AppKind)
 
+    /** The stored daily open limit, or null for none. */
+    suspend fun openLimitOf(packageName: String): Int?
+
+    /** Writes the open limit directly. Only SettingsGuard should call this. */
+    suspend fun setOpenLimit(packageName: String, limit: Int?)
+
     /** Puts [packageName] in [slot], moving out whichever app was there. */
     suspend fun setHomeSlot(packageName: String, slot: Int)
 

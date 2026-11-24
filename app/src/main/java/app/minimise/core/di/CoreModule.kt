@@ -6,9 +6,16 @@ import app.minimise.apps.data.RoomAppRepository
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppDatabase
+import app.minimise.core.db.BufferedNotificationDao
 import app.minimise.core.db.EventDao
+import app.minimise.core.db.FocusSessionDao
 import app.minimise.core.db.GrantDao
+import app.minimise.core.db.KeyDao
+import app.minimise.core.db.ModeDao
+import app.minimise.core.db.NoteDao
 import app.minimise.core.db.PendingChangeDao
+import app.minimise.core.db.ScheduleDao
+import app.minimise.core.db.SwapDao
 import app.minimise.core.db.TaskDao
 import app.minimise.core.prefs.DataStoreSettingsStore
 import app.minimise.core.prefs.SettingsStore
@@ -65,6 +72,27 @@ object CoreProviders {
 
     @Provides
     fun taskDao(db: AppDatabase): TaskDao = db.taskDao()
+
+    @Provides
+    fun swapDao(db: AppDatabase): SwapDao = db.swapDao()
+
+    @Provides
+    fun scheduleDao(db: AppDatabase): ScheduleDao = db.scheduleDao()
+
+    @Provides
+    fun keyDao(db: AppDatabase): KeyDao = db.keyDao()
+
+    @Provides
+    fun focusSessionDao(db: AppDatabase): FocusSessionDao = db.focusSessionDao()
+
+    @Provides
+    fun modeDao(db: AppDatabase): ModeDao = db.modeDao()
+
+    @Provides
+    fun bufferedNotificationDao(db: AppDatabase): BufferedNotificationDao = db.bufferedNotificationDao()
+
+    @Provides
+    fun noteDao(db: AppDatabase): NoteDao = db.noteDao()
 
     @Provides
     @Singleton

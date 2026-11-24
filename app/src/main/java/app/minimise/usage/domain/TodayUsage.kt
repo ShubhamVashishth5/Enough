@@ -10,7 +10,13 @@ data class TodayUsage(
     val vaultTime: Duration = Duration.ZERO,
     /** Vault opens the user went through with (past the pause screen). */
     val proceededOpens: Int = 0,
+    /** [proceededOpens] split by app. */
+    val proceededOpensByPackage: Map<String, Int> = emptyMap(),
+    /** Pause screens shown, however they ended. */
+    val pausesShown: Int = 0,
     val unlocks: Int = 0,
+    /** The day's first screen unlock, if there has been one. */
+    val firstUnlockAt: Instant? = null,
 ) {
     companion object {
         /**
@@ -34,10 +40,15 @@ data class TodayUsage(
                     val end = minOf(rawEnd, dayEnd, now)
                     if (end.isAfter(start)) total + durationBetween(start, end) else total
                 }
+            val unlocks = events.filter { it.type == EventType.SCREEN_UNLOCK && countFrom(it) }
+            val proceeded = events.filter { it.type == EventType.GATE_PROCEEDED && countFrom(it) }
             return TodayUsage(
                 vaultTime = vaultTime,
-                proceededOpens = events.count { it.type == EventType.GATE_PROCEEDED && countFrom(it) },
-                unlocks = events.count { it.type == EventType.SCREEN_UNLOCK && countFrom(it) },
+                proceededOpens = proceeded.size,
+                proceededOpensByPackage = proceeded.groupingBy { it.packageName.orEmpty() }.eachCount(),
+                pausesShown = events.count { it.type == EventType.GATE_SHOWN && countFrom(it) },
+                unlocks = unlocks.size,
+                firstUnlockAt = unlocks.minOfOrNull { it.startAt },
             )
         }
     }

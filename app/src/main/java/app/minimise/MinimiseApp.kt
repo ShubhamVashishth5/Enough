@@ -1,10 +1,14 @@
 package app.minimise
 
 import android.app.Application
+import app.minimise.apps.data.AutoVaultWatcher
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DebugClockOffset
+import app.minimise.digest.domain.DigestScheduler
+import app.minimise.focus.domain.FocusSessions
 import app.minimise.settings.domain.SettingsGuard
+import app.minimise.swaps.domain.SwapRepository
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +22,10 @@ class MinimiseApp : Application() {
     @Inject lateinit var settingsStore: SettingsStore
     @Inject lateinit var debugClockOffset: DebugClockOffset
     @Inject lateinit var settingsGuard: SettingsGuard
+    @Inject lateinit var swapRepository: SwapRepository
+    @Inject lateinit var focusSessions: FocusSessions
+    @Inject lateinit var digestScheduler: DigestScheduler
+    @Inject lateinit var autoVaultWatcher: AutoVaultWatcher
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -28,6 +36,10 @@ class MinimiseApp : Application() {
         }
         // Also runs on every screen unlock, from GateAccessibilityService.
         appScope.launch { settingsGuard.applyDue() }
+        appScope.launch { swapRepository.seedDefaultsOnce() }
+        appScope.launch { focusSessions.finishIfDue() }
+        digestScheduler.scheduleNext()
+        autoVaultWatcher.start()
     }
 
     private fun followDebugClockOffset() {

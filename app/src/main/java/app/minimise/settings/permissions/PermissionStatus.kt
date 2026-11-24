@@ -1,11 +1,16 @@
 package app.minimise.settings.permissions
 
+import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.app.NotificationManager
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.PowerManager
+import androidx.core.app.NotificationManagerCompat
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import app.minimise.launcher.HomeRole
@@ -29,6 +34,32 @@ class PermissionStatus @Inject constructor(
 
     fun isIgnoringBatteryOptimizations(): Boolean =
         context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
+
+    fun hasNotificationAccess(): Boolean = NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+
+    fun notificationAccessIntent(): Intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+
+    fun canPostNotifications(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+    } else {
+        NotificationManagerCompat.from(context).areNotificationsEnabled()
+    }
+
+    fun appNotificationSettingsIntent(): Intent =
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+
+    fun canReadCalendar(): Boolean =
+        context.checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
+
+    fun hasDoNotDisturbAccess(): Boolean = context.getSystemService(NotificationManager::class.java).isNotificationPolicyAccessGranted
+
+    fun doNotDisturbIntent(): Intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+
+    fun canWriteSecureSettings(): Boolean =
+        context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
+
+    /** Run once from a computer with USB debugging on. */
+    fun grayscaleGrantCommand(): String = "adb shell pm grant ${context.packageName} ${Manifest.permission.WRITE_SECURE_SETTINGS}"
 
     fun accessibilitySettingsIntent(): Intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
 
