@@ -3,6 +3,7 @@ package app.minimise.gate
 import app.minimise.gate.data.RoomGrantStore
 import app.minimise.gate.domain.GrantStore
 import app.minimise.gate.domain.Rule
+import app.minimise.gate.rules.BreathePauseRule
 import app.minimise.gate.rules.BudgetRule
 import app.minimise.gate.rules.FirstHourRule
 import app.minimise.gate.rules.FocusRule
@@ -26,6 +27,10 @@ abstract class GateModule {
     @Binds
     @IntoSet
     abstract fun vaultPauseRule(rule: VaultPauseRule): Rule
+
+    @Binds
+    @IntoSet
+    abstract fun breathePauseRule(rule: BreathePauseRule): Rule
 
     @Binds
     @IntoSet

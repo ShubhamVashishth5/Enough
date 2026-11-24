@@ -23,6 +23,9 @@ sealed interface Destination {
     data object Apps : Destination
 
     @Serializable
+    data object HomeSettings : Destination
+
+    @Serializable
     data object Budget : Destination
 
     @Serializable

@@ -7,4 +7,6 @@ data class SearchUiState(
     val results: List<AppEntry> = emptyList(),
     /** An app (or its pause screen) was opened: return to home. */
     val finished: Boolean = false,
+    /** The app whose App info / Uninstall choice is open, after a long-press. */
+    val actionsFor: AppEntry? = null,
 )

@@ -54,6 +54,7 @@ fun PauseScreen(
     onSwapDeclined: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpen: () -> Unit = {},
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -81,6 +82,7 @@ fun PauseScreen(
         Box(contentAlignment = Alignment.Center, modifier = Modifier.weight(1f).fillMaxWidth()) {
             when {
                 state.waiting -> Breathing(secondsLeft = state.remaining.inWholeSeconds + 1)
+                state.breatheOnly -> OpenChoice(state.appLabel, onOpen)
                 state.reason == null -> ReasonChoices(onReasonChosen)
                 state.offeringSwap && state.swap != null ->
                     SwapOffer(state.swap, state.swapAppLabel, onSwapTaken, onSwapDeclined)
@@ -121,6 +123,22 @@ private fun Breathing(secondsLeft: Long) {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+/** After a Breathe app's pause: still want it? */
+@Composable
+private fun OpenChoice(appLabel: String, onOpen: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+            text = stringResource(R.string.pause_breathe_question),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.announcedHeading(),
+        )
+        OutlinedButton(onClick = onOpen) {
+            Text(text = stringResource(R.string.pause_breathe_open, appLabel), style = MaterialTheme.typography.titleMedium)
         }
     }
 }

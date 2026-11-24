@@ -31,6 +31,8 @@ import kotlinx.coroutines.launch
 
 data class PauseUiState(
     val appLabel: String = "",
+    /** A Breathe app: after the wait, just Open or Not now. No reason, swap, time box or budget. */
+    val breatheOnly: Boolean = false,
     /** This open's number today, counting itself: "Open 4 today". */
     val openNumber: Int? = null,
     val wait: Duration = Duration.ZERO,
@@ -81,6 +83,7 @@ class PauseViewModel @Inject constructor(
     private val packageName: String = savedState[PauseActivity.EXTRA_PACKAGE] ?: ""
     private val launchAfter: Boolean = savedState[PauseActivity.EXTRA_LAUNCH_AFTER] ?: false
     private val wait: Duration = (savedState.get<Long>(PauseActivity.EXTRA_WAIT_MILLIS) ?: 0L).milliseconds
+    private val breatheOnly: Boolean = savedState[PauseActivity.EXTRA_BREATHE_ONLY] ?: false
 
     /** Monotonic start time, kept in saved state so rotation (or process death) doesn't restart the countdown. */
     private val startedAt: Duration = savedState.get<Long>(KEY_STARTED_AT)?.milliseconds
@@ -94,6 +97,7 @@ class PauseViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         PauseUiState(
+            breatheOnly = breatheOnly,
             wait = wait,
             remaining = remaining(),
             reason = savedState.get<String>(KEY_REASON)?.let(PauseReason::valueOf),
@@ -110,6 +114,10 @@ class PauseViewModel @Inject constructor(
             val today = todayUsage.today()
             if (logShown) outcomes.shown(packageName, wait)
             val label = appRepository.entry(packageName)?.label ?: packageName
+            if (breatheOnly) {
+                _uiState.update { it.copy(appLabel = label) }
+                return@launch
+            }
             val budgetLeft = dailyBudget.remaining()
             val turn = savedState.get<Int>(KEY_SWAP_TURN) ?: today.pausesShown.also { savedState[KEY_SWAP_TURN] = it }
             val swap = swapRepository.all().forTurn(turn)
@@ -135,7 +143,7 @@ class PauseViewModel @Inject constructor(
     }
 
     fun onReasonChosen(reason: PauseReason) {
-        if (decided || _uiState.value.waiting) return
+        if (breatheOnly || decided || _uiState.value.waiting) return
         savedState[KEY_REASON] = reason.name
         _uiState.update { it.copy(reason = reason) }
     }
@@ -171,10 +179,22 @@ class PauseViewModel @Inject constructor(
     fun onTimeBoxChosen(timeBox: Duration) {
         val state = _uiState.value
         val reason = state.reason ?: return
+        if (breatheOnly) return
         if (decided || state.waiting || state.offeringSwap || timeBox !in state.timeBoxOptions) return
         decided = true
         viewModelScope.launch {
             outcomes.proceeded(packageName, reason, timeBox)
+            if (launchAfter) appLauncher.launch(packageName)
+            _uiState.update { it.copy(finish = PauseFinish.PROCEED) }
+        }
+    }
+
+    /** A Breathe app, once the wait is over: on to it. */
+    fun onOpen() {
+        if (!breatheOnly || decided || _uiState.value.waiting) return
+        decided = true
+        viewModelScope.launch {
+            outcomes.breathed(packageName)
             if (launchAfter) appLauncher.launch(packageName)
             _uiState.update { it.copy(finish = PauseFinish.PROCEED) }
         }

@@ -5,6 +5,7 @@ import android.net.Uri
 import app.minimise.backup.domain.Backup
 import app.minimise.backup.domain.BackupCodec
 import app.minimise.backup.domain.BackupDiff
+import app.minimise.core.prefs.HomeOptions
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.TimeSource
 import app.minimise.display.domain.GrayscaleMode
@@ -38,7 +39,7 @@ class BackupExporter @Inject constructor(
  * Restores a backup file (ACTION_OPEN_DOCUMENT). Every rule setting that differs goes through
  * [SettingsGuard]: tighter applies now, looser waits 24 hours, and nothing loosens during a lock.
  * The few settings the app never guards (the Instead list, digest, grayscale, focus apps, friend
- * codes) are written as they are, as their own screens do.
+ * codes, the home screen's options) are written as they are, as their own screens do.
  */
 class BackupImporter @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -94,6 +95,18 @@ class BackupImporter @Inject constructor(
                 grayscaleMode = GrayscaleMode.entries.firstOrNull { it.name == incoming.grayscaleMode } ?: settings.grayscaleMode,
                 focusAllowlist = incoming.focusAllowlist?.toSet(),
                 swapsSeeded = true,
+                home = incoming.home?.let {
+                    HomeOptions(
+                        lockButton = it.lockButton,
+                        swipeDownShade = it.swipeDownShade,
+                        hideStatusBar = it.hideStatusBar,
+                        battery = it.battery,
+                        nextAlarm = it.nextAlarm,
+                        music = it.music,
+                        weather = it.weather,
+                        airQuality = it.airQuality,
+                    )
+                } ?: settings.home,
             )
         }
         if (incoming.swaps != here.swaps) {

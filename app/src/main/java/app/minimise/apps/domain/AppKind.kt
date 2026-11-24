@@ -10,4 +10,16 @@ enum class AppKind {
 
     /** Never shown anywhere in the launcher. */
     HIDDEN,
+
+    /**
+     * On home and in search like a Tool app, but every open starts with the breathing pause. Nothing
+     * else of the Vault: no reason, no time box, no daily budget, no open limit.
+     */
+    BREATHE,
+    ;
+
+    companion object {
+        /** Kinds that can sit on the home screen and match on any part of their name in search. */
+        val VISIBLE: Set<AppKind> = setOf(TOOL, BREATHE)
+    }
 }

@@ -21,6 +21,7 @@ import app.minimise.display.domain.GrayscaleMode
 @Composable
 fun SettingsRoute(
     onOpenApps: () -> Unit,
+    onOpenHome: () -> Unit,
     onOpenBudget: () -> Unit,
     onOpenSwaps: () -> Unit,
     onOpenSchedules: () -> Unit,
@@ -66,6 +67,7 @@ fun SettingsRoute(
     SettingsScreen(
         state = state,
         onOpenApps = onOpenApps,
+        onOpenHome = onOpenHome,
         onOpenBudget = onOpenBudget,
         onOpenSwaps = onOpenSwaps,
         onOpenSchedules = onOpenSchedules,
@@ -95,6 +97,7 @@ fun SettingsRoute(
 fun SettingsScreen(
     state: SettingsUiState,
     onOpenApps: () -> Unit,
+    onOpenHome: () -> Unit,
     onOpenBudget: () -> Unit,
     onOpenSwaps: () -> Unit,
     onOpenSchedules: () -> Unit,
@@ -118,11 +121,16 @@ fun SettingsScreen(
     onBackup: () -> Unit,
     onRestore: () -> Unit,
 ) {
-    ScreenScaffold(title = stringResource(R.string.settings_title)) {
+    ScreenScaffold(title = stringResource(R.string.settings_title), scrollable = true) {
         SettingsRow(
             title = stringResource(R.string.settings_apps),
             summary = stringResource(R.string.settings_apps_summary),
             onClick = onOpenApps,
+        )
+        SettingsRow(
+            title = stringResource(R.string.home_settings_title),
+            summary = stringResource(R.string.settings_home_summary),
+            onClick = onOpenHome,
         )
         // Hidden below Android 15 and when no Private space is set up.
         if (state.privateSpace != null) {
@@ -202,13 +210,14 @@ fun SettingsScreen(
         SettingsRow(
             title = stringResource(R.string.settings_grayscale),
             summary = if (state.grayscaleAvailable) {
-                stringResource(
+                val mode = stringResource(
                     when (state.grayscaleMode) {
                         GrayscaleMode.OFF -> R.string.grayscale_off
                         GrayscaleMode.VAULT_APPS -> R.string.grayscale_vault
                         GrayscaleMode.ALWAYS -> R.string.grayscale_always
                     },
                 )
+                stringResource(R.string.grayscale_summary, mode)
             } else {
                 stringResource(R.string.grayscale_needs_grant)
             },

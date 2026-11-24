@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -16,9 +17,10 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import app.minimise.R
+import app.minimise.tasks.domain.HomeTasks
 import app.minimise.tasks.domain.TodayTask
 
-/** Today's tasks under the clock. Tap ticks one off; long-press edits them all. */
+/** Today's top tasks under the clock. Tap ticks one off; long-press edits them all. */
 @Composable
 fun TodayTaskList(
     tasks: List<TodayTask>,
@@ -26,6 +28,7 @@ fun TodayTaskList(
     onEditTasks: () -> Unit,
 ) {
     val editLabel = stringResource(R.string.a11y_edit_tasks)
+    val home = HomeTasks.from(tasks)
     Column(modifier = Modifier.padding(top = 16.dp)) {
         if (tasks.isEmpty()) {
             Text(
@@ -35,7 +38,7 @@ fun TodayTaskList(
                 modifier = Modifier.combinedClickable(role = Role.Button, onClick = onEditTasks).padding(vertical = 6.dp),
             )
         }
-        tasks.forEach { task ->
+        home.shown.forEach { task ->
             Text(
                 text = task.text,
                 style = MaterialTheme.typography.titleMedium,
@@ -51,6 +54,14 @@ fun TodayTaskList(
                     )
                     .semantics { toggleableState = ToggleableState(task.done) }
                     .padding(vertical = 6.dp),
+            )
+        }
+        if (home.more > 0) {
+            Text(
+                text = pluralStringResource(R.plurals.today_more, home.more, home.more),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.combinedClickable(role = Role.Button, onClick = onEditTasks).padding(vertical = 4.dp),
             )
         }
     }

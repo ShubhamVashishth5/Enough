@@ -2,8 +2,11 @@ package app.minimise.gate
 
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
+import app.minimise.core.Defaults
 import app.minimise.core.time.TimeSource
+import app.minimise.core.time.plus
 import app.minimise.core.time.durationBetween
+import app.minimise.gate.domain.Grant
 import app.minimise.gate.domain.GrantStore
 import app.minimise.intervention.domain.InterventionLauncher
 import app.minimise.monitor.domain.ForegroundAppSource
@@ -24,6 +27,9 @@ import timber.log.Timber
 /**
  * While an app with a running time box is in front, waits for the box to end, then shows "Time's up".
  * Leaving the app stops the watch; coming back within the box resumes it.
+ *
+ * A Breathe app's grant has no box: while the app is in front its end keeps moving out, so it only
+ * runs out [Defaults.BREATHE_RETURN_WINDOW] after the user leaves.
  */
 class GrantWatcher @Inject constructor(
     private val foregroundSource: ForegroundAppSource,
@@ -51,7 +57,10 @@ class GrantWatcher @Inject constructor(
         // Only a box that is running when the app comes to the front is watched. An app that comes back
         // after its box ended goes through the gate instead.
         val grant = grantStore.get(packageName)?.takeIf { it.isActive(timeSource.now()) } ?: return
-        val usesBudget = appRepository.kindOf(packageName) == AppKind.VAULT && !grant.viaOverride
+        val kind = appRepository.kindOf(packageName)
+        // An override's grant (past a focus block, say) keeps its box, Breathe app or not.
+        if (kind == AppKind.BREATHE && !grant.viaOverride) return keepOpen(grant)
+        val usesBudget = kind == AppKind.VAULT && !grant.viaOverride
         while (true) {
             val boxLeft = durationBetween(timeSource.now(), grant.endAt)
             val budgetLeft = if (usesBudget) dailyBudget.remaining() else Duration.INFINITE
@@ -61,6 +70,18 @@ class GrantWatcher @Inject constructor(
             }
             // Wake up regularly rather than once, so wall-clock changes are noticed.
             delay(minOf(boxLeft, budgetLeft, CHECK_INTERVAL))
+        }
+    }
+
+    /**
+     * Runs until the app leaves the front, which cancels it. If the app is moved out of Breathe meanwhile
+     * (into the Vault, say), the grant goes at once, so its next open meets the new rules.
+     */
+    private suspend fun keepOpen(grant: Grant) {
+        while (true) {
+            if (appRepository.kindOf(grant.packageName) != AppKind.BREATHE) return grantStore.remove(grant.packageName)
+            grantStore.put(grant.copy(endAt = timeSource.now() + Defaults.BREATHE_RETURN_WINDOW))
+            delay(CHECK_INTERVAL)
         }
     }
 

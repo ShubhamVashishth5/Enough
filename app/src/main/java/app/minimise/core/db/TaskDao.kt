@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import app.minimise.tasks.domain.TaskReplace
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 
@@ -32,16 +33,18 @@ interface TaskDao {
     @Query("UPDATE tasks SET done = :done WHERE id = :id")
     suspend fun setDone(id: Long, done: Boolean)
 
+    /** Makes [texts] the day's tasks, in order, as [TaskReplace] plans it. */
     @Transaction
     suspend fun replaceDay(day: LocalDate, texts: List<String>) {
         val existing = tasksFor(day)
-        texts.forEachIndexed { position, text ->
-            val old = existing.getOrNull(position)
-            when {
-                old == null -> insert(TaskEntity(text = text, day = day, done = false, position = position))
-                old.text != text -> update(old.copy(text = text, done = false))
+        val plan = TaskReplace.plan(existing.map { it.text }, texts)
+        plan.steps.forEach { step ->
+            when (step) {
+                is TaskReplace.Step.Keep -> existing[step.from].let { if (it.position != step.position) update(it.copy(position = step.position)) }
+                is TaskReplace.Step.Edit -> update(existing[step.from].copy(text = step.text, done = false, position = step.position))
+                is TaskReplace.Step.Add -> insert(TaskEntity(text = step.text, day = day, done = false, position = step.position))
             }
         }
-        existing.drop(texts.size).forEach { delete(it.id) }
+        plan.removed.forEach { delete(existing[it].id) }
     }
 }

@@ -28,7 +28,8 @@ class GateEngine @Inject constructor(
     companion object {
         /**
          * Any Block wins; with several, the first reason is kept and only overrides every Block allows
-         * remain. Otherwise the longest Pause, otherwise Allow.
+         * remain. Otherwise the longest Pause (a full Vault pause over a breathe-only one of the same
+         * length), otherwise Allow.
          */
         fun strictest(decisions: List<Decision>): Decision {
             val blocks = decisions.filterIsInstance<Decision.Block>()
@@ -36,7 +37,8 @@ class GateEngine @Inject constructor(
                 val overrides = blocks.map { it.overrides.toSet() }.reduce { a, b -> a intersect b }
                 return Decision.Block(reason = blocks.first().reason, overrides = blocks.first().overrides.filter { it in overrides })
             }
-            return decisions.filterIsInstance<Decision.Pause>().maxByOrNull { it.wait } ?: Decision.Allow
+            return decisions.filterIsInstance<Decision.Pause>().maxWithOrNull(compareBy({ it.wait }, { !it.breatheOnly }))
+                ?: Decision.Allow
         }
     }
 }

@@ -58,6 +58,14 @@ class AppSearchTest {
     }
 
     @Test
+    fun `breathe apps are found like tools and auto-launch (into their pause)`() {
+        val whatsapp = app("WhatsApp", AppKind.BREATHE)
+        val result = AppSearch.search("whats", listOf(whatsapp, instagram))
+        assertEquals(listOf(whatsapp), result.matches)
+        assertEquals(whatsapp, result.autoLaunch)
+    }
+
+    @Test
     fun `a tool match alongside a vault match does not auto-launch`() {
         val lite = app("Instagram Lite")
         val result = AppSearch.search("instagram", listOf(instagram, lite))

@@ -31,7 +31,7 @@ import kotlin.time.Duration
 fun WindDownRoute(viewModel: WindDownViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var picking by rememberSaveable { mutableStateOf<String?>(null) }
-    ScreenScaffold(title = stringResource(R.string.wind_down_title)) {
+    ScreenScaffold(title = stringResource(R.string.wind_down_title), scrollable = true) {
         Text(
             text = stringResource(R.string.wind_down_explainer),
             style = MaterialTheme.typography.bodyMedium,

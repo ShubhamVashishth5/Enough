@@ -65,6 +65,16 @@ class DataStoreSettingsStore @Inject constructor(
             calendarFocusStartedKey = this[Keys.CALENDAR_FOCUS_STARTED],
             tightenAnsweredDay = this[Keys.TIGHTEN_ANSWERED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             savedColourCorrection = this[Keys.SAVED_COLOUR_CORRECTION]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 },
+            home = HomeOptions(
+                lockButton = this[Keys.HOME_LOCK_BUTTON] ?: defaults.home.lockButton,
+                swipeDownShade = this[Keys.HOME_SWIPE_DOWN_SHADE] ?: defaults.home.swipeDownShade,
+                hideStatusBar = this[Keys.HOME_HIDE_STATUS_BAR] ?: defaults.home.hideStatusBar,
+                battery = this[Keys.HOME_BATTERY] ?: defaults.home.battery,
+                nextAlarm = this[Keys.HOME_NEXT_ALARM] ?: defaults.home.nextAlarm,
+                music = this[Keys.HOME_MUSIC] ?: defaults.home.music,
+                weather = this[Keys.HOME_WEATHER] ?: defaults.home.weather,
+                airQuality = this[Keys.HOME_AIR_QUALITY] ?: defaults.home.airQuality,
+            ),
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
         )
@@ -94,6 +104,14 @@ class DataStoreSettingsStore @Inject constructor(
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
         settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
             ?: remove(Keys.SAVED_COLOUR_CORRECTION)
+        this[Keys.HOME_LOCK_BUTTON] = settings.home.lockButton
+        this[Keys.HOME_SWIPE_DOWN_SHADE] = settings.home.swipeDownShade
+        this[Keys.HOME_HIDE_STATUS_BAR] = settings.home.hideStatusBar
+        this[Keys.HOME_BATTERY] = settings.home.battery
+        this[Keys.HOME_NEXT_ALARM] = settings.home.nextAlarm
+        this[Keys.HOME_MUSIC] = settings.home.music
+        this[Keys.HOME_WEATHER] = settings.home.weather
+        this[Keys.HOME_AIR_QUALITY] = settings.home.airQuality
         this[Keys.DEBUG_TIME_OFFSET_SECONDS] = settings.debugTimeOffset.inWholeSeconds
         this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
@@ -120,6 +138,14 @@ class DataStoreSettingsStore @Inject constructor(
         val CALENDAR_FOCUS_STARTED = stringPreferencesKey("calendar_focus_started")
         val TIGHTEN_ANSWERED_EPOCH_DAY = longPreferencesKey("tighten_answered_epoch_day")
         val SAVED_COLOUR_CORRECTION = stringPreferencesKey("saved_colour_correction")
+        val HOME_LOCK_BUTTON = booleanPreferencesKey("home_lock_button")
+        val HOME_SWIPE_DOWN_SHADE = booleanPreferencesKey("home_swipe_down_shade")
+        val HOME_HIDE_STATUS_BAR = booleanPreferencesKey("home_hide_status_bar")
+        val HOME_BATTERY = booleanPreferencesKey("home_battery")
+        val HOME_NEXT_ALARM = booleanPreferencesKey("home_next_alarm")
+        val HOME_MUSIC = booleanPreferencesKey("home_music")
+        val HOME_WEATHER = booleanPreferencesKey("home_weather")
+        val HOME_AIR_QUALITY = booleanPreferencesKey("home_air_quality")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")
     }

@@ -129,12 +129,16 @@ data class SetCalendarFocus(val enabled: Boolean) : SettingChange {
     override val key: String get() = "calendar_focus"
 }
 
-/** How strict each kind is. Only Vault apps are gated, so leaving the Vault is always loosening. */
+/**
+ * How strict each kind is. Vault apps get every rule and Breathe apps only the pause, so leaving the
+ * Vault is always loosening, and so is going from Breathe to Tool or Hidden (no pause at all).
+ */
 private val AppKind.strictness: Int
     get() = when (this) {
         AppKind.TOOL -> 0
         AppKind.HIDDEN -> 1
-        AppKind.VAULT -> 2
+        AppKind.BREATHE -> 2
+        AppKind.VAULT -> 3
     }
 
 /** Null when nothing would change. */

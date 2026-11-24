@@ -93,6 +93,11 @@ class GateEngineTest {
         assertEquals(Decision.Allow, GateEngine.strictest(emptyList()))
         assertEquals(Decision.Pause(40.seconds), GateEngine.strictest(listOf(Decision.Allow, Decision.Pause(10.seconds), Decision.Pause(40.seconds))))
         assertEquals(block, GateEngine.strictest(listOf(Decision.Pause(40.seconds), block, Decision.Allow)))
+        // At the same length, the full Vault pause wins over a breathe-only one.
+        assertEquals(
+            Decision.Pause(10.seconds),
+            GateEngine.strictest(listOf(Decision.Pause(10.seconds, breatheOnly = true), Decision.Pause(10.seconds))),
+        )
     }
 
     @Test

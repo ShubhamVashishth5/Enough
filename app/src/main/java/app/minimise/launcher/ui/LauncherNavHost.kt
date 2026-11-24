@@ -21,6 +21,7 @@ import app.minimise.settings.ui.BudgetRoute
 import app.minimise.settings.ui.PendingChangesRoute
 import app.minimise.usage.ui.DebugUsageRoute
 import app.minimise.settings.ui.SettingsRoute
+import app.minimise.settings.ui.HomeSettingsRoute
 import app.minimise.swaps.ui.SwapsRoute
 import app.minimise.schedules.ui.SchedulesRoute
 import app.minimise.keys.ui.KeysRoute
@@ -117,6 +118,7 @@ fun LauncherNavHost(
         composable<Destination.Settings> {
             SettingsRoute(
                 onOpenApps = { navController.navigate(Destination.Apps) },
+                onOpenHome = { navController.navigate(Destination.HomeSettings) },
                 onOpenBudget = { navController.navigate(Destination.Budget) },
                 onOpenSwaps = { navController.navigate(Destination.Swaps) },
                 onOpenSchedules = { navController.navigate(Destination.Schedules) },
@@ -137,6 +139,9 @@ fun LauncherNavHost(
         }
         composable<Destination.Apps> {
             AppsRoute()
+        }
+        composable<Destination.HomeSettings> {
+            HomeSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })
         }
         composable<Destination.Budget> {
             BudgetRoute()

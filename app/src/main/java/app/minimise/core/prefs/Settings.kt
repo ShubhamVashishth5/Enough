@@ -48,8 +48,35 @@ data class Settings(
     val appsLockedByEnough: Set<String> = emptySet(),
     /** Set once the Instead list has been filled with the built-in swaps, so deleting them sticks. */
     val swapsSeeded: Boolean = false,
+    /** What the home screen shows and which gestures it answers. Not rules: changes apply at once. */
+    val home: HomeOptions = HomeOptions(),
     /** Debug builds only: shifts the wall clock, for testing day resets. */
     val debugTimeOffset: Duration = Duration.ZERO,
     /** Debug builds only: loosening waits 1 minute instead of 24 hours. */
     val debugShortLoosenDelay: Boolean = false,
 )
+
+/**
+ * The home screen's optional parts, each of which can be switched off. Weather and air quality are the
+ * only things in the app that use the internet, so they start off.
+ */
+data class HomeOptions(
+    /** A lock icon by the clock. */
+    val lockButton: Boolean = true,
+    /** Swiping down on home opens the notification shade. */
+    val swipeDownShade: Boolean = true,
+    /** The status bar is hidden while home is showing; a swipe from the top edge brings it back for a moment. */
+    val hideStatusBar: Boolean = false,
+    val battery: Boolean = true,
+    /** The next alarm, when one is set. */
+    val nextAlarm: Boolean = true,
+    /** What's playing, with previous, play/pause and next. Needs notification access. */
+    val music: Boolean = true,
+    /** Temperature and sky from Open-Meteo, for the phone's rough location. */
+    val weather: Boolean = false,
+    /** US AQI from Open-Meteo, for the phone's rough location. */
+    val airQuality: Boolean = false,
+) {
+    /** Both widgets that need the phone's location and the internet. */
+    val usesLocation: Boolean get() = weather || airQuality
+}

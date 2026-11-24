@@ -7,19 +7,25 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -48,9 +54,11 @@ fun HomeScreen(
     onSlotCleared: () -> Unit,
     onPickerDismissed: () -> Unit,
     onSwipeUp: () -> Unit,
+    onSwipeDown: () -> Unit,
     onSwipeLeft: () -> Unit,
     onSwipeRight: () -> Unit,
-    onDoubleTap: () -> Unit,
+    /** Double-tap, and the lock icon. */
+    onLock: () -> Unit,
     onClockLongPress: () -> Unit,
     onLongPressBackground: () -> Unit,
     onFixProtection: () -> Unit,
@@ -61,28 +69,45 @@ fun HomeScreen(
     digestLine: @Composable () -> Unit = {},
     eventLine: @Composable () -> Unit = {},
     appLockLine: @Composable () -> Unit = {},
+    widgets: @Composable () -> Unit = {},
 ) {
+    val options = state.options
     Column(
         modifier = modifier
             .fillMaxSize()
-            .swipeUp(onSwipeUp)
+            .swipeVertical(onUp = onSwipeUp, onDown = if (options.swipeDownShade) onSwipeDown else null)
             .swipeSideways(onLeft = onSwipeLeft, onRight = onSwipeRight)
-            .pointerInput(onLongPressBackground, onDoubleTap) {
-                detectTapGestures(onLongPress = { onLongPressBackground() }, onDoubleTap = { onDoubleTap() })
+            .pointerInput(onLongPressBackground, onLock) {
+                detectTapGestures(onLongPress = { onLongPressBackground() }, onDoubleTap = { onLock() })
             }
             .safeDrawingPadding()
             .padding(horizontal = 32.dp, vertical = 24.dp),
     ) {
         Spacer(Modifier.height(32.dp))
         // TalkBack takes over swipes and double taps, so the home gestures are actions on the clock too.
-        val gestures = listOf(
+        val gestures = listOfNotNull(
             CustomAccessibilityAction(stringResource(R.string.a11y_search_apps)) { onSwipeUp(); true },
+            if (options.swipeDownShade) CustomAccessibilityAction(stringResource(R.string.a11y_notifications)) { onSwipeDown(); true } else null,
             CustomAccessibilityAction(stringResource(R.string.a11y_settings)) { onLongPressBackground(); true },
             CustomAccessibilityAction(stringResource(R.string.a11y_capture)) { onSwipeLeft(); true },
             CustomAccessibilityAction(stringResource(R.string.a11y_camera)) { onSwipeRight(); true },
-            CustomAccessibilityAction(stringResource(R.string.a11y_lock_screen)) { onDoubleTap(); true },
+            CustomAccessibilityAction(stringResource(R.string.a11y_lock_screen)) { onLock(); true },
         )
-        state.now?.let { Clock(it, onLongPress = onClockLongPress, actions = gestures) }
+        state.now?.let { now ->
+            Row(verticalAlignment = Alignment.Top) {
+                Clock(now, onLongPress = onClockLongPress, actions = gestures, modifier = Modifier.weight(1f))
+                if (options.lockButton) {
+                    IconButton(onClick = onLock, modifier = Modifier.offset(x = 12.dp)) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_lock),
+                            contentDescription = stringResource(R.string.a11y_lock_screen),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        }
+        widgets()
         eventLine()
         TodayTaskList(tasks = state.tasks, onTaskTapped = onTaskTapped, onEditTasks = onEditTasks)
         digestLine()
@@ -139,8 +164,8 @@ fun HomeScreen(
     }
 }
 
-/** Calls [onSwipeUp] once per upward drag longer than a short threshold. */
-private fun Modifier.swipeUp(onSwipeUp: () -> Unit): Modifier = pointerInput(onSwipeUp) {
+/** Calls [onUp] or [onDown] once per vertical drag longer than a short threshold. No [onDown], no down swipe. */
+private fun Modifier.swipeVertical(onUp: () -> Unit, onDown: (() -> Unit)?): Modifier = pointerInput(onUp, onDown) {
     val threshold = 48.dp.toPx()
     var dragged = 0f
     var fired = false
@@ -153,7 +178,10 @@ private fun Modifier.swipeUp(onSwipeUp: () -> Unit): Modifier = pointerInput(onS
             dragged += amount
             if (!fired && dragged < -threshold) {
                 fired = true
-                onSwipeUp()
+                onUp()
+            } else if (!fired && onDown != null && dragged > threshold) {
+                fired = true
+                onDown()
             }
         },
     )
@@ -183,7 +211,7 @@ private fun Modifier.swipeSideways(onLeft: () -> Unit, onRight: () -> Unit): Mod
 }
 
 @Composable
-private fun Clock(now: LocalDateTime, onLongPress: () -> Unit, actions: List<CustomAccessibilityAction>) {
+private fun Clock(now: LocalDateTime, onLongPress: () -> Unit, actions: List<CustomAccessibilityAction>, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val is24Hour = DateFormat.is24HourFormat(context)
     val timeFormat = remember(is24Hour) { DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm") }
@@ -191,7 +219,7 @@ private fun Clock(now: LocalDateTime, onLongPress: () -> Unit, actions: List<Cus
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM"))
     }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .combinedClickable(onClick = {}, onLongClick = onLongPress, onLongClickLabel = stringResource(R.string.a11y_open_timer))
             .semantics(mergeDescendants = true) { customActions = actions },
     ) {

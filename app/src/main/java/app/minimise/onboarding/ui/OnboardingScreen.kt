@@ -115,7 +115,7 @@ fun OnboardingScreen(
 
 @Composable
 private fun WelcomeStep() {
-    ScreenScaffold(title = stringResource(R.string.app_name)) {
+    ScreenScaffold(title = stringResource(R.string.app_name), showBack = false) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             listOf(
                 R.string.onboarding_welcome_1,

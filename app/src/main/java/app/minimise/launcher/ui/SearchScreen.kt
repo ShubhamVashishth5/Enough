@@ -1,6 +1,6 @@
 package app.minimise.launcher.ui
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +38,7 @@ fun SearchScreen(
     onAppSelected: (AppEntry) -> Unit,
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
+    onAppLongPressed: (AppEntry) -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -83,6 +84,7 @@ fun SearchScreen(
                 }
             },
         )
+        val actionsLabel = stringResource(R.string.a11y_app_actions)
         LazyColumn {
             items(state.results, key = { it.packageName }) { app ->
                 Text(
@@ -90,7 +92,12 @@ fun SearchScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(role = Role.Button) { onAppSelected(app) }
+                        .combinedClickable(
+                            role = Role.Button,
+                            onClick = { onAppSelected(app) },
+                            onLongClick = { onAppLongPressed(app) },
+                            onLongClickLabel = actionsLabel,
+                        )
                         .padding(vertical = 10.dp),
                 )
             }

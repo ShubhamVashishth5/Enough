@@ -62,6 +62,18 @@ class LocalSettingsReader @Inject constructor(
             digestExempt = settings.digestExempt.sorted(),
             grayscaleMode = settings.grayscaleMode.name,
             focusAllowlist = settings.focusAllowlist?.sorted(),
+            home = settings.home.let {
+                Backup.Home(
+                    lockButton = it.lockButton,
+                    swipeDownShade = it.swipeDownShade,
+                    hideStatusBar = it.hideStatusBar,
+                    battery = it.battery,
+                    nextAlarm = it.nextAlarm,
+                    music = it.music,
+                    weather = it.weather,
+                    airQuality = it.airQuality,
+                )
+            },
         )
         return LocalSettings(
             settings = backup,

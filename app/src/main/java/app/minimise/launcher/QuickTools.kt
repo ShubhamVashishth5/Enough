@@ -17,6 +17,12 @@ object QuickTools {
         }
     }
 
+    /** The clock app's alarm list, from home's alarm line. */
+    fun openAlarms(context: Context) = start(context, Intent(AlarmClock.ACTION_SHOW_ALARMS))
+
+    /** The system's battery page, from home's battery line. */
+    fun openBatteryUsage(context: Context) = start(context, Intent(Intent.ACTION_POWER_USAGE_SUMMARY))
+
     private fun start(context: Context, intent: Intent): Boolean = try {
         context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         true

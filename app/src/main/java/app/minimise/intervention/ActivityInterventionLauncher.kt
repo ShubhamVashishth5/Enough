@@ -15,7 +15,7 @@ class ActivityInterventionLauncher @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : InterventionLauncher {
     override fun showPause(app: AppEntry, pause: Decision.Pause, launchAfter: Boolean) {
-        context.startActivity(PauseActivity.intent(context, app.packageName, pause.wait, launchAfter))
+        context.startActivity(PauseActivity.intent(context, app.packageName, pause.wait, launchAfter, breatheOnly = pause.breatheOnly))
     }
 
     override fun showBlocked(app: AppEntry, block: Decision.Block, launchAfter: Boolean) {

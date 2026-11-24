@@ -25,8 +25,9 @@ import java.util.UUID
 import kotlin.time.Duration
 
 /**
- * The pause screen: a breathing countdown, then "What are you here for?". Runs in its own task, so
- * finishing it reveals whatever was underneath (the Vault app, when opened from elsewhere).
+ * The pause screen: a breathing countdown, then "What are you here for?" (or, for a Breathe app, just
+ * "Open"). Runs in its own task, so finishing it reveals whatever was underneath (the app, when opened
+ * from elsewhere).
  */
 @AndroidEntryPoint
 class PauseActivity : ComponentActivity() {
@@ -68,14 +69,16 @@ class PauseActivity : ComponentActivity() {
         const val EXTRA_PACKAGE = "package_name"
         const val EXTRA_WAIT_MILLIS = "wait_millis"
         const val EXTRA_LAUNCH_AFTER = "launch_after"
+        const val EXTRA_BREATHE_ONLY = "breathe_only"
 
-        fun intent(context: Context, packageName: String, wait: Duration, launchAfter: Boolean): Intent =
+        fun intent(context: Context, packageName: String, wait: Duration, launchAfter: Boolean, breatheOnly: Boolean = false): Intent =
             Intent(context, PauseActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
                 .putExtra(EXTRA_REQUEST_ID, UUID.randomUUID().toString())
                 .putExtra(EXTRA_PACKAGE, packageName)
                 .putExtra(EXTRA_WAIT_MILLIS, wait.inWholeMilliseconds)
                 .putExtra(EXTRA_LAUNCH_AFTER, launchAfter)
+                .putExtra(EXTRA_BREATHE_ONLY, breatheOnly)
     }
 }
 
@@ -92,6 +95,7 @@ private fun PauseRoute(requestId: String, onFinish: (PauseFinish) -> Unit) {
         onChangeReason = viewModel::onChangeReason,
         onSwapTaken = viewModel::onSwapTaken,
         onSwapDeclined = viewModel::onSwapDeclined,
+        onOpen = viewModel::onOpen,
         onCancel = viewModel::onCancel,
     )
 }

@@ -1,5 +1,6 @@
 package app.minimise.intervention.domain
 
+import app.minimise.core.Defaults
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.plus
 import app.minimise.gate.domain.Grant
@@ -45,6 +46,16 @@ class GateOutcomes @Inject constructor(
                 }.toString(),
             ),
         )
+    }
+
+    /**
+     * Went on to a Breathe app after its pause. The grant only covers coming back soon after leaving:
+     * GrantWatcher keeps pushing its end out while the app is in front, and there is no Time's up.
+     */
+    suspend fun breathed(packageName: String) {
+        val now = timeSource.now()
+        grantStore.put(Grant(packageName = packageName, startAt = now, endAt = now + Defaults.BREATHE_RETURN_WINDOW))
+        eventLog.log(Event(type = EventType.BREATHE_PROCEEDED, startAt = now, packageName = packageName))
     }
 
     /** An override got past a block: log it and grant the chosen time box. */

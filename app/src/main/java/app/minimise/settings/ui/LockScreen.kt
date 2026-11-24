@@ -27,7 +27,7 @@ fun LockRoute(viewModel: LockViewModel = hiltViewModel()) {
 
 @Composable
 fun LockScreen(state: LockUiState, onLengthChosen: (Duration) -> Unit, onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    ScreenScaffold(title = stringResource(R.string.lock_title)) {
+    ScreenScaffold(title = stringResource(R.string.lock_title), scrollable = true) {
         Text(
             text = stringResource(R.string.lock_explainer),
             style = MaterialTheme.typography.bodyMedium,

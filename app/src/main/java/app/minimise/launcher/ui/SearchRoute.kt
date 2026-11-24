@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.minimise.core.ui.AppActionsDialog
 
 /** Connects [SearchScreen] to its ViewModel. [onClose] returns to home once an app has been opened. */
 @Composable
@@ -19,5 +20,14 @@ fun SearchRoute(
         onQueryChange = viewModel::onQueryChange,
         onAppSelected = viewModel::onAppSelected,
         onSubmit = viewModel::onSubmit,
+        onAppLongPressed = viewModel::onAppLongPressed,
     )
+    state.actionsFor?.let { app ->
+        AppActionsDialog(
+            label = app.label,
+            onAppInfo = viewModel::onAppInfo,
+            onUninstall = viewModel::onUninstall,
+            onDismiss = viewModel::onActionsDismissed,
+        )
+    }
 }

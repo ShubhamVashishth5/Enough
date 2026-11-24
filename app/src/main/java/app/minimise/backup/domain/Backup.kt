@@ -39,6 +39,8 @@ data class Backup(
     val digestExempt: List<String> = emptyList(),
     val grayscaleMode: String = "OFF",
     val focusAllowlist: List<String>? = null,
+    /** Missing from files made before version 2; a restore then leaves this phone's home screen alone. */
+    val home: Home? = null,
 ) {
     @Serializable
     data class App(val packageName: String, val kind: AppKind, val openLimit: Int? = null)
@@ -65,11 +67,26 @@ data class Backup(
 
     @Serializable
     data class Swap(val text: String, val packageName: String? = null)
+
+    /** The home screen's optional parts (HomeOptions). */
+    @Serializable
+    data class Home(
+        val lockButton: Boolean = true,
+        val swipeDownShade: Boolean = true,
+        val hideStatusBar: Boolean = false,
+        val battery: Boolean = true,
+        val nextAlarm: Boolean = true,
+        val music: Boolean = true,
+        val weather: Boolean = false,
+        val airQuality: Boolean = false,
+    )
 }
 
 object BackupCodec {
     const val FORMAT = "enough-settings"
-    const val VERSION = 1
+
+    /** 2: the Breathe app kind, which version 1 can't read, and the home screen's options. */
+    const val VERSION = 2
 
     private val json = Json {
         prettyPrint = true

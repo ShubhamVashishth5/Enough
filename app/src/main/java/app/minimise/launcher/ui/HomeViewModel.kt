@@ -8,10 +8,13 @@ import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.Defaults
+import app.minimise.core.prefs.HomeOptions
+import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DayBoundary
 import app.minimise.core.time.TimeSource
 import app.minimise.launcher.AppOpener
 import app.minimise.launcher.HomeRole
+import app.minimise.launcher.NotificationShade
 import app.minimise.monitor.AccessibilityActions
 import app.minimise.protection.ProtectionStatus
 import app.minimise.protection.domain.ProtectionLevel
@@ -53,7 +56,9 @@ class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val todayPrompt: TodayPrompt,
     private val accessibilityActions: AccessibilityActions,
+    private val notificationShade: NotificationShade,
     private val earnIt: EarnIt,
+    settingsStore: SettingsStore,
     dayBoundary: DayBoundary,
     todayUsage: TodayUsageProvider,
     homeSlotsInitializer: HomeSlotsInitializer,
@@ -75,8 +80,10 @@ class HomeViewModel @Inject constructor(
     private val numbers: Flow<TodayNumbers> = combine(ticks, resumes) { _, _ -> todayUsage.today() }
         .map { TodayNumbers(vaultTime = it.vaultTime, unlocks = it.unlocks) }
 
-    private val status = combine(editingSlot, permissions, promptToday) { editing, permissions, prompt ->
-        Status(editing, permissions, prompt)
+    private val options = settingsStore.settings.map { it.home }.distinctUntilChanged()
+
+    private val status = combine(editingSlot, permissions, promptToday, options) { editing, permissions, prompt, options ->
+        Status(editing, permissions, prompt, options)
     }
 
     val uiState: StateFlow<HomeUiState> = combine(appRepository.apps, ticks, tasks, numbers, status) { apps, now, tasks, numbers, status ->
@@ -87,8 +94,9 @@ class HomeViewModel @Inject constructor(
             numbers = numbers,
             isDefaultHome = status.permissions.defaultHome,
             protection = status.permissions.protection,
-            slotPicker = status.editingSlot?.let { SlotPicker(slot = it, choices = apps.filter { app -> app.kind == AppKind.TOOL }) },
+            slotPicker = status.editingSlot?.let { SlotPicker(slot = it, choices = apps.filter { app -> app.kind in AppKind.VISIBLE }) },
             promptToday = status.promptToday,
+            options = status.options,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
@@ -147,10 +155,11 @@ class HomeViewModel @Inject constructor(
         editingSlot.value = null
     }
 
-    /** Double-tap on home locks the screen, through the accessibility service. */
-    fun onDoubleTap() {
-        accessibilityActions.lockScreen()
-    }
+    /** Double-tap or the lock icon locks the screen, through the accessibility service. False when it's off. */
+    fun onLock(): Boolean = accessibilityActions.lockScreen()
+
+    /** Swipe down: the notification shade. False when it couldn't be opened. */
+    fun onSwipeDown(): Boolean = notificationShade.open()
 
     /** Called when the Home button is pressed while home is already showing. */
     fun onHomePressed() {
@@ -159,8 +168,8 @@ class HomeViewModel @Inject constructor(
 
     private fun homeSlots(apps: List<AppEntry>): List<HomeSlot> =
         (0 until Defaults.HOME_SLOT_COUNT).map { index ->
-            // Vault and Hidden apps never sit on home, even if they were placed there before.
-            HomeSlot(index = index, app = apps.firstOrNull { it.homeSlot == index && it.kind == AppKind.TOOL })
+            // Vault and Hidden apps never sit on home, even if they were placed there before. Breathe apps do.
+            HomeSlot(index = index, app = apps.firstOrNull { it.homeSlot == index && it.kind in AppKind.VISIBLE })
         }
 
     /** Now, then again at the start of every minute. */
@@ -174,7 +183,12 @@ class HomeViewModel @Inject constructor(
 
     private data class Permissions(val defaultHome: Boolean = true, val protection: ProtectionLevel = ProtectionLevel.FULL)
 
-    private data class Status(val editingSlot: Int?, val permissions: Permissions, val promptToday: Boolean)
+    private data class Status(
+        val editingSlot: Int?,
+        val permissions: Permissions,
+        val promptToday: Boolean,
+        val options: HomeOptions,
+    )
 
     private companion object {
         const val MILLIS_PER_MINUTE = 60_000L

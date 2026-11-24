@@ -30,4 +30,10 @@ enum class EventType {
 
     /** The protection level changed (accessibility, usage access or overlay switched). data: level. */
     PROTECTION_CHANGED,
+
+    /**
+     * Went on to a Breathe app after its pause. Kept apart from [GATE_PROCEEDED], so Breathe opens don't
+     * lengthen Vault pauses or count towards open limits.
+     */
+    BREATHE_PROCEEDED,
 }

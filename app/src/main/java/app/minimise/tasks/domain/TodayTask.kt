@@ -18,8 +18,8 @@ interface TaskRepository {
     suspend fun tasksFor(day: LocalDate): List<TodayTask>
 
     /**
-     * Makes [texts] the day's tasks, in order. A task whose text is unchanged keeps its done mark;
-     * blank entries are dropped.
+     * Makes [texts] the day's tasks, in order. A task whose text is unchanged keeps its done mark, even
+     * if it moved; blank entries are dropped.
      */
     suspend fun replaceDay(day: LocalDate, texts: List<String>)
 

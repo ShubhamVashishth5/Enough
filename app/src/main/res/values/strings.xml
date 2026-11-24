@@ -27,6 +27,45 @@
     <string name="auto_vault_notice_body">New social, video, game and news apps go in by themselves. Taking one out waits 24 hours.</string>
     <string name="home_protection_off">Vault protection is off. Tap to turn it back on.</string>
     <string name="home_protection_lite">Protection is Lite: feeds and websites aren\'t covered.</string>
+    <string name="home_lock_unavailable">Locking needs the accessibility service. Turn it on in Settings → Permissions.</string>
+    <string name="home_shade_unavailable">Couldn\'t open notifications on this phone.</string>
+
+    <!-- Home: the lines under the clock (Settings → Home screen) -->
+    <string name="home_weather">%1$d° %2$s</string>
+    <string name="home_weather_temperature_only">%d°</string>
+    <string name="home_aqi">AQI %1$d (%2$s)</string>
+    <string name="home_battery">Battery %d%%</string>
+    <string name="home_battery_charging">Charging %d%%</string>
+    <string name="home_alarm">Alarm %s</string>
+    <string name="home_weather_needs_location">Weather: allow location</string>
+    <string name="home_weather_no_location">Weather: location is off</string>
+    <string name="home_weather_offline">Weather unavailable</string>
+    <string name="home_music_track">%1$s — %2$s</string>
+    <string name="home_music_previous">Previous</string>
+    <string name="home_music_play">Play</string>
+    <string name="home_music_pause">Pause</string>
+    <string name="home_music_next">Next</string>
+    <string name="sky_clear">Clear</string>
+    <string name="sky_mainly_clear">Mostly clear</string>
+    <string name="sky_partly_cloudy">Partly cloudy</string>
+    <string name="sky_overcast">Overcast</string>
+    <string name="sky_fog">Fog</string>
+    <string name="sky_drizzle">Drizzle</string>
+    <string name="sky_freezing_drizzle">Freezing drizzle</string>
+    <string name="sky_rain">Rain</string>
+    <string name="sky_freezing_rain">Freezing rain</string>
+    <string name="sky_snow">Snow</string>
+    <string name="sky_snow_grains">Snow grains</string>
+    <string name="sky_rain_showers">Showers</string>
+    <string name="sky_snow_showers">Snow showers</string>
+    <string name="sky_thunderstorm">Thunderstorm</string>
+    <string name="sky_thunderstorm_hail">Thunderstorm with hail</string>
+    <string name="aqi_good">good</string>
+    <string name="aqi_moderate">moderate</string>
+    <string name="aqi_sensitive">unhealthy for sensitive groups</string>
+    <string name="aqi_unhealthy">unhealthy</string>
+    <string name="aqi_very_unhealthy">very unhealthy</string>
+    <string name="aqi_hazardous">hazardous</string>
 
     <!-- Protection levels -->
     <string name="protection_channel">Protection</string>
@@ -67,6 +106,8 @@
     <string name="pause_swap_question">How about this instead?</string>
     <string name="pause_swap_take">Do this instead</string>
     <string name="pause_swap_open_anyway">Open anyway</string>
+    <string name="pause_breathe_question">Still want it?</string>
+    <string name="pause_breathe_open">Open %s</string>
 
     <!-- Time's up -->
     <string name="time_up_title">Time\'s up</string>
@@ -111,17 +152,23 @@
 
     <!-- Today -->
     <string name="today_title">Today</string>
-    <string name="today_question">What matters today? Up to three things.</string>
+    <string name="today_question">What matters today? Put the most important first: home shows the top three still to do.</string>
     <string name="today_hint">Task %d</string>
     <string name="today_save">Done</string>
-    <string name="today_skip">Skip</string>
+    <string name="today_cancel">Cancel</string>
+    <string name="today_add">Add a task</string>
+    <string name="today_later">Next, once those are done</string>
+    <plurals name="today_more">
+        <item quantity="one">+%d more task</item>
+        <item quantity="other">+%d more tasks</item>
+    </plurals>
     <string name="today_set_tasks">Set today\'s tasks</string>
 
     <!-- Onboarding -->
     <string name="onboarding_welcome_1">A home screen that helps you use your phone less.</string>
     <string name="onboarding_welcome_2">Distracting apps go in the Vault. They leave your home screen and search, and each open starts with a short pause that grows through the day.</string>
     <string name="onboarding_welcome_3">One daily budget covers every Vault app. Making a rule stricter is instant; making it looser waits 24 hours.</string>
-    <string name="onboarding_welcome_4">Nothing leaves your phone. No account, no internet access.</string>
+    <string name="onboarding_welcome_4">Nothing you do leaves your phone, and there\'s no account. Only the weather line goes online, and only once you switch it on.</string>
     <string name="onboarding_home_title">Home apps</string>
     <plurals name="onboarding_home_body">
         <item quantity="one">Pick up to %2$d tool for the home screen. %1$d picked.</item>
@@ -139,14 +186,19 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_apps">Apps</string>
-    <string name="settings_apps_summary">Choose which apps are tools and which go in the Vault</string>
+    <string name="settings_apps_summary">Choose which apps are tools, which pause to breathe first and which go in the Vault. Uninstall apps here too.</string>
+    <string name="settings_home_summary">Lock button, battery, alarm, music, weather, the status bar, and what each tap and swipe does</string>
 
     <!-- Apps (kinds) -->
     <string name="apps_title">Apps</string>
-    <string name="apps_explainer">Tool apps are always one search away. Vault apps leave home and search, and open only when you type their full name. Hidden apps never show.</string>
+    <string name="apps_explainer">Tool apps are always one search away. Breathe apps stay on home and in search, but every open starts with a short breathing pause: no time limit, and nothing taken from your budget. Vault apps leave home and search, open only when you type their full name, and share the daily budget. Hidden apps never show. Long-press an app\'s name to see its info or uninstall it.</string>
     <string name="app_kind_tool">Tool</string>
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
+    <string name="app_kind_breathe">Breathe</string>
+    <string name="app_actions_info">App info</string>
+    <string name="app_actions_uninstall">Uninstall</string>
+    <string name="app_actions_close">Close</string>
     <string name="apps_pending_move">Moves to %1$s in %2$s</string>
     <string name="apps_open_limit">Open limit: %d a day</string>
     <string name="apps_open_limit_none">Open limit: none</string>
@@ -318,6 +370,7 @@
     <string name="grayscale_off">Off</string>
     <string name="grayscale_vault">While a Vault app is open</string>
     <string name="grayscale_always">Always</string>
+    <string name="grayscale_summary">%s. Tap to switch between Off, While a Vault app is open, and Always.</string>
     <string name="grayscale_needs_grant">Needs a one-time grant from a computer. Tap for how.</string>
 
     <string name="settings_permissions">Permissions</string>
@@ -609,16 +662,16 @@
     <string name="report_ready">Your week</string>
     <string name="report_ready_text">This week against last, on one screen.</string>
     <string name="settings_export">Export data</string>
-    <string name="settings_export_summary">The whole event log as a CSV file, saved where you choose</string>
+    <string name="settings_export_summary">The whole event log as a CSV file. Tap to choose where to save it.</string>
     <plurals name="export_done">
         <item quantity="one">Exported %d event</item>
         <item quantity="other">Exported %d events</item>
     </plurals>
     <string name="export_failed">Couldn\'t write the file.</string>
     <string name="settings_backup">Back up settings</string>
-    <string name="settings_backup_summary">Every setting in one file, to set up a new phone. Keys and friend codes go in only as fingerprints.</string>
+    <string name="settings_backup_summary">Every setting in one file, to set up a new phone. Tap to choose where to save it. Keys and friend codes go in only as fingerprints.</string>
     <string name="settings_restore">Restore settings</string>
-    <string name="settings_restore_summary">From a backup file. Anything stricter applies at once; anything looser waits 24 hours.</string>
+    <string name="settings_restore_summary">Tap to pick a backup file. Anything stricter applies at once; anything looser waits 24 hours.</string>
     <string name="backup_saved">Settings saved.</string>
     <string name="restore_done">Restored. Everything in it applies now.</string>
     <plurals name="restore_waiting">
@@ -688,10 +741,58 @@
     <string name="disclosure_intro">Enough uses Android\'s accessibility service to put a pause in front of the apps you chose. It isn\'t an accessibility tool for disabilities.</string>
     <string name="disclosure_apps">It sees which app is in front, so a Vault app opened from a notification, recents or a link still gets the pause screen, and its time counts against your budget.</string>
     <string name="disclosure_screen">It reads what\'s on screen only where a rule you switched on needs it: the endless feed inside an app you blocked it in, a browser\'s address bar while a website is in the Vault, and this app\'s own Settings pages during a lock period. It looks only for those, and keeps none of what it reads.</string>
-    <string name="disclosure_actions">It can press Back or Home to leave a blocked feed or page, and lock the screen when you double-tap home.</string>
-    <string name="disclosure_private">Nothing it sees is stored beyond which app was open and for how long, and nothing leaves the phone: Enough has no internet access.</string>
+    <string name="disclosure_actions">It can press Back or Home to leave a blocked feed or page, lock the screen when you double-tap home or tap the lock, and pull down notifications when you swipe down on home.</string>
+    <string name="disclosure_private">Nothing it sees is stored beyond which app was open and for how long, and none of it leaves the phone.</string>
     <string name="disclosure_agree">Agree and continue</string>
     <string name="disclosure_decline">Not now</string>
+
+    <!-- Settings → Home screen -->
+    <string name="home_settings_title">Home screen</string>
+    <string name="home_settings_explainer">Switch parts of home on or off. Changes apply at once.</string>
+    <string name="home_option_lock">Lock button</string>
+    <string name="home_option_lock_summary">A lock icon by the clock. Tap it to lock the phone. Double-tapping empty space on home does the same.</string>
+    <string name="home_option_needs_accessibility">Locking needs the accessibility service, which is off. Tap to turn it on.</string>
+    <string name="home_option_shade">Swipe down for notifications</string>
+    <string name="home_option_shade_summary">Swipe down anywhere on home to pull down the notification shade.</string>
+    <string name="home_option_status_bar">Hide the status bar</string>
+    <string name="home_option_status_bar_summary">Hides the time and icons at the top while home is showing. Swipe in from the top edge to see them for a moment.</string>
+    <string name="home_option_battery">Battery</string>
+    <string name="home_option_battery_summary">The battery level under the clock, and when it\'s charging. Tap it on home for battery usage.</string>
+    <string name="home_option_alarm">Next alarm</string>
+    <string name="home_option_alarm_summary">When your next alarm goes off, if one is set. Tap it on home to open your alarms.</string>
+    <string name="home_option_music">Music</string>
+    <string name="home_option_music_summary">What\'s playing in Spotify, YouTube Music or any other player, with Previous, Pause and Next. Tap the song to open the player.</string>
+    <string name="home_option_needs_notification_access">Needs notification access, which is off. Tap to allow it.</string>
+    <string name="home_option_weather">Weather</string>
+    <string name="home_option_weather_summary">The temperature and sky where you are. Tap it on home to refresh.</string>
+    <string name="home_option_aqi">Air quality</string>
+    <string name="home_option_aqi_summary">The air quality index (US AQI) where you are, and what it means for you. Tap it on home to refresh.</string>
+    <string name="home_option_needs_location">Weather and air quality need your location. Tap to allow it.</string>
+    <string name="home_option_internet_note">Weather and air quality are the only parts of Enough that use the internet. They come from Open-Meteo, which is sent your rough location, rounded to about a kilometre, and nothing else. Both stay off until you switch them on.</string>
+    <string name="home_gestures_title">Taps and swipes on home</string>
+    <string name="gesture_tap_app">Tap an app</string>
+    <string name="gesture_tap_app_does">Opens it. Breathe and Vault apps pause first.</string>
+    <string name="gesture_long_press_app">Long-press an app</string>
+    <string name="gesture_long_press_app_does">Choose a different app for that row, or leave it empty.</string>
+    <string name="gesture_tap_task">Tap a task</string>
+    <string name="gesture_tap_task_does">Ticks it off. Tap it again to undo.</string>
+    <string name="gesture_long_press_task">Long-press a task</string>
+    <string name="gesture_long_press_task_does">Edit today\'s tasks: add more, put them in order, remove some. Home shows the top three still to do.</string>
+    <string name="gesture_swipe_up">Swipe up</string>
+    <string name="gesture_swipe_up_does">Search apps. Long-press a result to see its info or uninstall it.</string>
+    <string name="gesture_swipe_down">Swipe down</string>
+    <string name="gesture_swipe_down_does">Notifications.</string>
+    <string name="gesture_off">Nothing: it\'s switched off above.</string>
+    <string name="gesture_swipe_left">Swipe left</string>
+    <string name="gesture_swipe_left_does">Save a thought for later.</string>
+    <string name="gesture_swipe_right">Swipe right</string>
+    <string name="gesture_swipe_right_does">Camera.</string>
+    <string name="gesture_double_tap">Double-tap empty space</string>
+    <string name="gesture_double_tap_does">Locks the screen.</string>
+    <string name="gesture_long_press_clock">Long-press the clock</string>
+    <string name="gesture_long_press_clock_does">Timer.</string>
+    <string name="gesture_long_press_space">Long-press empty space</string>
+    <string name="gesture_long_press_space_does">Settings.</string>
 
     <!-- Read out by TalkBack -->
     <string name="a11y_search_apps">Search apps</string>
@@ -702,6 +803,13 @@
     <string name="a11y_open_timer">open the timer</string>
     <string name="a11y_change_app">change app</string>
     <string name="a11y_edit_tasks">edit today\'s tasks</string>
+    <string name="a11y_notifications">Notifications</string>
+    <string name="a11y_back">Back</string>
+    <string name="a11y_open_player">open the player</string>
+    <string name="a11y_app_actions">app info or uninstall</string>
+    <string name="a11y_task_up">Move %s up</string>
+    <string name="a11y_task_down">Move %s down</string>
+    <string name="a11y_task_remove">Remove %s</string>
     <string name="a11y_fewer_minutes">Fewer minutes</string>
     <string name="a11y_more_minutes">More minutes</string>
     <plurals name="a11y_vault_minutes">

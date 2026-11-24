@@ -25,14 +25,36 @@ object Defaults {
     /** Rows of apps on the home screen. */
     const val HOME_SLOT_COUNT: Int = 6
 
+    /**
+     * After going on to a Breathe app, coming back to it this soon after leaving (a link, the share
+     * sheet, the screen going off for a moment) doesn't pause again.
+     */
+    val BREATHE_RETURN_WINDOW: Duration = 3.minutes
+
+    /** Home's weather and air quality: asked for again once this old, when home is next shown. */
+    val WEATHER_STALE_AFTER: Duration = 30.minutes
+
+    /** However often home is opened or the weather tapped, Open-Meteo is asked at most this often. */
+    val WEATHER_MIN_GAP: Duration = 1.minutes
+
+    /** A last known location younger than this is used as it is, without asking for a new one. */
+    val LOCATION_FRESH_FOR: Duration = 1.hours
+
+    /** How long to wait for a new location, and for each Open-Meteo answer. */
+    val LOCATION_TIMEOUT: Duration = 20.seconds
+    val WEATHER_TIMEOUT: Duration = 10.seconds
+
     /** How long a loosening settings change waits before it applies. */
     val LOOSEN_DELAY: Duration = 24.hours
 
     /** Debug builds only: the loosen delay when the hidden debug switch is on. */
     val DEBUG_LOOSEN_DELAY: Duration = 1.minutes
 
-    /** Tasks asked for on the Today screen. */
-    const val MAX_TODAY_TASKS: Int = 3
+    /** Most tasks a day can hold. */
+    const val MAX_TODAY_TASKS: Int = 10
+
+    /** Tasks shown on home: the top ones still to do. The rest wait on the Today screen. */
+    const val HOME_TASKS: Int = 3
 
     /** Choices offered after a pause. */
     val TIME_BOX_OPTIONS: List<Duration> = listOf(2.minutes, 5.minutes, 10.minutes)

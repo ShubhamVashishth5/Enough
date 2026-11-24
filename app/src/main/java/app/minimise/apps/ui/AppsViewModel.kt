@@ -2,6 +2,7 @@ package app.minimise.apps.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.minimise.apps.data.AppActions
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
@@ -38,6 +39,8 @@ data class AppsUiState(
     val websiteInvalid: Boolean = false,
     /** Websites are read from the address bar, which only Full protection can see. */
     val websitesCovered: Boolean = true,
+    /** The app whose App info / Uninstall choice is open, after a long-press. */
+    val actionsFor: AppEntry? = null,
 )
 
 /**
@@ -57,11 +60,15 @@ class AppsViewModel @Inject constructor(
     private val settingsGuard: SettingsGuard,
     private val timeSource: TimeSource,
     private val protectionStatus: ProtectionStatus,
+    private val appActions: AppActions,
 ) : ViewModel() {
     private val editingLimit = MutableStateFlow<String?>(null)
     private val websiteDialog = MutableStateFlow<WebsiteDialog?>(null)
+    private val actionsFor = MutableStateFlow<AppEntry?>(null)
 
-    private val everything = combine(appRepository.apps, appRepository.webTargets) { apps, websites -> apps to websites }
+    private val everything = combine(appRepository.apps, appRepository.webTargets, actionsFor) { apps, websites, actions ->
+        Everything(apps, websites, actions)
+    }
 
     val uiState: StateFlow<AppsUiState> = combine(
         everything,
@@ -69,7 +76,7 @@ class AppsViewModel @Inject constructor(
         editingLimit,
         websiteDialog,
         ticker(REFRESH).onEach { settingsGuard.applyDue() },
-    ) { (apps, websites), pending, editing, dialog, _ ->
+    ) { (apps, websites, actions), pending, editing, dialog, _ ->
         val now = timeSource.now()
         val byPackage = pending.mapNotNull { p -> (p.change as? SetAppKind)?.let { it.packageName to (it to p.applyAt) } }.toMap()
         val limits = pending.mapNotNull { p -> (p.change as? SetOpenLimit)?.let { it.packageName to (it to p.applyAt) } }.toMap()
@@ -85,6 +92,7 @@ class AppsViewModel @Inject constructor(
             addingWebsite = dialog != null,
             websiteInvalid = dialog?.invalid == true,
             websitesCovered = protectionStatus.current().readsScreens,
+            actionsFor = actions,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppsUiState())
 
@@ -127,7 +135,28 @@ class AppsViewModel @Inject constructor(
         viewModelScope.launch { settingsGuard.request(SetAppKind(WebTarget.idFor(domain), AppKind.VAULT)) }
     }
 
+    fun onAppLongPressed(app: AppEntry) {
+        if (appActions.canManage(app.packageName)) actionsFor.value = app
+    }
+
+    fun onAppInfo() {
+        actionsFor.value?.let { appActions.openAppInfo(it.packageName) }
+        actionsFor.value = null
+    }
+
+    /** The system asks to confirm; once it's gone, the list drops it by itself. */
+    fun onUninstall() {
+        actionsFor.value?.let { appActions.uninstall(it.packageName) }
+        actionsFor.value = null
+    }
+
+    fun onActionsDismissed() {
+        actionsFor.value = null
+    }
+
     private data class WebsiteDialog(val invalid: Boolean = false)
+
+    private data class Everything(val apps: List<AppEntry>, val websites: List<AppEntry>, val actions: AppEntry?)
 
     private companion object {
         val REFRESH = 15.seconds

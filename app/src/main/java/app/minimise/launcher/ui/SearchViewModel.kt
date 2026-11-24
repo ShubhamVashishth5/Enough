@@ -2,6 +2,7 @@ package app.minimise.launcher.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.minimise.apps.data.AppActions
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppRepository
 import app.minimise.launcher.AppOpener
@@ -19,14 +20,16 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     appRepository: AppRepository,
     private val appOpener: AppOpener,
+    private val appActions: AppActions,
 ) : ViewModel() {
     private val query = MutableStateFlow("")
     private val finished = MutableStateFlow(false)
+    private val actionsFor = MutableStateFlow<AppEntry?>(null)
     private var latestApps: List<AppEntry> = emptyList()
 
-    val uiState: StateFlow<SearchUiState> = combine(appRepository.apps, query, finished) { apps, text, done ->
+    val uiState: StateFlow<SearchUiState> = combine(appRepository.apps, query, finished, actionsFor) { apps, text, done, actions ->
         latestApps = apps
-        SearchUiState(query = text, results = AppSearch.search(text, apps).matches, finished = done)
+        SearchUiState(query = text, results = AppSearch.search(text, apps).matches, finished = done, actionsFor = actions)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SearchUiState())
 
     fun onQueryChange(text: String) {
@@ -39,6 +42,24 @@ class SearchViewModel @Inject constructor(
     /** The keyboard's Go key opens the top result. */
     fun onSubmit() {
         uiState.value.results.firstOrNull()?.let(::open)
+    }
+
+    fun onAppLongPressed(app: AppEntry) {
+        if (appActions.canManage(app.packageName)) actionsFor.value = app
+    }
+
+    fun onAppInfo() {
+        actionsFor.value?.let { appActions.openAppInfo(it.packageName) }
+        actionsFor.value = null
+    }
+
+    fun onUninstall() {
+        actionsFor.value?.let { appActions.uninstall(it.packageName) }
+        actionsFor.value = null
+    }
+
+    fun onActionsDismissed() {
+        actionsFor.value = null
     }
 
     private fun open(app: AppEntry) {

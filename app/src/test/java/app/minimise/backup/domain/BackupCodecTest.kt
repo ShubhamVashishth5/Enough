@@ -2,6 +2,7 @@ package app.minimise.backup.domain
 
 import app.minimise.apps.domain.AppKind
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -51,6 +52,18 @@ class BackupCodecTest {
     @Test
     fun `fields an older file doesn't have take their defaults`() {
         val old = """{"format":"enough-settings","version":1,"exportedAtMillis":5,"budgetMinutes":20}"""
-        assertEquals(BackupCodec.Decoded.Ok(Backup(exportedAtMillis = 5, budgetMinutes = 20)), BackupCodec.decode(old))
+        val decoded = BackupCodec.decode(old)
+        assertEquals(BackupCodec.Decoded.Ok(Backup(version = 1, exportedAtMillis = 5, budgetMinutes = 20)), decoded)
+        // No home section: a restore leaves this phone's home screen as it is.
+        assertNull((decoded as BackupCodec.Decoded.Ok).backup.home)
+    }
+
+    @Test
+    fun `breathe apps and the home screen survive a round trip`() {
+        val withBreathe = backup.copy(
+            apps = listOf(Backup.App("com.whatsapp", AppKind.BREATHE)),
+            home = Backup.Home(weather = true, hideStatusBar = true, battery = false),
+        )
+        assertEquals(BackupCodec.Decoded.Ok(withBreathe), BackupCodec.decode(BackupCodec.encode(withBreathe)))
     }
 }

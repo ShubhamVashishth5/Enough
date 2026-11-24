@@ -56,7 +56,7 @@ class PrivateSpaceViewModel @Inject constructor(
 fun PrivateSpaceRoute(viewModel: PrivateSpaceViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
-    ScreenScaffold(title = stringResource(R.string.private_space_title)) {
+    ScreenScaffold(title = stringResource(R.string.private_space_title), scrollable = true) {
         Text(
             text = stringResource(R.string.private_space_explainer),
             style = MaterialTheme.typography.bodyMedium,

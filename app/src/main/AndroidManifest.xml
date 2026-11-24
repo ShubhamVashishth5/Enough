@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- No INTERNET permission, now or later: usage data never leaves the phone. -->
+<!-- Usage data never leaves the phone. INTERNET is here only for home's weather and air quality lines,
+     which are off until the user switches them on and send Open-Meteo a rounded location, nothing else. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Home's weather and air quality (Open-Meteo), when switched on. Coarse location is plenty. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+
+    <!-- Swipe down on home: pull down the notification shade when the accessibility service is off. -->
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+
+    <!-- Long-press an app: Uninstall opens the system's own confirmation. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
     <!-- Opens the system dialog that exempts the app from battery optimisation. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />

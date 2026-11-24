@@ -1,6 +1,7 @@
 package app.minimise.launcher.ui
 
 import app.minimise.apps.domain.AppEntry
+import app.minimise.core.prefs.HomeOptions
 import app.minimise.protection.domain.ProtectionLevel
 import app.minimise.tasks.domain.TodayTask
 import java.time.LocalDateTime
@@ -19,6 +20,8 @@ data class HomeUiState(
     val slotPicker: SlotPicker? = null,
     /** The day's first visit: open the Today screen. */
     val promptToday: Boolean = false,
+    /** The home screen's switchable parts. */
+    val options: HomeOptions = HomeOptions(),
 )
 
 data class HomeSlot(val index: Int, val app: AppEntry?)
