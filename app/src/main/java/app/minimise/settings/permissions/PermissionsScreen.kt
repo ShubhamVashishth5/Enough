@@ -42,6 +42,9 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
     val notificationRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         viewModel.onResume()
     }
+    val calendarRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        viewModel.onResume()
+    }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
 
     fun open(intent: Intent, fallback: Intent? = null) {
@@ -64,6 +67,7 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
         onRequestBattery = { open(viewModel.batteryIntent(), fallback = viewModel.appInfoIntent()) },
         onRequestDoNotDisturb = { open(viewModel.doNotDisturbIntent()) },
         onRequestNotificationAccess = { open(viewModel.notificationAccessIntent()) },
+        onRequestCalendar = { calendarRequest.launch(Manifest.permission.READ_CALENDAR) },
         onRequestPostNotifications = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 notificationRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -84,6 +88,7 @@ fun PermissionsScreen(
     onRequestDoNotDisturb: () -> Unit,
     onRequestNotificationAccess: () -> Unit,
     onRequestPostNotifications: () -> Unit,
+    onRequestCalendar: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.permissions_title)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -138,6 +143,13 @@ fun PermissionsScreen(
                 granted = state.doNotDisturb,
                 action = stringResource(R.string.permission_allow),
                 onAction = onRequestDoNotDisturb,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_calendar),
+                why = stringResource(R.string.permission_calendar_why),
+                granted = state.calendar,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestCalendar,
             )
             GrayscaleItem(granted = state.grayscale, command = state.grayscaleCommand)
         }

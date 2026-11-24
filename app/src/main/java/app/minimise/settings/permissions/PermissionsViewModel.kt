@@ -15,6 +15,7 @@ data class PermissionsUiState(
     val notificationAccess: Boolean = false,
     val postNotifications: Boolean = false,
     val doNotDisturb: Boolean = false,
+    val calendar: Boolean = false,
     val grayscale: Boolean = false,
     val grayscaleCommand: String = "",
 )
@@ -35,6 +36,7 @@ class PermissionsViewModel @Inject constructor(
             notificationAccess = status.hasNotificationAccess(),
             postNotifications = status.canPostNotifications(),
             doNotDisturb = status.hasDoNotDisturbAccess(),
+            calendar = status.canReadCalendar(),
             grayscale = status.canWriteSecureSettings(),
             grayscaleCommand = status.grayscaleGrantCommand(),
         )
