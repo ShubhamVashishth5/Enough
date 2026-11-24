@@ -49,6 +49,7 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var grayscaleController: GrayscaleController
     @Inject lateinit var focusController: FocusController
     @Inject lateinit var focusSessions: FocusSessions
+    @Inject lateinit var accessibilityActions: AccessibilityActions
     @Inject lateinit var usageTracker: UsageTracker
     @Inject lateinit var eventLog: EventLog
     @Inject lateinit var settingsGuard: SettingsGuard
@@ -77,6 +78,7 @@ class GateAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         safely("connect") {
             filter = ForegroundPackageFilter(this)
+            accessibilityActions.service = this
             val screenEvents = IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_USER_PRESENT)
@@ -115,6 +117,7 @@ class GateAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         safely("destroy") {
+            accessibilityActions.service = null
             if (receiverRegistered) unregisterReceiver(screenReceiver)
             receiverRegistered = false
             appScope.launch { usageTracker.closeOpenSpan() }

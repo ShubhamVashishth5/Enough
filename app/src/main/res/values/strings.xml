@@ -136,6 +136,18 @@
     <string name="settings_swaps">Instead list</string>
     <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
 
+    <!-- Quick capture and inbox -->
+    <string name="capture_title">Later</string>
+    <string name="capture_hint">Look it up later…</string>
+    <string name="capture_explainer">Press Enter to save. It comes back in your inbox at the end of a focus session and with the evening digest.</string>
+    <string name="inbox_title">Inbox</string>
+    <string name="inbox_empty">Nothing saved for later. Swipe left on home to capture a thought.</string>
+    <string name="inbox_share">Share</string>
+    <plurals name="inbox_link">
+        <item quantity="one">Inbox · %d note</item>
+        <item quantity="other">Inbox · %d notes</item>
+    </plurals>
+
     <!-- Digest -->
     <string name="digest_title">Digest</string>
     <string name="digest_empty">Nothing here. Updates held since the last digest come out at the next one.</string>

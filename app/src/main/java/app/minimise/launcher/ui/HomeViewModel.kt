@@ -12,6 +12,7 @@ import app.minimise.core.time.DayBoundary
 import app.minimise.core.time.TimeSource
 import app.minimise.launcher.AppOpener
 import app.minimise.launcher.HomeRole
+import app.minimise.monitor.AccessibilityActions
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.settings.permissions.PermissionStatus
 import app.minimise.tasks.domain.TaskRepository
@@ -47,6 +48,7 @@ class HomeViewModel @Inject constructor(
     private val settingsGuard: SettingsGuard,
     private val taskRepository: TaskRepository,
     private val todayPrompt: TodayPrompt,
+    private val accessibilityActions: AccessibilityActions,
     dayBoundary: DayBoundary,
     todayUsage: TodayUsageProvider,
     homeSlotsInitializer: HomeSlotsInitializer,
@@ -134,6 +136,11 @@ class HomeViewModel @Inject constructor(
 
     fun onPickerDismissed() {
         editingSlot.value = null
+    }
+
+    /** Double-tap on home locks the screen, through the accessibility service. */
+    fun onDoubleTap() {
+        accessibilityActions.lockScreen()
     }
 
     /** Called when the Home button is pressed while home is already showing. */

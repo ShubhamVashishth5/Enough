@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
+import app.minimise.capture.ui.InboxLink
 import app.minimise.core.Defaults
 import app.minimise.core.ui.durationText
 import app.minimise.keys.ui.KeyCheck
 
 /** The Focus line on home: start a session, see the time left, or end it early. */
 @Composable
-fun FocusSection(viewModel: FocusViewModel = hiltViewModel()) {
+fun FocusSection(onOpenInbox: () -> Unit, viewModel: FocusViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         state.justEndedMinutes?.let {
@@ -38,6 +39,8 @@ fun FocusSection(viewModel: FocusViewModel = hiltViewModel()) {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            // Thoughts captured mid-focus come back now.
+            InboxLink(onOpenInbox = onOpenInbox)
         }
         val active = state.active
         Text(

@@ -2,6 +2,7 @@ package app.minimise.launcher.ui
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,10 @@ fun HomeScreen(
     onSlotCleared: () -> Unit,
     onPickerDismissed: () -> Unit,
     onSwipeUp: () -> Unit,
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit,
+    onDoubleTap: () -> Unit,
+    onClockLongPress: () -> Unit,
     onLongPressBackground: () -> Unit,
     onFixProtection: () -> Unit,
     onTaskTapped: (TodayTask) -> Unit,
@@ -53,12 +58,15 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .swipeUp(onSwipeUp)
-            .pointerInput(onLongPressBackground) { detectTapGestures(onLongPress = { onLongPressBackground() }) }
+            .swipeSideways(onLeft = onSwipeLeft, onRight = onSwipeRight)
+            .pointerInput(onLongPressBackground, onDoubleTap) {
+                detectTapGestures(onLongPress = { onLongPressBackground() }, onDoubleTap = { onDoubleTap() })
+            }
             .safeDrawingPadding()
             .padding(horizontal = 32.dp, vertical = 24.dp),
     ) {
         Spacer(Modifier.height(32.dp))
-        state.now?.let { Clock(it) }
+        state.now?.let { Clock(it, onLongPress = onClockLongPress) }
         TodayTaskList(tasks = state.tasks, onTaskTapped = onTaskTapped, onEditTasks = onEditTasks)
         digestLine()
         if (!state.isDefaultHome) {
@@ -127,20 +135,45 @@ private fun Modifier.swipeUp(onSwipeUp: () -> Unit): Modifier = pointerInput(onS
     )
 }
 
+/** Calls [onLeft] or [onRight] once per sideways drag longer than a short threshold. */
+private fun Modifier.swipeSideways(onLeft: () -> Unit, onRight: () -> Unit): Modifier = pointerInput(onLeft, onRight) {
+    val threshold = 64.dp.toPx()
+    var dragged = 0f
+    var fired = false
+    detectHorizontalDragGestures(
+        onDragStart = {
+            dragged = 0f
+            fired = false
+        },
+        onHorizontalDrag = { _, amount ->
+            dragged += amount
+            if (!fired && dragged < -threshold) {
+                fired = true
+                onLeft()
+            } else if (!fired && dragged > threshold) {
+                fired = true
+                onRight()
+            }
+        },
+    )
+}
+
 @Composable
-private fun Clock(now: LocalDateTime) {
+private fun Clock(now: LocalDateTime, onLongPress: () -> Unit) {
     val context = LocalContext.current
     val is24Hour = DateFormat.is24HourFormat(context)
     val timeFormat = remember(is24Hour) { DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm") }
     val dateFormat = remember {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM"))
     }
-    Text(text = now.format(timeFormat), style = MaterialTheme.typography.displayLarge)
-    Text(
-        text = now.format(dateFormat),
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
+    Column(modifier = Modifier.combinedClickable(onClick = {}, onLongClick = onLongPress)) {
+        Text(text = now.format(timeFormat), style = MaterialTheme.typography.displayLarge)
+        Text(
+            text = now.format(dateFormat),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 @Composable

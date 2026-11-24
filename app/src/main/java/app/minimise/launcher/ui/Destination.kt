@@ -50,6 +50,12 @@ sealed interface Destination {
     data object DigestSettings : Destination
 
     @Serializable
+    data object Capture : Destination
+
+    @Serializable
+    data object Inbox : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable
