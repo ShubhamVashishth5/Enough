@@ -82,4 +82,7 @@ private fun describe(description: PendingDescription): String = when (descriptio
         stringResource(if (description.enabled) R.string.pending_first_hour_on else R.string.pending_first_hour_off)
     is PendingDescription.KeyChange ->
         stringResource(if (description.removed) R.string.pending_key_removed else R.string.pending_key_added, description.label)
+    is PendingDescription.ModeSwitch ->
+        stringResource(R.string.pending_mode_switch, description.modeName ?: stringResource(R.string.modes_follow))
+    is PendingDescription.ModeEdit -> stringResource(R.string.pending_mode_edit, description.modeName)
 }

@@ -46,6 +46,8 @@
     <string name="blocked_focus_title">Focusing</string>
     <string name="blocked_focus_body">%s isn\'t on your focus list.</string>
     <string name="blocked_waiting">Wait</string>
+    <string name="blocked_mode_title">Not in this mode</string>
+    <string name="blocked_mode_body">%s isn\'t one of this mode\'s apps.</string>
     <string name="blocked_schedule_title">Scheduled block</string>
     <string name="blocked_schedule_body">Vault apps are off during this schedule.</string>
     <string name="blocked_first_hour_title">First hour</string>
@@ -114,6 +116,9 @@
     <string name="open_limit_save">Save</string>
     <string name="open_limit_remove">No limit</string>
 
+    <string name="settings_modes">Modes</string>
+    <string name="settings_modes_now">Now: %s</string>
+    <string name="settings_modes_none">No mode on right now</string>
     <string name="settings_schedules">Schedules</string>
     <string name="settings_schedules_summary">Hours when Vault apps don\'t open at all</string>
     <string name="settings_focus">Focus</string>
@@ -122,6 +127,26 @@
     <string name="settings_keys_summary">A sticker or printed code that ends a block</string>
     <string name="settings_swaps">Instead list</string>
     <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
+
+    <!-- Modes -->
+    <string name="mode_work">Work</string>
+    <string name="mode_study">Study</string>
+    <string name="mode_home">Home</string>
+    <string name="mode_sleep">Sleep</string>
+    <string name="modes_title">Modes</string>
+    <string name="modes_explainer">Each mode has its own budget and waits, and can let only chosen apps open. Turn one on here or give it a schedule. Switching to a stricter mode applies at once; a looser one waits 24 hours.</string>
+    <string name="modes_follow">Follow schedules</string>
+    <string name="modes_follow_summary">Each mode turns on during its own hours</string>
+    <string name="modes_now">%s · on now</string>
+    <string name="modes_use">Use now</string>
+    <string name="modes_budget">%d min a day</string>
+    <string name="modes_no_schedule">no schedule</string>
+    <string name="modes_only_apps">only %d apps</string>
+    <string name="modes_switch_pending">Switching to %1$s in %2$s</string>
+    <string name="mode_budget_label">Minutes a day across all Vault apps</string>
+    <string name="mode_on_schedule">On a schedule</string>
+    <string name="mode_only_apps">Only let chosen apps open</string>
+    <string name="mode_saved_later">Saved. It makes the mode looser, so it applies in 24 hours; see Pending changes.</string>
 
     <!-- Schedules -->
     <string name="schedules_title">Schedules</string>
@@ -261,6 +286,8 @@
     <string name="pending_first_hour_off">First hour → off</string>
     <string name="pending_key_added">Pair %s</string>
     <string name="pending_key_removed">Remove %s</string>
+    <string name="pending_mode_switch">Mode → %s</string>
+    <string name="pending_mode_edit">Changes to %s mode</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

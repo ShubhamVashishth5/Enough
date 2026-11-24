@@ -6,6 +6,8 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+data class ModePreset(val key: String, val budget: Duration, val waitSteps: List<Duration>)
+
 /** Every tunable number in the app lives here. */
 object Defaults {
     /** Usage days start at this local time, not midnight. */
@@ -46,4 +48,12 @@ object Defaults {
 
     /** How long home shows "Focus done" after a session ends. */
     val FOCUS_SUMMARY_SHOWN_FOR: Duration = 30.minutes
+
+    /** The modes the app ships with. None has a schedule until the user gives it one. */
+    val MODES: List<ModePreset> = listOf(
+        ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),
+        ModePreset("study", budget = 15.minutes, waitSteps = listOf(30, 60, 120, 180, 300).map { it.seconds }),
+        ModePreset("home", budget = DAILY_BUDGET, waitSteps = WAIT_STEPS),
+        ModePreset("sleep", budget = 0.minutes, waitSteps = listOf(60, 120, 300).map { it.seconds }),
+    )
 }
