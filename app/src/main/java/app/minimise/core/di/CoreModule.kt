@@ -6,6 +6,7 @@ import app.minimise.apps.data.RoomAppRepository
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppDatabase
+import app.minimise.core.db.BufferedNotificationDao
 import app.minimise.core.db.EventDao
 import app.minimise.core.db.FocusSessionDao
 import app.minimise.core.db.GrantDao
@@ -85,6 +86,9 @@ object CoreProviders {
 
     @Provides
     fun modeDao(db: AppDatabase): ModeDao = db.modeDao()
+
+    @Provides
+    fun bufferedNotificationDao(db: AppDatabase): BufferedNotificationDao = db.bufferedNotificationDao()
 
     @Provides
     @Singleton

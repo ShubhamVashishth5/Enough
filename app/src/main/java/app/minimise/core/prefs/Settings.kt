@@ -20,6 +20,10 @@ data class Settings(
     val manualModeId: Long? = null,
     /** Apps that open during focus sessions; null means the Tool apps on the home screen. */
     val focusAllowlist: Set<String>? = null,
+    /** Hold notifications for the digest. Off until the user turns it on. */
+    val digestEnabled: Boolean = false,
+    /** Apps whose notifications always come through live (the VIP list). */
+    val digestExempt: Set<String> = emptySet(),
     val grayscaleMode: GrayscaleMode = GrayscaleMode.OFF,
     /** The user's colour correction (enabled, mode) from before grayscale first went on; null when not saved. */
     val savedColourCorrection: List<Int>? = null,
