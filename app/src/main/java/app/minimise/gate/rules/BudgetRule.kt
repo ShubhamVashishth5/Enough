@@ -6,6 +6,7 @@ import app.minimise.core.prefs.current
 import app.minimise.gate.domain.Decision
 import app.minimise.gate.domain.GateContext
 import app.minimise.gate.domain.Rule
+import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.usage.domain.DailyBudget
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -24,8 +25,7 @@ class BudgetRule @Inject constructor(
 
         fun evaluate(ctx: GateContext, budget: Duration): Decision =
             if (ctx.app.kind == AppKind.VAULT && DailyBudget.remaining(budget, ctx.today) <= Duration.ZERO) {
-                // TODO(question): Phase 2.2 adds EMERGENCY_PASS as an override.
-                Decision.Block(reason = REASON, overrides = emptyList())
+                Decision.Block(reason = REASON, overrides = listOf(UnlockMethodId.EMERGENCY_PASS))
             } else {
                 Decision.Allow
             }

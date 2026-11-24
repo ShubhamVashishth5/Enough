@@ -5,6 +5,7 @@ import app.minimise.gate.domain.Decision
 import app.minimise.gate.domain.GateContext
 import app.minimise.gate.domain.GateEngine
 import app.minimise.testing.app
+import app.minimise.unlock.domain.UnlockMethodId
 import app.minimise.usage.domain.DailyBudget
 import app.minimise.usage.domain.TodayUsage
 import java.time.Instant
@@ -41,7 +42,7 @@ class BudgetRuleTest {
     @Test
     fun `a used-up budget beats the pause`() {
         val decisions = listOf(Decision.Pause(10.seconds), BudgetRule.evaluate(ctx(instagram, 5.minutes), budget))
-        assertEquals(Decision.Block(BudgetRule.REASON, emptyList()), GateEngine.strictest(decisions))
+        assertEquals(Decision.Block(BudgetRule.REASON, listOf(UnlockMethodId.EMERGENCY_PASS)), GateEngine.strictest(decisions))
     }
 
     @Test

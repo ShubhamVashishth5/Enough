@@ -11,6 +11,7 @@ import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
 import app.minimise.intervention.domain.GateOutcomes
 import app.minimise.intervention.domain.PauseReason
+import app.minimise.intervention.domain.TimeBoxOptions
 import app.minimise.swaps.domain.Swap
 import app.minimise.swaps.domain.SwapRepository
 import app.minimise.swaps.domain.forTurn
@@ -117,7 +118,7 @@ class PauseViewModel @Inject constructor(
                     appLabel = label,
                     openNumber = today.proceededOpens + 1,
                     budgetLeft = budgetLeft,
-                    timeBoxOptions = timeBoxOptions(budgetLeft),
+                    timeBoxOptions = TimeBoxOptions.cappedAt(budgetLeft),
                     swap = swap,
                     swapAppLabel = swap?.packageName?.let { pkg -> toolApp(pkg)?.label },
                 )
@@ -192,12 +193,6 @@ class PauseViewModel @Inject constructor(
             decided = true
             appScope.launch { outcomes.cancelled(packageName) }
         }
-    }
-
-    /** Every option shorter than the budget left, then the budget left itself if it's shorter than the longest. */
-    private fun timeBoxOptions(budgetLeft: Duration): List<Duration> {
-        val under = Defaults.TIME_BOX_OPTIONS.filter { it < budgetLeft }
-        return if (budgetLeft < Defaults.TIME_BOX_OPTIONS.last()) under + budgetLeft else under
     }
 
     /** A swap only opens apps that are still Tool apps; one moved to the Vault since is skipped. */

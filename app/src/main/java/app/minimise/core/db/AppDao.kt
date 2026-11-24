@@ -23,6 +23,9 @@ interface AppDao {
     @Query("UPDATE apps SET kind = :kind WHERE packageName = :packageName")
     suspend fun setKind(packageName: String, kind: AppKind)
 
+    @Query("UPDATE apps SET openLimit = :limit WHERE packageName = :packageName")
+    suspend fun setOpenLimit(packageName: String, limit: Int?)
+
     @Query("UPDATE apps SET homeSlot = NULL WHERE homeSlot = :slot")
     suspend fun clearSlot(slot: Int)
 

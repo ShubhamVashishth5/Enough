@@ -40,6 +40,16 @@
     <string name="blocked_body">This app is blocked right now.</string>
     <string name="blocked_budget_title">Daily budget used</string>
     <string name="blocked_budget_body">Vault apps open again after 04:00.</string>
+    <string name="blocked_open_limit_title">Open limit reached</string>
+    <string name="blocked_open_limit_body">That\'s all the opens of %s for today.</string>
+    <string name="blocked_back">Back</string>
+    <plurals name="override_emergency_pass">
+        <item quantity="one">Use an emergency pass (%d left this week)</item>
+        <item quantity="other">Use an emergency pass (%d left this week)</item>
+    </plurals>
+    <string name="override_nfc_key">Tap your key</string>
+    <string name="override_qr_key">Scan your code</string>
+    <string name="override_wait">Wait 2 minutes</string>
 
     <!-- Budget -->
     <string name="settings_budget">Daily budget</string>
@@ -88,6 +98,14 @@
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
     <string name="apps_pending_move">Moves to %1$s in %2$s</string>
+    <string name="apps_open_limit">Open limit: %d a day</string>
+    <string name="apps_open_limit_none">Open limit: none</string>
+    <string name="apps_pending_limit">Limit changes to %1$d a day in %2$s</string>
+    <string name="apps_pending_limit_none">Limit comes off in %s</string>
+    <string name="open_limit_title">Open limit for %s</string>
+    <string name="open_limit_hint">Opens a day</string>
+    <string name="open_limit_save">Save</string>
+    <string name="open_limit_remove">No limit</string>
 
     <string name="settings_swaps">Instead list</string>
     <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
@@ -152,6 +170,8 @@
     <string name="pending_cancel">Cancel</string>
     <string name="pending_app_kind">%1$s → %2$s</string>
     <string name="pending_budget">Daily budget → %d min</string>
+    <string name="pending_open_limit">%1$s → %2$d opens a day</string>
+    <string name="pending_open_limit_none">%s → no open limit</string>
 
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

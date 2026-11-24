@@ -9,6 +9,7 @@ import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -29,6 +30,9 @@ sealed interface PendingDescription {
     data class AppKindChange(val appLabel: String, val kind: AppKind) : PendingDescription
 
     data class BudgetChange(val minutes: Int) : PendingDescription
+
+    /** @property limit null when the limit is being removed. */
+    data class OpenLimitChange(val appLabel: String, val limit: Int?) : PendingDescription
 }
 
 @HiltViewModel
@@ -52,6 +56,10 @@ class PendingChangesViewModel @Inject constructor(
                         kind = change.kind,
                     )
                     is SetBudget -> PendingDescription.BudgetChange(change.minutes)
+                    is SetOpenLimit -> PendingDescription.OpenLimitChange(
+                        appLabel = labels[change.packageName] ?: change.packageName,
+                        limit = change.limit,
+                    )
                 }
                 PendingItem(id = p.id, description = description, remaining = durationBetween(now, p.applyAt))
             },

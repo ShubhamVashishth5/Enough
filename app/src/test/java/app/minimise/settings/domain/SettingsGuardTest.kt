@@ -138,4 +138,13 @@ class SettingsGuardTest {
         assertEquals(Direction.LOOSEN, budgetChangeDirection(45, 46))
         assertEquals(null, budgetChangeDirection(45, 45))
     }
+
+    @Test
+    fun `adding or lowering an open limit is instant, raising or removing one waits`() = runTest {
+        assertEquals(GuardResult.AppliedNow, guard.request(SetOpenLimit("wa", 15)))
+        assertEquals(GuardResult.AppliedNow, guard.request(SetOpenLimit("wa", 10)))
+        assertTrue(guard.request(SetOpenLimit("wa", 20)) is GuardResult.Scheduled)
+        assertTrue(guard.request(SetOpenLimit("wa", null)) is GuardResult.Scheduled)
+        assertEquals(10, target.openLimits["wa"])
+    }
 }

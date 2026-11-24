@@ -1,6 +1,7 @@
 package app.minimise.core.time
 
 import app.minimise.core.Defaults
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -25,6 +26,9 @@ class DayBoundary @Inject constructor(
 
     /** The first instant of [day]. */
     fun startOf(day: LocalDate): Instant = day.atTime(resetAt).atZone(timeSource.zone()).toInstant()
+
+    /** The Monday that starts [day]'s usage week. */
+    fun weekStartOf(day: LocalDate): LocalDate = day.minusDays((day.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
 
     /** The first instant after [day] (exclusive end). */
     fun endOf(day: LocalDate): Instant = startOf(day.plusDays(1))

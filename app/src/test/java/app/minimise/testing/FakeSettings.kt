@@ -6,10 +6,12 @@ import app.minimise.settings.domain.PendingChange
 import app.minimise.settings.domain.PendingChangeStore
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingChange
 import app.minimise.settings.domain.SettingsTarget
 import app.minimise.settings.domain.budgetChangeDirection
 import app.minimise.settings.domain.kindChangeDirection
+import app.minimise.settings.domain.openLimitChangeDirection
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,16 +19,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class FakeSettingsTarget : SettingsTarget {
     val kinds = mutableMapOf<String, AppKind>()
     var budgetMinutes = 45
+    val openLimits = mutableMapOf<String, Int?>()
 
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
         is SetBudget -> budgetChangeDirection(budgetMinutes, change.minutes)
+        is SetOpenLimit -> openLimitChangeDirection(openLimits[change.packageName], change.limit)
     }
 
     override suspend fun apply(change: SettingChange) {
         when (change) {
             is SetAppKind -> kinds[change.packageName] = change.kind
             is SetBudget -> budgetMinutes = change.minutes
+            is SetOpenLimit -> openLimits[change.packageName] = change.limit
         }
     }
 }
