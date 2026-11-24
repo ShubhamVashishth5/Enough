@@ -33,6 +33,8 @@ android {
     }
 
     defaultConfig {
+        // TODO(question): keep app.minimise for the first public release? It can't change afterwards
+        // without every user reinstalling.
         applicationId = "app.minimise"
         minSdk = 29
         targetSdk = 37
