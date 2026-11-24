@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
+import app.minimise.backup.data.BackupImporter
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.SettingsRow
 import app.minimise.core.ui.dateTimeText
@@ -43,6 +44,18 @@ fun SettingsRoute(
     val exportFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         uri?.let { viewModel.onExport(it) }
     }
+    val backupFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri?.let { viewModel.onBackup(it) }
+    }
+    val restoreFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let { viewModel.onRestore(it) }
+    }
+    LaunchedEffect(state.backupMessage) {
+        state.backupMessage?.let { message ->
+            Toast.makeText(context, backupMessageText(context, message), Toast.LENGTH_LONG).show()
+            viewModel.onBackupMessageShown()
+        }
+    }
     LaunchedEffect(state.exported) {
         state.exported?.let { count ->
             val text = if (count >= 0) context.resources.getQuantityString(R.plurals.export_done, count, count) else context.getString(R.string.export_failed)
@@ -66,6 +79,8 @@ fun SettingsRoute(
         onOpenWindDown = onOpenWindDown,
         onOpenPrivateSpace = onOpenPrivateSpace,
         onExport = { exportFile.launch(EXPORT_FILE_NAME) },
+        onBackup = { backupFile.launch(BACKUP_FILE_NAME) },
+        onRestore = { restoreFile.launch(arrayOf("application/json", "*/*")) },
         onOpenFriendKey = onOpenFriendKey,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
@@ -100,6 +115,8 @@ fun SettingsScreen(
     onDebugShortLoosenDelayToggled: () -> Unit,
     onDebugDumpScreen: () -> Unit,
     onExport: () -> Unit,
+    onBackup: () -> Unit,
+    onRestore: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title)) {
         SettingsRow(
@@ -208,6 +225,16 @@ fun SettingsScreen(
             onClick = onExport,
         )
         SettingsRow(
+            title = stringResource(R.string.settings_backup),
+            summary = stringResource(R.string.settings_backup_summary),
+            onClick = onBackup,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_restore),
+            summary = stringResource(R.string.settings_restore_summary),
+            onClick = onRestore,
+        )
+        SettingsRow(
             title = stringResource(R.string.settings_permissions),
             summary = stringResource(R.string.settings_permissions_summary),
             onClick = onOpenPermissions,
@@ -232,3 +259,18 @@ fun SettingsScreen(
 }
 
 private const val EXPORT_FILE_NAME = "enough-events.csv"
+private const val BACKUP_FILE_NAME = "enough-settings.json"
+
+private fun backupMessageText(context: android.content.Context, message: BackupMessage): String = when (message) {
+    BackupMessage.Saved -> context.getString(R.string.backup_saved)
+    BackupMessage.SaveFailed -> context.getString(R.string.export_failed)
+    is BackupMessage.Restored -> when (val result = message.result) {
+        is BackupImporter.Result.TooNew -> context.getString(R.string.restore_too_new)
+        BackupImporter.Result.Unreadable -> context.getString(R.string.restore_unreadable)
+        is BackupImporter.Result.Restored -> when {
+            result.refused > 0 -> context.getString(R.string.restore_locked)
+            result.waiting > 0 -> context.resources.getQuantityString(R.plurals.restore_waiting, result.waiting, result.waiting)
+            else -> context.getString(R.string.restore_done)
+        }
+    }
+}

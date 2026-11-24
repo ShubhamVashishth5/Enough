@@ -40,6 +40,7 @@ import app.minimise.settings.domain.switchDirection
 import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class AppSettingsTarget @Inject constructor(
     private val appRepository: AppRepository,
@@ -114,7 +115,11 @@ class AppSettingsTarget @Inject constructor(
     }
 
     private fun SaveMode.applyTo(mode: app.minimise.modes.domain.Mode) = mode.copy(
-        values = mode.values.copy(budget = budgetMinutes.minutes, allowlist = allowlist?.toSet()),
+        values = mode.values.copy(
+            budget = budgetMinutes.minutes,
+            waitSteps = waitStepsSeconds?.takeIf { it.isNotEmpty() }?.map { it.seconds } ?: mode.values.waitSteps,
+            allowlist = allowlist?.toSet(),
+        ),
         schedule = if (scheduleDays == 0) null else WeeklyWindow.fromStored(scheduleDays, scheduleStartMinute, scheduleEndMinute),
     )
 

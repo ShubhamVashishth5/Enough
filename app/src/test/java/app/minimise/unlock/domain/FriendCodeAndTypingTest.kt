@@ -17,6 +17,8 @@ class FriendCodeAndTypingTest {
 
         override suspend fun unusedCount(): Int = hashes.count { !it.value }
 
+        override suspend fun unusedHashes(): List<String> = hashes.filterValues { !it }.keys.toList()
+
         override suspend fun replaceAll(hashes: List<String>) {
             this.hashes.clear()
             hashes.forEach { this.hashes[it] = false }

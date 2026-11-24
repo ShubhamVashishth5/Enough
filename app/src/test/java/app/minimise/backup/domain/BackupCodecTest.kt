@@ -1,0 +1,56 @@
+package app.minimise.backup.domain
+
+import app.minimise.apps.domain.AppKind
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class BackupCodecTest {
+    private val backup = Backup(
+        exportedAtMillis = 1_764_000_000_000,
+        apps = listOf(Backup.App("com.instagram.android", AppKind.VAULT, openLimit = 3), Backup.App("web:youtube.com", AppKind.VAULT)),
+        budgetMinutes = 30,
+        taperFloorMinutes = 15,
+        blockedFeeds = listOf("youtube_shorts"),
+        modes = listOf(Backup.Mode("sleep", budgetMinutes = 0, waitStepsSeconds = listOf(60, 120, 300), allowlist = listOf("com.kindle"), scheduleDays = 127, scheduleStartMinute = 1290, scheduleEndMinute = 420)),
+        manualMode = "work",
+        schedules = listOf(Backup.Schedule("Bedtime", days = 127, startMinute = 1320, endMinute = 420)),
+        keys = listOf(Backup.Key("QR", "Printed code", "ab12")),
+        friendCodeHashes = listOf("cd34"),
+        swaps = listOf(Backup.Swap("Read 5 pages", "com.kindle")),
+        digestEnabled = true,
+        digestExempt = listOf("com.whatsapp"),
+        grayscaleMode = "VAULT_APPS",
+    )
+
+    @Test
+    fun `a backup reads back the same`() {
+        assertEquals(BackupCodec.Decoded.Ok(backup), BackupCodec.decode(BackupCodec.encode(backup)))
+    }
+
+    @Test
+    fun `the file says what it is and which version wrote it`() {
+        val text = BackupCodec.encode(backup)
+        assertTrue(text.contains("\"format\": \"enough-settings\""))
+        assertTrue(text.contains("\"version\": ${BackupCodec.VERSION}"))
+    }
+
+    @Test
+    fun `a file from a newer version is refused`() {
+        val newer = BackupCodec.encode(backup.copy(version = BackupCodec.VERSION + 1))
+        assertEquals(BackupCodec.Decoded.TooNew(BackupCodec.VERSION + 1), BackupCodec.decode(newer))
+    }
+
+    @Test
+    fun `other files are unreadable`() {
+        assertEquals(BackupCodec.Decoded.Unreadable, BackupCodec.decode("type,packageName\nAPP_SPAN,x"))
+        assertEquals(BackupCodec.Decoded.Unreadable, BackupCodec.decode("""{"format":"something-else","version":1}"""))
+        assertEquals(BackupCodec.Decoded.Unreadable, BackupCodec.decode("""{"format":"enough-settings","version":1}"""))
+    }
+
+    @Test
+    fun `fields an older file doesn't have take their defaults`() {
+        val old = """{"format":"enough-settings","version":1,"exportedAtMillis":5,"budgetMinutes":20}"""
+        assertEquals(BackupCodec.Decoded.Ok(Backup(exportedAtMillis = 5, budgetMinutes = 20)), BackupCodec.decode(old))
+    }
+}

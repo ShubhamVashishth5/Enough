@@ -11,6 +11,9 @@ interface FriendCodeRepository {
 
     suspend fun unusedCount(): Int
 
+    /** The hashes of the codes not spent yet, for a settings backup. */
+    suspend fun unusedHashes(): List<String>
+
     /** Throws away every earlier code. */
     suspend fun replaceAll(hashes: List<String>)
 

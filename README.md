@@ -34,6 +34,9 @@ It's Android only, works fully offline and has no internet permission. Nothing y
 - **The system app lock.** On Android 17 QPR2 and later, while protection is below Full, home offers to
   put Vault apps behind the phone's own fingerprint lock, and to take it off again once it's back. Android
   asks you to confirm each one. Enough only ever removes locks it added.
+- **Backup and restore.** Every setting in one JSON file (the event log stays in the CSV export). Restoring
+  it on a new phone follows the same rule as everything else: stricter settings apply at once, looser ones
+  wait 24 hours, and nothing loosens during a lock period. A file from a newer version is refused.
 - **Private space.** On Android 15+, lock and unlock Private space from the launcher; its apps are hidden
   everywhere while it's locked.
 

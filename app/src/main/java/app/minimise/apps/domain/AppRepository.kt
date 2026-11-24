@@ -24,6 +24,9 @@ interface AppRepository {
     /** The stored daily open limit, or null for none. */
     suspend fun openLimitOf(packageName: String): Int?
 
+    /** Every stored open limit, by package, installed or not. */
+    suspend fun openLimits(): Map<String, Int>
+
     /** Writes the open limit directly. Only SettingsGuard should call this. */
     suspend fun setOpenLimit(packageName: String, limit: Int?)
 

@@ -15,6 +15,8 @@ class RoomFriendCodeRepository @Inject constructor(
 
     override suspend fun unusedCount(): Int = dao.unused()
 
+    override suspend fun unusedHashes(): List<String> = dao.unusedHashes()
+
     override suspend fun replaceAll(hashes: List<String>) {
         val now = timeSource.now()
         dao.replaceAll(hashes.map { FriendCodeEntity(codeHash = it, createdAt = now) })

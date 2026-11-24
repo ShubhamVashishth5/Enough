@@ -26,6 +26,9 @@ class FakeAppRepository(initial: List<AppEntry> = emptyList()) : AppRepository {
 
     override suspend fun openLimitOf(packageName: String): Int? = entry(packageName)?.openLimit
 
+    override suspend fun openLimits(): Map<String, Int> =
+        state.value.mapNotNull { app -> app.openLimit?.let { app.packageName to it } }.toMap()
+
     override suspend fun setOpenLimit(packageName: String, limit: Int?) {
         state.value = state.value.map { if (it.packageName == packageName) it.copy(openLimit = limit) else it }
     }

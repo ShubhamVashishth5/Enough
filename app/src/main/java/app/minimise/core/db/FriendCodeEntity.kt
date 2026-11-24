@@ -26,6 +26,9 @@ interface FriendCodeDao {
     @Query("SELECT COUNT(*) FROM friend_codes WHERE usedAt IS NULL")
     suspend fun unused(): Int
 
+    @Query("SELECT codeHash FROM friend_codes WHERE usedAt IS NULL")
+    suspend fun unusedHashes(): List<String>
+
     @Query("DELETE FROM friend_codes")
     suspend fun deleteAll()
 
