@@ -57,6 +57,7 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
                 .onFailure { open(viewModel.homeSettingsIntent()) }
         },
         onRequestBattery = { open(viewModel.batteryIntent(), fallback = viewModel.appInfoIntent()) },
+        onRequestDoNotDisturb = { open(viewModel.doNotDisturbIntent()) },
     )
 }
 
@@ -67,6 +68,7 @@ fun PermissionsScreen(
     onOpenAppInfo: () -> Unit,
     onRequestHome: () -> Unit,
     onRequestBattery: () -> Unit,
+    onRequestDoNotDisturb: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.permissions_title)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -100,6 +102,13 @@ fun PermissionsScreen(
                 granted = state.batteryUnrestricted,
                 action = stringResource(R.string.permission_allow),
                 onAction = onRequestBattery,
+            )
+            PermissionItem(
+                title = stringResource(R.string.permission_dnd),
+                why = stringResource(R.string.permission_dnd_why),
+                granted = state.doNotDisturb,
+                action = stringResource(R.string.permission_allow),
+                onAction = onRequestDoNotDisturb,
             )
             GrayscaleItem(granted = state.grayscale, command = state.grayscaleCommand)
         }

@@ -16,6 +16,8 @@ data class Settings(
     val todayPromptedDay: LocalDate? = null,
     /** No Vault apps until [app.minimise.core.Defaults.FIRST_HOUR] after the day's first unlock. */
     val firstHourRule: Boolean = false,
+    /** Apps that open during focus sessions; null means the Tool apps on the home screen. */
+    val focusAllowlist: Set<String>? = null,
     val grayscaleMode: GrayscaleMode = GrayscaleMode.OFF,
     /** The user's colour correction (enabled, mode) from before grayscale first went on; null when not saved. */
     val savedColourCorrection: List<Int>? = null,

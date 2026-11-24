@@ -8,7 +8,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,6 +18,8 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import app.minimise.R
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.core.ui.theme.MinimiseTheme
@@ -111,13 +115,18 @@ private fun BlockedRoute(requestId: String, onFinish: (PauseFinish) -> Unit, onS
         onBack = viewModel::onBack,
         onGoHome = viewModel::onGoHome,
         verifyContent = { method, _ ->
-            KeyCheck(
-                method = method,
-                failed = state.verifyFailed,
-                onNfcTag = viewModel::onNfcTag,
-                onQrScanned = viewModel::onQrScanned,
-                onScanStarting = onScanStarting,
-            )
+            if (method == UnlockMethodId.WAIT) {
+                Text(stringResource(R.string.blocked_waiting), style = MaterialTheme.typography.headlineSmall)
+                Text((state.waitRemaining.inWholeSeconds + 1).toString(), style = MaterialTheme.typography.displayMedium)
+            } else {
+                KeyCheck(
+                    method = method,
+                    failed = state.verifyFailed,
+                    onNfcTag = viewModel::onNfcTag,
+                    onQrScanned = viewModel::onQrScanned,
+                    onScanStarting = onScanStarting,
+                )
+            }
         },
     )
 }

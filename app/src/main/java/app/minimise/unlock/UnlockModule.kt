@@ -3,6 +3,7 @@ package app.minimise.unlock
 import app.minimise.unlock.domain.EmergencyPassMethod
 import app.minimise.unlock.domain.UnlockMethod
 import app.minimise.unlock.domain.UnlockMethodId
+import app.minimise.unlock.domain.WaitMethod
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module
@@ -21,4 +22,9 @@ abstract class UnlockModule {
     @IntoMap
     @UnlockMethodKey(UnlockMethodId.EMERGENCY_PASS)
     abstract fun emergencyPass(method: EmergencyPassMethod): UnlockMethod
+
+    @Binds
+    @IntoMap
+    @UnlockMethodKey(UnlockMethodId.WAIT)
+    abstract fun waitMethod(method: WaitMethod): UnlockMethod
 }

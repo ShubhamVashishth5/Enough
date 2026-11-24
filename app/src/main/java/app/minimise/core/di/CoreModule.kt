@@ -7,6 +7,7 @@ import app.minimise.apps.domain.AppRepository
 import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppDatabase
 import app.minimise.core.db.EventDao
+import app.minimise.core.db.FocusSessionDao
 import app.minimise.core.db.GrantDao
 import app.minimise.core.db.KeyDao
 import app.minimise.core.db.PendingChangeDao
@@ -77,6 +78,9 @@ object CoreProviders {
 
     @Provides
     fun keyDao(db: AppDatabase): KeyDao = db.keyDao()
+
+    @Provides
+    fun focusSessionDao(db: AppDatabase): FocusSessionDao = db.focusSessionDao()
 
     @Provides
     @Singleton

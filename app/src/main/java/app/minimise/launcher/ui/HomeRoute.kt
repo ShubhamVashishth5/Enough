@@ -10,6 +10,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.minimise.focus.ui.FocusSection
 import kotlinx.coroutines.flow.Flow
 
 /** Connects [HomeScreen] to its ViewModel and to the activity (role request, Back, Home presses). */
@@ -51,5 +52,6 @@ fun HomeRoute(
         onFixProtection = onOpenPermissions,
         onTaskTapped = viewModel::onTaskTapped,
         onEditTasks = onOpenToday,
+        focusSection = { FocusSection() },
     )
 }

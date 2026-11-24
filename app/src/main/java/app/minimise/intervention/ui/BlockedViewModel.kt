@@ -4,18 +4,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.minimise.apps.data.AppLauncher
+import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.Defaults
+import app.minimise.core.time.TimeSource
 import app.minimise.intervention.domain.GateOutcomes
 import app.minimise.intervention.domain.TimeBoxOptions
 import app.minimise.keys.domain.NfcKeyMethod
 import app.minimise.keys.domain.QrKeyMethod
 import app.minimise.unlock.domain.UnlockMethod
 import app.minimise.unlock.domain.UnlockMethodId
+import app.minimise.unlock.domain.WaitMethod
 import app.minimise.usage.domain.DailyBudget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +35,8 @@ data class BlockedUiState(
     val options: List<OverrideOption> = emptyList(),
     val step: BlockedStep = BlockedStep.Choose,
     val timeBoxOptions: List<Duration> = Defaults.TIME_BOX_OPTIONS,
+    /** Left of the wait, while waiting is the method. */
+    val waitRemaining: Duration = Duration.ZERO,
     /** The last tap or scan didn't match a paired key. */
     val verifyFailed: Boolean = false,
     val finish: PauseFinish? = null,
@@ -58,7 +66,11 @@ class BlockedViewModel @Inject constructor(
     private val appLauncher: AppLauncher,
     private val nfcKey: NfcKeyMethod,
     private val qrKey: QrKeyMethod,
+    private val waitMethod: WaitMethod,
+    private val timeSource: TimeSource,
 ) : ViewModel() {
+    private var waitJob: Job? = null
+
     private val packageName: String = savedState[BlockedActivity.EXTRA_PACKAGE] ?: ""
     private val launchAfter: Boolean = savedState[BlockedActivity.EXTRA_LAUNCH_AFTER] ?: false
     private val allowed: List<UnlockMethodId> = savedState.get<Array<String>>(BlockedActivity.EXTRA_OVERRIDES)
@@ -72,13 +84,16 @@ class BlockedViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val label = appRepository.entry(packageName)?.label ?: packageName
+            val app = appRepository.entry(packageName)
+            val label = app?.label ?: packageName
+            // Only Vault apps spend the budget, so only they have their time box capped by it.
+            val timeBoxes = if (app?.kind == AppKind.VAULT) TimeBoxOptions.cappedAt(dailyBudget.remaining()) else Defaults.TIME_BOX_OPTIONS
             val options = allowed.mapNotNull { id ->
                 val method = methods[id] ?: return@mapNotNull null
                 if (method.isAvailable()) OverrideOption(id, method.usesLeft()) else null
             }
             _uiState.update {
-                it.copy(appLabel = label, options = options, timeBoxOptions = TimeBoxOptions.cappedAt(dailyBudget.remaining()))
+                it.copy(appLabel = label, options = options, timeBoxOptions = timeBoxes)
             }
         }
     }
@@ -87,6 +102,22 @@ class BlockedViewModel @Inject constructor(
         if (decided || _uiState.value.options.none { it.method == method }) return
         val step = if (method in VERIFIED_METHODS) BlockedStep.Verify(method) else BlockedStep.TimeBox(method)
         _uiState.update { it.copy(step = step, verifyFailed = false) }
+        if (method == UnlockMethodId.WAIT) startWait()
+    }
+
+    /** Counts down on the monotonic clock, then passes the wait. */
+    private fun startWait() {
+        waitJob?.cancel()
+        val endsAt = timeSource.elapsed() + waitMethod.wait
+        waitJob = viewModelScope.launch {
+            while (true) {
+                val left = (endsAt - timeSource.elapsed()).coerceAtLeast(Duration.ZERO)
+                _uiState.update { it.copy(waitRemaining = left) }
+                if (left == Duration.ZERO) break
+                delay(TICK)
+            }
+            onVerified(UnlockMethodId.WAIT)
+        }
     }
 
     fun onNfcTag(tagId: ByteArray) {
@@ -128,6 +159,7 @@ class BlockedViewModel @Inject constructor(
     /** Back steps out of a method; from the first step it goes home. */
     fun onBack() {
         if (decided) return
+        waitJob?.cancel()
         if (_uiState.value.step == BlockedStep.Choose) onGoHome() else _uiState.update { it.copy(step = BlockedStep.Choose) }
     }
 
@@ -140,5 +172,6 @@ class BlockedViewModel @Inject constructor(
     private companion object {
         /** Methods with a check of their own before the time box. An emergency pass needs none. */
         val VERIFIED_METHODS = setOf(UnlockMethodId.NFC_KEY, UnlockMethodId.QR_KEY, UnlockMethodId.WAIT)
+        val TICK = 200.milliseconds
     }
 }

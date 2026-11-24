@@ -43,6 +43,9 @@
     <string name="blocked_open_limit_title">Open limit reached</string>
     <string name="blocked_open_limit_body">That\'s all the opens of %s for today.</string>
     <string name="blocked_back">Back</string>
+    <string name="blocked_focus_title">Focusing</string>
+    <string name="blocked_focus_body">%s isn\'t on your focus list.</string>
+    <string name="blocked_waiting">Wait</string>
     <string name="blocked_schedule_title">Scheduled block</string>
     <string name="blocked_schedule_body">Vault apps are off during this schedule.</string>
     <string name="blocked_first_hour_title">First hour</string>
@@ -113,6 +116,8 @@
 
     <string name="settings_schedules">Schedules</string>
     <string name="settings_schedules_summary">Hours when Vault apps don\'t open at all</string>
+    <string name="settings_focus">Focus</string>
+    <string name="settings_focus_summary">Which apps open during a focus session</string>
     <string name="settings_keys">Physical key</string>
     <string name="settings_keys_summary">A sticker or printed code that ends a block</string>
     <string name="settings_swaps">Instead list</string>
@@ -138,6 +143,21 @@
     <string name="window_summary">%1$s · %2$s–%3$s</string>
     <string name="days_every_day">Every day</string>
     <string name="days_none">No days</string>
+
+    <!-- Focus -->
+    <string name="focus_start_line">Focus</string>
+    <string name="focus_left">Focus · %s left</string>
+    <string name="focus_done">Focus done · %d min</string>
+    <string name="focus_title">Focus</string>
+    <string name="focus_explainer">Only your focus apps open. Do Not Disturb goes on, and the screen goes grey if grayscale is set up.</string>
+    <string name="focus_lock">Lock it: ending early needs your key</string>
+    <string name="focus_end_title">End focus early?</string>
+    <string name="focus_end_body">Other apps open again straight away.</string>
+    <string name="focus_end_locked">This session is locked. Ending it early needs your key.</string>
+    <string name="focus_end_now">End now</string>
+    <string name="focus_keep_going">Keep going</string>
+    <string name="focus_settings_title">Focus apps</string>
+    <string name="focus_settings_explainer">During a focus session only these open. Anything else, Tool apps included, is blocked: an unlocked session lets you in after a 2-minute wait, a locked one only with your key. Calls always get through.</string>
 
     <!-- Physical keys -->
     <string name="keys_title">Physical key</string>
@@ -212,6 +232,9 @@
     <string name="permission_grayscale">Grayscale (optional)</string>
     <string name="permission_grayscale_why">Turns the screen grey while a Vault app is open, which makes feeds less gripping. Android lets only a computer grant this: turn on USB debugging, connect the phone and run the command below once.</string>
     <string name="permission_copy_command">Copy command</string>
+
+    <string name="permission_dnd">Do Not Disturb (optional)</string>
+    <string name="permission_dnd_why">Turns on Do Not Disturb during focus sessions and puts it back afterwards.</string>
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Enough: Vault gate</string>

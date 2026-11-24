@@ -10,6 +10,8 @@ import androidx.core.content.ContextCompat
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
 import app.minimise.display.GrayscaleController
+import app.minimise.focus.FocusController
+import app.minimise.focus.domain.FocusSessions
 import app.minimise.gate.GateMonitor
 import app.minimise.gate.GrantWatcher
 import app.minimise.launcher.HomeActivity
@@ -45,6 +47,8 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var gateMonitor: GateMonitor
     @Inject lateinit var grantWatcher: GrantWatcher
     @Inject lateinit var grayscaleController: GrayscaleController
+    @Inject lateinit var focusController: FocusController
+    @Inject lateinit var focusSessions: FocusSessions
     @Inject lateinit var usageTracker: UsageTracker
     @Inject lateinit var eventLog: EventLog
     @Inject lateinit var settingsGuard: SettingsGuard
@@ -83,6 +87,7 @@ class GateAccessibilityService : AccessibilityService() {
             scope.launch { gateMonitor.run() }
             scope.launch { grantWatcher.run() }
             scope.launch { grayscaleController.run() }
+            scope.launch { focusController.run() }
             scope.launch {
                 while (isActive) {
                     delay(CHECKPOINT_INTERVAL)
@@ -125,6 +130,7 @@ class GateAccessibilityService : AccessibilityService() {
         scope.launch {
             eventLog.log(Event(type = EventType.SCREEN_UNLOCK, startAt = now))
             settingsGuard.applyDue()
+            focusSessions.finishIfDue()
             if (todayPrompt.claim()) startActivity(HomeActivity.todayIntent(this@GateAccessibilityService))
         }
         // The app that was in front before the screen went off is in front again, and no window
