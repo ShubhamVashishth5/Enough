@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-/** Runs in the accessibility service: grayscale while a Vault app is in front, or always, per the setting. */
+/** Runs in ProtectionRuntime: grayscale while a Vault app is in front, or always, per the setting. */
 class GrayscaleController @Inject constructor(
     private val foreground: ForegroundAppSource,
     private val appRepository: AppRepository,
@@ -42,7 +42,7 @@ class GrayscaleController @Inject constructor(
             .collect { filter.get().setGrayscale(it) }
     }
 
-    /** Without the service nothing follows the app in front, so "Vault apps only" goes back to colour. */
+    /** With no watcher running nothing follows the app in front, so "Vault apps only" goes back to colour. */
     suspend fun onServiceStopped() {
         if (settingsStore.current().grayscaleMode == GrayscaleMode.VAULT_APPS) filter.get().setGrayscale(false)
     }

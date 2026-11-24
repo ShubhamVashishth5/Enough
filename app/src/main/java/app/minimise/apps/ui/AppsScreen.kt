@@ -71,6 +71,13 @@ fun AppsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (!state.websitesCovered) {
+                        Text(
+                            text = stringResource(R.string.needs_full_protection),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
                 }
             }
             items(state.websites, key = { it.app.packageName }) { row ->

@@ -13,6 +13,8 @@ import app.minimise.core.time.TimeSource
 import app.minimise.launcher.AppOpener
 import app.minimise.launcher.HomeRole
 import app.minimise.monitor.AccessibilityActions
+import app.minimise.protection.ProtectionStatus
+import app.minimise.protection.domain.ProtectionLevel
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.settings.permissions.PermissionStatus
 import app.minimise.tasks.domain.TaskRepository
@@ -45,6 +47,7 @@ class HomeViewModel @Inject constructor(
     private val appOpener: AppOpener,
     private val homeRole: HomeRole,
     private val permissionStatus: PermissionStatus,
+    private val protectionStatus: ProtectionStatus,
     private val timeSource: TimeSource,
     private val settingsGuard: SettingsGuard,
     private val taskRepository: TaskRepository,
@@ -83,7 +86,7 @@ class HomeViewModel @Inject constructor(
             slots = homeSlots(apps),
             numbers = numbers,
             isDefaultHome = status.permissions.defaultHome,
-            protectionOff = !status.permissions.accessibility,
+            protection = status.permissions.protection,
             slotPicker = status.editingSlot?.let { SlotPicker(slot = it, choices = apps.filter { app -> app.kind == AppKind.TOOL }) },
             promptToday = status.promptToday,
         )
@@ -94,9 +97,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onResume() {
+        protectionStatus.refresh()
         permissions.value = Permissions(
             defaultHome = permissionStatus.isDefaultHome(),
-            accessibility = permissionStatus.isAccessibilityEnabled(),
+            protection = protectionStatus.current(),
         )
         resumes.value++
         viewModelScope.launch {
@@ -168,7 +172,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private data class Permissions(val defaultHome: Boolean = true, val accessibility: Boolean = true)
+    private data class Permissions(val defaultHome: Boolean = true, val protection: ProtectionLevel = ProtectionLevel.FULL)
 
     private data class Status(val editingSlot: Int?, val permissions: Permissions, val promptToday: Boolean)
 

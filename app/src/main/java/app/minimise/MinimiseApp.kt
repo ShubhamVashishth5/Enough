@@ -9,6 +9,7 @@ import app.minimise.core.time.DebugClockOffset
 import app.minimise.digest.domain.DigestScheduler
 import app.minimise.stats.domain.WeeklyReportScheduler
 import app.minimise.focus.domain.FocusSessions
+import app.minimise.protection.ProtectionStatus
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.swaps.domain.SwapRepository
 import app.minimise.usage.domain.Taper
@@ -32,6 +33,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var autoVaultWatcher: AutoVaultWatcher
     @Inject lateinit var taper: Taper
     @Inject lateinit var calendarFocusScheduler: CalendarFocusScheduler
+    @Inject lateinit var protectionStatus: ProtectionStatus
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -40,7 +42,7 @@ class MinimiseApp : Application() {
             Timber.plant(Timber.DebugTree())
             followDebugClockOffset()
         }
-        // Also runs on every screen unlock, from GateAccessibilityService.
+        // Also runs on every screen unlock, from ProtectionRuntime.
         appScope.launch {
             settingsGuard.applyDue()
             taper.applyIfDue()
@@ -51,6 +53,8 @@ class MinimiseApp : Application() {
         weeklyReportScheduler.scheduleNext()
         appScope.launch { calendarFocusScheduler.scheduleNext() }
         autoVaultWatcher.start()
+        // Starts Lite protection when accessibility is off but usage access and overlay are on.
+        protectionStatus.refresh()
     }
 
     private fun followDebugClockOffset() {

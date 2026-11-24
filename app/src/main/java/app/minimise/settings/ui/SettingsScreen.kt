@@ -148,13 +148,14 @@ fun SettingsScreen(
         )
         SettingsRow(
             title = stringResource(R.string.settings_feeds),
-            summary = stringResource(R.string.settings_feeds_summary),
+            summary = if (state.screensCovered) stringResource(R.string.settings_feeds_summary) else stringResource(R.string.needs_full_protection),
             onClick = onOpenFeeds,
         )
+        val lockSummary = state.lockedUntil?.let { stringResource(R.string.lock_locked_until, dateTimeText(it)) }
+            ?: stringResource(R.string.settings_lock_summary)
         SettingsRow(
             title = stringResource(R.string.lock_title),
-            summary = state.lockedUntil?.let { stringResource(R.string.lock_locked_until, dateTimeText(it)) }
-                ?: stringResource(R.string.settings_lock_summary),
+            summary = if (state.screensCovered) lockSummary else lockSummary + "\n" + stringResource(R.string.lock_guard_needs_full_protection),
             onClick = onOpenLock,
         )
         SettingsRow(

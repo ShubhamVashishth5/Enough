@@ -58,12 +58,15 @@ adb shell pm grant app.minimise android.permission.WRITE_SECURE_SETTINGS
 
 ## Permissions and why
 
-Every permission is optional except the first two, and each feature switches itself off cleanly when its
-permission is missing. The Permissions screen in the app shows the status of each.
+Every permission is optional except the default home app, and each feature switches itself off cleanly
+when its permission is missing. The Permissions screen in the app shows the status of each, and which
+protection level that adds up to: **Full** (accessibility), **Lite** (usage access plus display over other
+apps) or **home screen only**.
 
 | Permission | Why |
 | --- | --- |
 | Accessibility service | Sees which app comes to the front, so a Vault app opened from a notification, recents or a link still gets the pause screen. Reads screen content only where a rule you switched on needs it: inside an app with a blocked feed, a browser's address bar while a website is in the Vault, and this app's own Settings pages during a lock period. Nothing is stored or sent anywhere. |
+| Usage access and display over other apps | **Lite protection**, for when accessibility is off or Android takes it away (Android 17's Advanced Protection does). Enough checks once a second which app is in front and shows the pause over a Vault app, from a foreground service with one quiet notification. It reads no screen content, so feed blocking, website rules and the lock guard are off at this level. |
 | Default home app | Every unlock lands on Enough, so Vault apps aren't one tap away. Also lets it list and lock Private space (`ACCESS_HIDDEN_PROFILES`). |
 | Unrestricted battery | Stops the system pausing the service, which would switch protection off. |
 | Notification access | The digest: holds non-urgent notifications and releases them at 9:00, 14:00 and 20:00. |

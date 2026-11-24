@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.core.ui.AppPickerDialog
+import app.minimise.protection.domain.ProtectionLevel
 import app.minimise.tasks.domain.TodayTask
 import app.minimise.tasks.ui.TodayTaskList
 import java.time.LocalDateTime
@@ -81,9 +82,11 @@ fun HomeScreen(
                     .combinedClickable(onClick = onMakeDefaultHome),
             )
         }
-        if (state.protectionOff) {
+        if (state.protection != ProtectionLevel.FULL) {
             Text(
-                text = stringResource(R.string.home_protection_off),
+                text = stringResource(
+                    if (state.protection == ProtectionLevel.LITE) R.string.home_protection_lite else R.string.home_protection_off,
+                ),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(top = 16.dp)

@@ -113,6 +113,18 @@ object Defaults {
     /** Calendar focus looks this far ahead for the next event, and re-arms at least this often. */
     val CALENDAR_FOCUS_LOOKAHEAD: Duration = 24.hours
 
+    /** Lite protection: how often usage access is read while the screen is on. */
+    val LITE_POLL_INTERVAL: Duration = 1.seconds
+
+    /** Each read starts this far before the last one ended, since the system can write an event late. */
+    val LITE_POLL_OVERLAP: Duration = 2.seconds
+
+    /** When Lite protection starts, how far back to look for the app already in front. */
+    val LITE_LOOK_BACK: Duration = 1.hours
+
+    /** After the accessibility service stops, wait this long for the system's settings to catch up before checking the level again. */
+    val ACCESSIBILITY_SETTLE: Duration = 1.seconds
+
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(
         ModePreset("work", budget = 20.minutes, waitSteps = listOf(20, 40, 60, 120, 180).map { it.seconds }),

@@ -3,7 +3,7 @@ package app.minimise.focus
 import app.minimise.focus.domain.FocusSessions
 import javax.inject.Inject
 
-/** Runs in the accessibility service: finishes a session the moment it ends, so Do Not Disturb comes back off on time. */
+/** Runs in ProtectionRuntime: finishes a session the moment it ends, so Do Not Disturb comes back off on time. */
 class FocusController @Inject constructor(
     private val focusSessions: FocusSessions,
 ) {

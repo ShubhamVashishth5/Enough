@@ -9,6 +9,7 @@ import app.minimise.apps.domain.WebTarget
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
+import app.minimise.protection.ProtectionStatus
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingsGuard
@@ -35,6 +36,8 @@ data class AppsUiState(
     val editingLimit: AppEntry? = null,
     val addingWebsite: Boolean = false,
     val websiteInvalid: Boolean = false,
+    /** Websites are read from the address bar, which only Full protection can see. */
+    val websitesCovered: Boolean = true,
 )
 
 /**
@@ -53,6 +56,7 @@ class AppsViewModel @Inject constructor(
     appRepository: AppRepository,
     private val settingsGuard: SettingsGuard,
     private val timeSource: TimeSource,
+    private val protectionStatus: ProtectionStatus,
 ) : ViewModel() {
     private val editingLimit = MutableStateFlow<String?>(null)
     private val websiteDialog = MutableStateFlow<WebsiteDialog?>(null)
@@ -80,6 +84,7 @@ class AppsViewModel @Inject constructor(
             editingLimit = editing?.let { pkg -> apps.firstOrNull { it.packageName == pkg } },
             addingWebsite = dialog != null,
             websiteInvalid = dialog?.invalid == true,
+            websitesCovered = protectionStatus.current().readsScreens,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppsUiState())
 

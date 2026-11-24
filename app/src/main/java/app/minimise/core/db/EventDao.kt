@@ -28,4 +28,7 @@ interface EventDao {
 
     @Query(OVERLAP_QUERY)
     fun observeBetween(from: Instant, to: Instant, type: EventType?): Flow<List<EventEntity>>
+
+    @Query("SELECT * FROM events WHERE type = :type AND startAt < :before ORDER BY startAt DESC, id DESC LIMIT 1")
+    suspend fun latest(type: EventType, before: Instant): EventEntity?
 }
