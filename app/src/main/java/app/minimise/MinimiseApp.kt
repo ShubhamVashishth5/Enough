@@ -4,6 +4,7 @@ import android.app.Application
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DebugClockOffset
+import app.minimise.focus.domain.FocusSessions
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.swaps.domain.SwapRepository
 import dagger.hilt.android.HiltAndroidApp
@@ -20,6 +21,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var debugClockOffset: DebugClockOffset
     @Inject lateinit var settingsGuard: SettingsGuard
     @Inject lateinit var swapRepository: SwapRepository
+    @Inject lateinit var focusSessions: FocusSessions
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
     override fun onCreate() {
@@ -31,6 +33,7 @@ class MinimiseApp : Application() {
         // Also runs on every screen unlock, from GateAccessibilityService.
         appScope.launch { settingsGuard.applyDue() }
         appScope.launch { swapRepository.seedDefaultsOnce() }
+        appScope.launch { focusSessions.finishIfDue() }
     }
 
     private fun followDebugClockOffset() {

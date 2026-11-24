@@ -11,4 +11,5 @@ enum class EventType {
     OVERRIDE_USED,
     SETTING_CHANGED,
     SWAP_TAKEN,
+    FOCUS_SESSION,
 }

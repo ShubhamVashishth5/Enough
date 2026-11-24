@@ -46,6 +46,7 @@ fun HomeScreen(
     onTaskTapped: (TodayTask) -> Unit,
     onEditTasks: () -> Unit,
     modifier: Modifier = Modifier,
+    focusSection: @Composable () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -84,6 +85,7 @@ fun HomeScreen(
             }
         }
         Spacer(Modifier.weight(1f))
+        focusSection()
         state.numbers?.let { numbers ->
             Text(
                 text = stringResource(R.string.home_numbers, numbers.vaultTime.inWholeMinutes, numbers.unlocks),

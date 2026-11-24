@@ -6,6 +6,7 @@ import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.prefs.current
 import app.minimise.display.domain.DisplayFilter
 import app.minimise.display.domain.GrayscaleMode
+import app.minimise.focus.domain.FocusSessions
 import app.minimise.monitor.domain.ForegroundAppSource
 import javax.inject.Inject
 import javax.inject.Provider
@@ -19,14 +20,16 @@ class GrayscaleController @Inject constructor(
     private val appRepository: AppRepository,
     private val settingsStore: SettingsStore,
     private val filter: Provider<DisplayFilter>,
+    private val focusSessions: FocusSessions,
 ) {
     suspend fun run() {
         combine(
             foreground.current,
             appRepository.kinds,
             settingsStore.settings.map { it.grayscaleMode }.distinctUntilChanged(),
-        ) { current, kinds, mode ->
-            wanted(mode, inVaultApp = current?.packageName?.let { kinds[it] == AppKind.VAULT } == true)
+            focusSessions.active.map { it != null },
+        ) { current, kinds, mode, focusing ->
+            wanted(mode, inVaultApp = current?.packageName?.let { kinds[it] == AppKind.VAULT } == true, focusing = focusing)
         }
             .distinctUntilChanged()
             .collect { filter.get().setGrayscale(it) }
@@ -38,9 +41,10 @@ class GrayscaleController @Inject constructor(
     }
 
     companion object {
-        fun wanted(mode: GrayscaleMode, inVaultApp: Boolean): Boolean = when (mode) {
+        /** A focus session goes grayscale too, unless the feature is off. */
+        fun wanted(mode: GrayscaleMode, inVaultApp: Boolean, focusing: Boolean = false): Boolean = when (mode) {
             GrayscaleMode.OFF -> false
-            GrayscaleMode.VAULT_APPS -> inVaultApp
+            GrayscaleMode.VAULT_APPS -> inVaultApp || focusing
             GrayscaleMode.ALWAYS -> true
         }
     }

@@ -37,4 +37,13 @@ object Defaults {
 
     /** With the first-hour rule on, Vault apps stay blocked this long after the day's first unlock. */
     val FIRST_HOUR: Duration = 60.minutes
+
+    /** Focus session lengths offered on home. */
+    val FOCUS_LENGTHS: List<Duration> = listOf(25.minutes, 50.minutes, 90.minutes)
+
+    /** The wait that gets past an unlocked focus session for one app. */
+    val FOCUS_WAIT: Duration = 120.seconds
+
+    /** How long home shows "Focus done" after a session ends. */
+    val FOCUS_SUMMARY_SHOWN_FOR: Duration = 30.minutes
 }

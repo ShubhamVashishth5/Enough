@@ -5,6 +5,7 @@ import app.minimise.gate.domain.GrantStore
 import app.minimise.gate.domain.Rule
 import app.minimise.gate.rules.BudgetRule
 import app.minimise.gate.rules.FirstHourRule
+import app.minimise.gate.rules.FocusRule
 import app.minimise.gate.rules.OpenLimitRule
 import app.minimise.gate.rules.ScheduleRule
 import app.minimise.gate.rules.VaultPauseRule
@@ -40,4 +41,8 @@ abstract class GateModule {
     @Binds
     @IntoSet
     abstract fun firstHourRule(rule: FirstHourRule): Rule
+
+    @Binds
+    @IntoSet
+    abstract fun focusRule(rule: FocusRule): Rule
 }

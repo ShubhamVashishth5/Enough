@@ -22,6 +22,7 @@ import app.minimise.R
 import app.minimise.core.ui.durationText
 import app.minimise.gate.rules.BudgetRule
 import app.minimise.gate.rules.FirstHourRule
+import app.minimise.gate.rules.FocusRule
 import app.minimise.gate.rules.OpenLimitRule
 import app.minimise.gate.rules.ScheduleRule
 import app.minimise.unlock.domain.UnlockMethodId
@@ -115,6 +116,7 @@ private fun blockedTitle(reason: String): String = stringResource(
         OpenLimitRule.REASON -> R.string.blocked_open_limit_title
         ScheduleRule.REASON -> R.string.blocked_schedule_title
         FirstHourRule.REASON -> R.string.blocked_first_hour_title
+        FocusRule.REASON -> R.string.blocked_focus_title
         else -> R.string.blocked_title
     },
 )
@@ -125,5 +127,6 @@ private fun blockedBody(reason: String, appLabel: String): String = when (reason
     OpenLimitRule.REASON -> stringResource(R.string.blocked_open_limit_body, appLabel)
     ScheduleRule.REASON -> stringResource(R.string.blocked_schedule_body)
     FirstHourRule.REASON -> stringResource(R.string.blocked_first_hour_body)
+    FocusRule.REASON -> stringResource(R.string.blocked_focus_body, appLabel)
     else -> stringResource(R.string.blocked_body)
 }

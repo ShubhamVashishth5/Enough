@@ -35,6 +35,9 @@ sealed interface Destination {
     data object Keys : Destination
 
     @Serializable
+    data object Focus : Destination
+
+    @Serializable
     data object PendingChanges : Destination
 
     @Serializable

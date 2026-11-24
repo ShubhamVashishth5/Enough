@@ -12,6 +12,9 @@
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Focus sessions turn on Do Not Disturb, once the user allows it. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
     <!-- Grayscale: changes Android's colour correction. Only ADB or Shizuku can grant it. -->
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
