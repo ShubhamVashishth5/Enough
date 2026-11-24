@@ -1,0 +1,39 @@
+Enough is a home screen and app blocker in one, scored on how little you use your phone, not how much.
+
+<b>A quiet home screen</b>
+<ul>
+<li>Up to six tool apps as plain words. No icons, badges or app grid.</li>
+<li>Today's one to three tasks under the clock, plus your next calendar item.</li>
+<li>Type to find an app. Distracting apps never auto-launch.</li>
+</ul>
+
+<b>The Vault, behind a pause</b>
+<ul>
+<li>Apps you mark as distracting leave home and search. Opening one starts a breathing pause that grows with each open, then asks what you're there for.</li>
+<li>Pick a time box of 2, 5 or 10 minutes. When it ends, you're sent home.</li>
+<li>One shared daily budget across every Vault app, so hopping between them doesn't dodge it.</li>
+<li>Websites in the Vault get the same rules in Chrome, Firefox, Samsung Internet, Brave and others.</li>
+<li>Block just the endless parts: YouTube Shorts, Instagram Reels and Explore.</li>
+</ul>
+
+<b>Commitment</b>
+<ul>
+<li>Tightening a rule is instant; loosening one waits 24 hours.</li>
+<li>Lock every setting for 7, 30 or 90 days.</li>
+<li>Skip a wait with a code a friend keeps, by typing a long passage, or with an NFC sticker or printed QR code you leave in another room.</li>
+<li>Schedules, a first-hour rule, focus sessions, modes, wind-down at bedtime and focus sessions from your calendar.</li>
+</ul>
+
+<b>Stats that don't become a habit</b>
+<ul>
+<li>Two numbers on home: Vault minutes and unlocks today.</li>
+<li>One weekly report, which opens once a day. CSV export of everything.</li>
+</ul>
+
+<b>Private and offline</b>
+Enough has no internet permission. Usage data never leaves the phone and no account is needed.
+
+<b>Honest limits</b>
+Safe mode, a factory reset or a computer with USB debugging can get around everything. The aim is to make cheating take effort, not to make it impossible.
+
+The accessibility service sees which app is in front so the pause screen can appear first, and reads screen content only where a rule you switched on needs it.
