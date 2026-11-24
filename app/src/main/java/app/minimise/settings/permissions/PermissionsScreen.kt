@@ -13,7 +13,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,9 +61,21 @@ fun PermissionsRoute(viewModel: PermissionsViewModel = hiltViewModel()) {
         }
     }
 
+    // Play's accessibility policy: say what's read and why, and get a yes, before the system setting.
+    var disclosing by rememberSaveable { mutableStateOf(false) }
+    if (disclosing) {
+        AccessibilityDisclosure(
+            onAgree = {
+                disclosing = false
+                open(viewModel.accessibilityIntent())
+            },
+            onDecline = { disclosing = false },
+        )
+    }
+
     PermissionsScreen(
         state = state,
-        onOpenAccessibility = { open(viewModel.accessibilityIntent()) },
+        onOpenAccessibility = { disclosing = true },
         onOpenAppInfo = { open(viewModel.appInfoIntent()) },
         onRequestHome = {
             runCatching { roleRequest.launch(viewModel.homeRoleIntent()) }
@@ -163,6 +180,33 @@ fun PermissionsScreen(
             GrayscaleItem(granted = state.grayscale, command = state.grayscaleCommand)
         }
     }
+}
+
+/**
+ * The prominent disclosure Google Play asks for before an app sends anyone to turn on its accessibility
+ * service: what is read, what it's used for, that nothing leaves the phone, and an explicit choice.
+ */
+@Composable
+private fun AccessibilityDisclosure(onAgree: () -> Unit, onDecline: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDecline,
+        title = { Text(stringResource(R.string.disclosure_title)) },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                listOf(
+                    R.string.disclosure_intro,
+                    R.string.disclosure_apps,
+                    R.string.disclosure_screen,
+                    R.string.disclosure_actions,
+                    R.string.disclosure_private,
+                ).forEach { line ->
+                    Text(text = stringResource(line), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 8.dp))
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onAgree) { Text(stringResource(R.string.disclosure_agree)) } },
+        dismissButton = { TextButton(onClick = onDecline) { Text(stringResource(R.string.disclosure_decline)) } },
+    )
 }
 
 /** Can't be granted from the phone: show the ADB command to run once from a computer. */
