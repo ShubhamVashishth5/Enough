@@ -10,6 +10,8 @@ data class TodayUsage(
     val vaultTime: Duration = Duration.ZERO,
     /** Vault opens the user went through with (past the pause screen). */
     val proceededOpens: Int = 0,
+    /** Pause screens shown, however they ended. */
+    val pausesShown: Int = 0,
     val unlocks: Int = 0,
 ) {
     companion object {
@@ -37,6 +39,7 @@ data class TodayUsage(
             return TodayUsage(
                 vaultTime = vaultTime,
                 proceededOpens = events.count { it.type == EventType.GATE_PROCEEDED && countFrom(it) },
+                pausesShown = events.count { it.type == EventType.GATE_SHOWN && countFrom(it) },
                 unlocks = events.count { it.type == EventType.SCREEN_UNLOCK && countFrom(it) },
             )
         }

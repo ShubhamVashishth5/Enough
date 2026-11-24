@@ -26,6 +26,9 @@
     <string name="pause_how_long">For how long?</string>
     <string name="pause_budget_left">%s left today</string>
     <string name="pause_change_reason">Change reason</string>
+    <string name="pause_swap_question">How about this instead?</string>
+    <string name="pause_swap_take">Do this instead</string>
+    <string name="pause_swap_open_anyway">Open anyway</string>
 
     <!-- Time's up -->
     <string name="time_up_title">Time\'s up</string>
@@ -85,6 +88,33 @@
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
     <string name="apps_pending_move">Moves to %1$s in %2$s</string>
+
+    <string name="settings_swaps">Instead list</string>
+    <string name="settings_swaps_summary">Things to do instead, offered when you answer Bored or Habit</string>
+
+    <!-- Instead list -->
+    <string name="swaps_title">Instead list</string>
+    <string name="swaps_explainer">When you answer Bored or Habit on the pause screen, it offers one of these first, taking turns. Link an app to open it; otherwise Do this instead goes home.</string>
+    <string name="swaps_empty">Nothing here yet, so the pause screen won\'t offer anything instead.</string>
+    <string name="swaps_add">Add a swap</string>
+    <string name="swaps_opens">Opens %s</string>
+    <string name="swaps_goes_home">Goes home</string>
+    <string name="swap_new">New swap</string>
+    <string name="swap_edit">Edit swap</string>
+    <string name="swap_hint">Read 5 pages</string>
+    <string name="swap_app">App to open</string>
+    <string name="swap_app_none">None, go home</string>
+    <string name="swap_save">Save</string>
+    <string name="swap_delete">Delete</string>
+    <string name="swap_cancel">Cancel</string>
+    <!-- The Instead list starts with these. -->
+    <string-array name="default_swaps">
+        <item>Read 5 pages</item>
+        <item>10 push-ups</item>
+        <item>Go for a walk</item>
+        <item>A language lesson</item>
+        <item>Call someone</item>
+    </string-array>
 
     <string name="settings_permissions">Permissions</string>
     <string name="settings_permissions_summary">What the app needs and why</string>

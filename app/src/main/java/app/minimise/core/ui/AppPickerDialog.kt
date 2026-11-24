@@ -1,4 +1,4 @@
-package app.minimise.launcher.ui
+package app.minimise.core.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,7 @@ import androidx.compose.ui.window.Dialog
 import app.minimise.R
 import app.minimise.apps.domain.AppEntry
 
-/** Picks a Tool app for a home slot. */
+/** Picks a Tool app, or none (for a home slot or a swap). */
 @Composable
 fun AppPickerDialog(
     choices: List<AppEntry>,
