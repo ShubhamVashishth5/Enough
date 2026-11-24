@@ -765,6 +765,11 @@
     <string name="home_option_needs_notification_access">Needs notification access, which is off. Tap to allow it.</string>
     <string name="home_option_weather">Weather</string>
     <string name="home_option_weather_summary">The temperature and sky where you are. Tap it on home to refresh.</string>
+    <string name="home_option_temperature">Temperature unit</string>
+    <string name="home_option_temperature_summary">%s. Tap to switch between Automatic, Celsius and Fahrenheit.</string>
+    <string name="temperature_automatic_now">Automatic, from the phone\'s regional settings (%s right now)</string>
+    <string name="temperature_celsius">Celsius</string>
+    <string name="temperature_fahrenheit">Fahrenheit</string>
     <string name="home_option_aqi">Air quality</string>
     <string name="home_option_aqi_summary">The air quality index (US AQI) where you are, and what it means for you. Tap it on home to refresh.</string>
     <string name="home_option_needs_location">Weather and air quality need your location. Tap to allow it.</string>

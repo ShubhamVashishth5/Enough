@@ -76,7 +76,16 @@ data class HomeOptions(
     val weather: Boolean = false,
     /** US AQI from Open-Meteo, for the phone's rough location. */
     val airQuality: Boolean = false,
+    val temperatureUnit: TemperatureChoice = TemperatureChoice.AUTOMATIC,
 ) {
     /** Both widgets that need the phone's location and the internet. */
     val usesLocation: Boolean get() = weather || airQuality
+}
+
+/** Stored by name, so never rename an entry. */
+enum class TemperatureChoice {
+    /** The phone's regional preference: Fahrenheit where that's the custom (or the phone says so), Celsius elsewhere. */
+    AUTOMATIC,
+    CELSIUS,
+    FAHRENHEIT,
 }

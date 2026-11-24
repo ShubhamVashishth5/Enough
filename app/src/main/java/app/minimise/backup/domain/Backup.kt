@@ -79,6 +79,8 @@ data class Backup(
         val music: Boolean = true,
         val weather: Boolean = false,
         val airQuality: Boolean = false,
+        /** TemperatureChoice by name. */
+        val temperatureUnit: String = "AUTOMATIC",
     )
 }
 

@@ -1,9 +1,7 @@
 package app.minimise.widgets.data
 
-import androidx.core.text.util.LocalePreferences
 import app.minimise.core.time.TimeSource
 import app.minimise.widgets.domain.OpenMeteo
-import app.minimise.widgets.domain.TemperatureUnit
 import app.minimise.widgets.domain.WeatherNow
 import app.minimise.widgets.domain.WeatherRefresh
 import javax.inject.Inject
@@ -68,10 +66,8 @@ class WeatherRepository @Inject constructor(
     }
 
     private suspend fun fetch(weather: Boolean, airQuality: Boolean, forced: Boolean) {
-        val unit = temperatureUnit()
         val before = _state.value
-        val keptWeather = before.weather?.takeIf { it.unit == unit }
-        val missing = (weather && keptWeather == null) || (airQuality && before.usAqi == null)
+        val missing = (weather && before.weather == null) || (airQuality && before.usAqi == null)
         val now = timeSource.elapsed()
         if (!WeatherRefresh.due(now, lastAttempt, lastSuccess, missing, forced)) return
         lastAttempt = now
@@ -83,7 +79,7 @@ class WeatherRepository @Inject constructor(
         }
         val (newWeather, newAqi) = coroutineScope {
             val forecast = async {
-                if (weather) client.get(OpenMeteo.forecastUrl(place.latitude, place.longitude, unit))?.let { OpenMeteo.parseWeather(it, unit) } else null
+                if (weather) client.get(OpenMeteo.forecastUrl(place.latitude, place.longitude))?.let(OpenMeteo::parseWeather) else null
             }
             val air = async {
                 if (airQuality) client.get(OpenMeteo.airQualityUrl(place.latitude, place.longitude))?.let(OpenMeteo::parseUsAqi) else null
@@ -93,13 +89,9 @@ class WeatherRepository @Inject constructor(
         val complete = (!weather || newWeather != null) && (!airQuality || newAqi != null)
         if (complete) lastSuccess = now
         _state.value = WeatherState(
-            weather = newWeather ?: keptWeather,
+            weather = newWeather ?: before.weather,
             usAqi = newAqi ?: before.usAqi,
             problem = if (complete) null else WeatherProblem.OFFLINE,
         )
     }
-
-    /** Follows the phone's regional preference: Fahrenheit where that's the custom, Celsius elsewhere. */
-    private fun temperatureUnit(): TemperatureUnit =
-        if (LocalePreferences.getTemperatureUnit() == LocalePreferences.TemperatureUnit.FAHRENHEIT) TemperatureUnit.FAHRENHEIT else TemperatureUnit.CELSIUS
 }

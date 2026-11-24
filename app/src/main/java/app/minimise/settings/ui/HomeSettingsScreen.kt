@@ -21,8 +21,12 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.core.prefs.HomeOptions
+import app.minimise.core.prefs.TemperatureChoice
+import app.minimise.core.ui.SettingsRow
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.ToggleRow
+import app.minimise.widgets.data.TemperatureUnits
+import app.minimise.widgets.domain.TemperatureUnit
 import timber.log.Timber
 
 @Composable
@@ -114,6 +118,32 @@ fun HomeSettingsScreen(
             checked = options.weather,
             onToggle = { onToggle { it.copy(weather = !it.weather) } },
         )
+        if (options.weather) {
+            val unit = when (options.temperatureUnit) {
+                TemperatureChoice.CELSIUS -> stringResource(R.string.temperature_celsius)
+                TemperatureChoice.FAHRENHEIT -> stringResource(R.string.temperature_fahrenheit)
+                TemperatureChoice.AUTOMATIC -> stringResource(
+                    R.string.temperature_automatic_now,
+                    stringResource(
+                        if (TemperatureUnits.resolve(TemperatureChoice.AUTOMATIC) == TemperatureUnit.FAHRENHEIT) {
+                            R.string.temperature_fahrenheit
+                        } else {
+                            R.string.temperature_celsius
+                        },
+                    ),
+                )
+            }
+            SettingsRow(
+                title = stringResource(R.string.home_option_temperature),
+                summary = stringResource(R.string.home_option_temperature_summary, unit),
+                onClick = {
+                    onToggle {
+                        val next = TemperatureChoice.entries[(it.temperatureUnit.ordinal + 1) % TemperatureChoice.entries.size]
+                        it.copy(temperatureUnit = next)
+                    }
+                },
+            )
+        }
         ToggleRow(
             title = stringResource(R.string.home_option_aqi),
             summary = stringResource(R.string.home_option_aqi_summary),

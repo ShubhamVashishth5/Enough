@@ -7,6 +7,7 @@ import app.minimise.backup.domain.BackupCodec
 import app.minimise.backup.domain.BackupDiff
 import app.minimise.core.prefs.HomeOptions
 import app.minimise.core.prefs.SettingsStore
+import app.minimise.core.prefs.TemperatureChoice
 import app.minimise.core.time.TimeSource
 import app.minimise.display.domain.GrayscaleMode
 import app.minimise.settings.domain.GuardResult
@@ -105,6 +106,8 @@ class BackupImporter @Inject constructor(
                         music = it.music,
                         weather = it.weather,
                         airQuality = it.airQuality,
+                        temperatureUnit = TemperatureChoice.entries.firstOrNull { choice -> choice.name == it.temperatureUnit }
+                            ?: settings.home.temperatureUnit,
                     )
                 } ?: settings.home,
             )

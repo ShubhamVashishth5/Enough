@@ -53,7 +53,9 @@ fun HomeWidgets(viewModel: HomeWidgetsViewModel = hiltViewModel()) {
     val items = buildList {
         if (options.usesLocation) {
             val weather = state.weather
-            if (options.weather) weather.weather?.let { add(Item(weatherText(it.temperature, it.sky), viewModel::onWeatherTapped)) }
+            if (options.weather) {
+                weather.weather?.let { add(Item(weatherText(it.temperatureIn(state.temperatureUnit), it.sky), viewModel::onWeatherTapped)) }
+            }
             if (options.airQuality) weather.usAqi?.let { add(Item(aqiText(it), viewModel::onWeatherTapped)) }
             val nothingToShow = (!options.weather || weather.weather == null) && (!options.airQuality || weather.usAqi == null)
             if (nothingToShow) {

@@ -74,6 +74,8 @@ class DataStoreSettingsStore @Inject constructor(
                 music = this[Keys.HOME_MUSIC] ?: defaults.home.music,
                 weather = this[Keys.HOME_WEATHER] ?: defaults.home.weather,
                 airQuality = this[Keys.HOME_AIR_QUALITY] ?: defaults.home.airQuality,
+                temperatureUnit = this[Keys.HOME_TEMPERATURE_UNIT]?.let { name -> TemperatureChoice.entries.firstOrNull { it.name == name } }
+                    ?: defaults.home.temperatureUnit,
             ),
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
@@ -112,6 +114,7 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.HOME_MUSIC] = settings.home.music
         this[Keys.HOME_WEATHER] = settings.home.weather
         this[Keys.HOME_AIR_QUALITY] = settings.home.airQuality
+        this[Keys.HOME_TEMPERATURE_UNIT] = settings.home.temperatureUnit.name
         this[Keys.DEBUG_TIME_OFFSET_SECONDS] = settings.debugTimeOffset.inWholeSeconds
         this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
@@ -146,6 +149,7 @@ class DataStoreSettingsStore @Inject constructor(
         val HOME_MUSIC = booleanPreferencesKey("home_music")
         val HOME_WEATHER = booleanPreferencesKey("home_weather")
         val HOME_AIR_QUALITY = booleanPreferencesKey("home_air_quality")
+        val HOME_TEMPERATURE_UNIT = stringPreferencesKey("home_temperature_unit")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")
     }

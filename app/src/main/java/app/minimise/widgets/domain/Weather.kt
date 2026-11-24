@@ -50,13 +50,19 @@ enum class Sky {
     }
 }
 
-enum class TemperatureUnit(val apiName: String) {
-    CELSIUS("celsius"),
-    FAHRENHEIT("fahrenheit"),
-}
+enum class TemperatureUnit { CELSIUS, FAHRENHEIT }
 
-/** @property temperature in [unit], rounded to a whole degree. */
-data class WeatherNow(val temperature: Int, val sky: Sky, val unit: TemperatureUnit)
+/**
+ * Kept in Celsius, as Open-Meteo sends it by default, and turned into the unit shown only for display,
+ * so switching units needs no new request.
+ */
+data class WeatherNow(val celsius: Double, val sky: Sky) {
+    /** Rounded to a whole degree. */
+    fun temperatureIn(unit: TemperatureUnit): Int = when (unit) {
+        TemperatureUnit.CELSIUS -> celsius.roundToInt()
+        TemperatureUnit.FAHRENHEIT -> (celsius * 9 / 5 + 32).roundToInt()
+    }
+}
 
 /** The US AQI bands, the scale most weather apps show. */
 enum class AqiLevel {
@@ -85,9 +91,10 @@ enum class AqiLevel {
  * in a request; nothing about the user or the phone does.
  */
 object OpenMeteo {
-    fun forecastUrl(latitude: Double, longitude: Double, unit: TemperatureUnit): String =
+    /** Temperatures come in Celsius, Open-Meteo's default. */
+    fun forecastUrl(latitude: Double, longitude: Double): String =
         "https://api.open-meteo.com/v1/forecast?latitude=${coordinate(latitude)}&longitude=${coordinate(longitude)}" +
-            "&current=temperature_2m,weather_code&temperature_unit=${unit.apiName}"
+            "&current=temperature_2m,weather_code"
 
     fun airQualityUrl(latitude: Double, longitude: Double): String =
         "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${coordinate(latitude)}&longitude=${coordinate(longitude)}" +
@@ -97,11 +104,11 @@ object OpenMeteo {
     fun coordinate(value: Double): String = String.format(Locale.ROOT, "%.2f", value)
 
     /** Null when the answer isn't the shape asked for. */
-    fun parseWeather(json: String, unit: TemperatureUnit): WeatherNow? = runCatching {
+    fun parseWeather(json: String): WeatherNow? = runCatching {
         val current = current(json) ?: return null
         val temperature = current["temperature_2m"]?.jsonPrimitive?.doubleOrNull ?: return null
         val code = current["weather_code"]?.jsonPrimitive?.doubleOrNull ?: return null
-        WeatherNow(temperature = temperature.roundToInt(), sky = Sky.fromWmo(code.toInt()), unit = unit)
+        WeatherNow(celsius = temperature, sky = Sky.fromWmo(code.toInt()))
     }.getOrNull()
 
     /** Null when the answer isn't the shape asked for, or there's no reading for the place. */

@@ -72,6 +72,7 @@ class LocalSettingsReader @Inject constructor(
                     music = it.music,
                     weather = it.weather,
                     airQuality = it.airQuality,
+                    temperatureUnit = it.temperatureUnit.name,
                 )
             },
         )

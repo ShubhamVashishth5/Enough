@@ -11,9 +11,11 @@ import app.minimise.widgets.data.BatteryMonitor
 import app.minimise.widgets.data.BatteryState
 import app.minimise.widgets.data.NextAlarmSource
 import app.minimise.widgets.data.NowPlaying
+import app.minimise.widgets.data.TemperatureUnits
 import app.minimise.widgets.data.Track
 import app.minimise.widgets.data.WeatherRepository
 import app.minimise.widgets.data.WeatherState
+import app.minimise.widgets.domain.TemperatureUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -41,6 +43,7 @@ data class HomeWidgetsUiState(
     val now: LocalDateTime? = null,
     val track: Track? = null,
     val weather: WeatherState = WeatherState(),
+    val temperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -80,6 +83,8 @@ class HomeWidgetsViewModel @Inject constructor(
                 now = timeSource.now().atZone(timeSource.zone()).toLocalDateTime(),
                 track = track,
                 weather = weather,
+                // Read on every update (and resume), so a change to the phone's preference shows at once.
+                temperatureUnit = TemperatureUnits.resolve(options.temperatureUnit),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeWidgetsUiState())
 

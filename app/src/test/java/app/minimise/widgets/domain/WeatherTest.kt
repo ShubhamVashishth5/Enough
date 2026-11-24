@@ -10,7 +10,16 @@ class WeatherTest {
     @Test
     fun `reads Open-Meteo's current weather`() {
         val json = """{"latitude":12.98,"current_units":{"temperature_2m":"°C"},"current":{"time":"2026-11-25T10:00","interval":900,"temperature_2m":23.6,"weather_code":2}}"""
-        assertEquals(WeatherNow(24, Sky.PARTLY_CLOUDY, TemperatureUnit.CELSIUS), OpenMeteo.parseWeather(json, TemperatureUnit.CELSIUS))
+        assertEquals(WeatherNow(23.6, Sky.PARTLY_CLOUDY), OpenMeteo.parseWeather(json))
+    }
+
+    @Test
+    fun `one reading shows in either unit, without asking again`() {
+        val now = WeatherNow(23.6, Sky.CLEAR)
+        assertEquals(24, now.temperatureIn(TemperatureUnit.CELSIUS))
+        assertEquals(74, now.temperatureIn(TemperatureUnit.FAHRENHEIT))
+        assertEquals(32, WeatherNow(0.0, Sky.CLEAR).temperatureIn(TemperatureUnit.FAHRENHEIT))
+        assertEquals(-40, WeatherNow(-40.0, Sky.CLEAR).temperatureIn(TemperatureUnit.FAHRENHEIT))
     }
 
     @Test
@@ -22,17 +31,17 @@ class WeatherTest {
 
     @Test
     fun `an unexpected answer is no reading, not a crash`() {
-        assertNull(OpenMeteo.parseWeather("""{"error":true,"reason":"Latitude must be in range"}""", TemperatureUnit.CELSIUS))
-        assertNull(OpenMeteo.parseWeather("<html>busy</html>", TemperatureUnit.CELSIUS))
+        assertNull(OpenMeteo.parseWeather("""{"error":true,"reason":"Latitude must be in range"}"""))
+        assertNull(OpenMeteo.parseWeather("<html>busy</html>"))
         assertNull(OpenMeteo.parseUsAqi(""))
     }
 
     @Test
     fun `requests carry only a location rounded to two places`() {
-        val url = OpenMeteo.forecastUrl(12.971599, -77.594566, TemperatureUnit.FAHRENHEIT)
+        val url = OpenMeteo.forecastUrl(12.971599, -77.594566)
         assertTrue(url.startsWith("https://api.open-meteo.com/v1/forecast?"))
         assertTrue("latitude=12.97&longitude=-77.59" in url)
-        assertTrue("temperature_unit=fahrenheit" in url)
+        assertFalse("temperature_unit" in url)
         assertFalse("12.9715" in url)
         assertTrue("latitude=12.97&longitude=-77.59&current=us_aqi" in OpenMeteo.airQualityUrl(12.971599, -77.594566))
     }
