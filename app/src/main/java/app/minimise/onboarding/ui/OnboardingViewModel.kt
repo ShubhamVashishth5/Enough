@@ -7,6 +7,7 @@ import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.apps.domain.CommonTimeSinks
+import app.minimise.apps.domain.WebTarget
 import app.minimise.core.Defaults
 import app.minimise.onboarding.domain.InitialSetup
 import app.minimise.settings.domain.SetAppKind
@@ -115,11 +116,14 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    /** Through the guard like any other change: ticking is tightening, so it applies at once. */
+    /** Through the guard like any other change: ticking is tightening, so it applies at once. Their websites go in too. */
     private suspend fun saveVaultPicks(apps: List<AppEntry>, picks: Set<String>) {
         apps.forEach { app ->
             val wanted = if (app.packageName in picks) AppKind.VAULT else if (app.kind == AppKind.VAULT) AppKind.TOOL else null
             if (wanted != null && wanted != app.kind) settingsGuard.request(SetAppKind(app.packageName, wanted))
+        }
+        picks.flatMap { CommonTimeSinks.websites[it].orEmpty() }.toSet().forEach { domain ->
+            settingsGuard.request(SetAppKind(WebTarget.idFor(domain), AppKind.VAULT))
         }
     }
 

@@ -1,0 +1,15 @@
+{
+  "note": "The address bar of each browser, in the same matcher format as feed_rules.json. Find new IDs with Settings > Debug: dump screen (debug builds).",
+  "browsers": [
+    { "package": "com.android.chrome", "name": "Chrome", "matchers": [{ "viewId": "com.android.chrome:id/url_bar" }] },
+    { "package": "com.chrome.beta", "name": "Chrome Beta", "matchers": [{ "viewId": "com.chrome.beta:id/url_bar" }] },
+    { "package": "org.mozilla.firefox", "name": "Firefox", "matchers": [{ "viewId": "org.mozilla.firefox:id/mozac_browser_toolbar_url_view" }, { "viewId": "org.mozilla.firefox:id/url_bar_title" }] },
+    { "package": "org.mozilla.firefox_beta", "name": "Firefox Beta", "matchers": [{ "viewId": "org.mozilla.firefox_beta:id/mozac_browser_toolbar_url_view" }] },
+    { "package": "com.sec.android.app.sbrowser", "name": "Samsung Internet", "matchers": [{ "viewId": "com.sec.android.app.sbrowser:id/location_bar_edit_text" }] },
+    { "package": "com.brave.browser", "name": "Brave", "matchers": [{ "viewId": "com.brave.browser:id/url_bar" }] },
+    { "package": "com.microsoft.emmx", "name": "Edge", "matchers": [{ "viewId": "com.microsoft.emmx:id/url_bar" }] },
+    { "package": "com.vivaldi.browser", "name": "Vivaldi", "matchers": [{ "viewId": "com.vivaldi.browser:id/url_bar" }] },
+    { "package": "com.opera.browser", "name": "Opera", "matchers": [{ "viewId": "com.opera.browser:id/url_field" }] },
+    { "package": "com.duckduckgo.mobile.android", "name": "DuckDuckGo", "matchers": [{ "viewId": "com.duckduckgo.mobile.android:id/omnibarTextInput" }] }
+  ]
+}

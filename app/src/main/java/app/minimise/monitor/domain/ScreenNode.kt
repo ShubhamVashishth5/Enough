@@ -19,6 +19,12 @@ interface ScreenNode {
     val childCount: Int
 
     fun child(index: Int): ScreenNode?
+
+    /**
+     * Every node under this one with [viewId], found by the system in one call. Null when that isn't
+     * supported, and the tree must be walked instead.
+     */
+    fun findByViewId(viewId: String): List<ScreenNode>? = null
 }
 
 /**
@@ -73,20 +79,37 @@ object ScreenTree {
     }
 
     fun firstMatch(root: ScreenNode, matchers: List<NodeMatcher>, maxDepth: Int, maxNodes: Int): ScreenNode? {
+        val (byId, walked) = fastLookups(root, matchers)
+        byId.firstNotNullOfOrNull { (matcher, nodes) -> nodes.firstOrNull(matcher::matches) }?.let { return it }
+        if (walked.isEmpty()) return null
         var found: ScreenNode? = null
-        any(root, maxDepth, maxNodes) { node -> matchers.any { it.matches(node) }.also { if (it) found = node } }
+        any(root, maxDepth, maxNodes) { node -> walked.any { it.matches(node) }.also { if (it) found = node } }
         return found
     }
 
     /** True when every one of [matchers] matches some node. */
     fun matchesAll(root: ScreenNode, matchers: List<NodeMatcher>, maxDepth: Int, maxNodes: Int): Boolean {
         if (matchers.isEmpty()) return false
-        val left = matchers.toMutableSet()
+        val (byId, walked) = fastLookups(root, matchers)
+        if (byId.any { (matcher, nodes) -> nodes.none(matcher::matches) }) return false
+        if (walked.isEmpty()) return true
+        val left = walked.toMutableSet()
         any(root, maxDepth, maxNodes) { node ->
             left.removeAll { it.matches(node) }
             left.isEmpty()
         }
         return left.isEmpty()
+    }
+
+    /** Matchers with a view ID, paired with the system's lookup when the node supports it; the rest need a walk. */
+    private fun fastLookups(root: ScreenNode, matchers: List<NodeMatcher>): Pair<List<Pair<NodeMatcher, List<ScreenNode>>>, List<NodeMatcher>> {
+        val byId = mutableListOf<Pair<NodeMatcher, List<ScreenNode>>>()
+        val walked = mutableListOf<NodeMatcher>()
+        matchers.forEach { matcher ->
+            val found = matcher.viewId?.let(root::findByViewId)
+            if (found != null) byId += matcher to found else walked += matcher
+        }
+        return byId to walked
     }
 }
 

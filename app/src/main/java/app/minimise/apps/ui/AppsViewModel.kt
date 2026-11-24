@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
+import app.minimise.apps.domain.WebTarget
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.ui.ticker
@@ -23,8 +24,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/** @property editingLimit the app whose open limit is being set, if any. */
-data class AppsUiState(val rows: List<AppRow> = emptyList(), val editingLimit: AppEntry? = null)
+/**
+ * @property websites Vault (and formerly Vault) websites, covered in the browsers Enough knows.
+ * @property editingLimit the app whose open limit is being set, if any.
+ * @property addingWebsite the "Add a website" dialog is open; [websiteInvalid] when the last entry wasn't a domain.
+ */
+data class AppsUiState(
+    val rows: List<AppRow> = emptyList(),
+    val websites: List<AppRow> = emptyList(),
+    val editingLimit: AppEntry? = null,
+    val addingWebsite: Boolean = false,
+    val websiteInvalid: Boolean = false,
+)
 
 /**
  * @property pending a waiting loosen for this app: the kind it moves to and how long until it does.
@@ -44,26 +55,31 @@ class AppsViewModel @Inject constructor(
     private val timeSource: TimeSource,
 ) : ViewModel() {
     private val editingLimit = MutableStateFlow<String?>(null)
+    private val websiteDialog = MutableStateFlow<WebsiteDialog?>(null)
+
+    private val everything = combine(appRepository.apps, appRepository.webTargets) { apps, websites -> apps to websites }
 
     val uiState: StateFlow<AppsUiState> = combine(
-        appRepository.apps,
+        everything,
         settingsGuard.pending,
         editingLimit,
+        websiteDialog,
         ticker(REFRESH).onEach { settingsGuard.applyDue() },
-    ) { apps, pending, editing, _ ->
+    ) { (apps, websites), pending, editing, dialog, _ ->
         val now = timeSource.now()
         val byPackage = pending.mapNotNull { p -> (p.change as? SetAppKind)?.let { it.packageName to (it to p.applyAt) } }.toMap()
         val limits = pending.mapNotNull { p -> (p.change as? SetOpenLimit)?.let { it.packageName to (it to p.applyAt) } }.toMap()
+        fun rowFor(app: AppEntry) = AppRow(
+            app = app,
+            pending = byPackage[app.packageName]?.let { (change, applyAt) -> PendingKind(change.kind, durationBetween(now, applyAt)) },
+            pendingLimit = limits[app.packageName]?.let { (change, applyAt) -> PendingLimit(change.limit, durationBetween(now, applyAt)) },
+        )
         AppsUiState(
-            rows = apps.map { app ->
-                val waiting = byPackage[app.packageName]
-                AppRow(
-                    app = app,
-                    pending = waiting?.let { (change, applyAt) -> PendingKind(change.kind, durationBetween(now, applyAt)) },
-                    pendingLimit = limits[app.packageName]?.let { (change, applyAt) -> PendingLimit(change.limit, durationBetween(now, applyAt)) },
-                )
-            },
+            rows = apps.map(::rowFor),
+            websites = websites.map(::rowFor),
             editingLimit = editing?.let { pkg -> apps.firstOrNull { it.packageName == pkg } },
+            addingWebsite = dialog != null,
+            websiteInvalid = dialog?.invalid == true,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppsUiState())
 
@@ -86,6 +102,27 @@ class AppsViewModel @Inject constructor(
         editingLimit.value = null
         viewModelScope.launch { settingsGuard.request(SetOpenLimit(packageName, limit?.takeIf { it > 0 })) }
     }
+
+    fun onAddWebsite() {
+        websiteDialog.value = WebsiteDialog()
+    }
+
+    fun onWebsiteDismissed() {
+        websiteDialog.value = null
+    }
+
+    /** A new Vault website is tightening, so it applies at once. */
+    fun onWebsiteEntered(text: String) {
+        val domain = WebTarget.normalise(text)
+        if (domain == null) {
+            websiteDialog.value = WebsiteDialog(invalid = true)
+            return
+        }
+        websiteDialog.value = null
+        viewModelScope.launch { settingsGuard.request(SetAppKind(WebTarget.idFor(domain), AppKind.VAULT)) }
+    }
+
+    private data class WebsiteDialog(val invalid: Boolean = false)
 
     private companion object {
         val REFRESH = 15.seconds
