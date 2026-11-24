@@ -12,6 +12,8 @@ data class PermissionsUiState(
     val accessibility: Boolean = false,
     val defaultHome: Boolean = false,
     val batteryUnrestricted: Boolean = false,
+    val grayscale: Boolean = false,
+    val grayscaleCommand: String = "",
 )
 
 @HiltViewModel
@@ -27,6 +29,8 @@ class PermissionsViewModel @Inject constructor(
             accessibility = status.isAccessibilityEnabled(),
             defaultHome = status.isDefaultHome(),
             batteryUnrestricted = status.isIgnoringBatteryOptimizations(),
+            grayscale = status.canWriteSecureSettings(),
+            grayscaleCommand = status.grayscaleGrantCommand(),
         )
     }
 

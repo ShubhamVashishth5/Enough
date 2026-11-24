@@ -9,6 +9,7 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
 import app.minimise.core.di.ApplicationScope
 import app.minimise.core.time.TimeSource
+import app.minimise.display.GrayscaleController
 import app.minimise.gate.GateMonitor
 import app.minimise.gate.GrantWatcher
 import app.minimise.launcher.HomeActivity
@@ -43,6 +44,7 @@ class GateAccessibilityService : AccessibilityService() {
     @Inject lateinit var foregroundSource: AccessibilityForegroundSource
     @Inject lateinit var gateMonitor: GateMonitor
     @Inject lateinit var grantWatcher: GrantWatcher
+    @Inject lateinit var grayscaleController: GrayscaleController
     @Inject lateinit var usageTracker: UsageTracker
     @Inject lateinit var eventLog: EventLog
     @Inject lateinit var settingsGuard: SettingsGuard
@@ -80,6 +82,7 @@ class GateAccessibilityService : AccessibilityService() {
             scope.launch { foregroundSource.events.collect { usageTracker.onForeground(it) } }
             scope.launch { gateMonitor.run() }
             scope.launch { grantWatcher.run() }
+            scope.launch { grayscaleController.run() }
             scope.launch {
                 while (isActive) {
                     delay(CHECKPOINT_INTERVAL)
@@ -110,6 +113,7 @@ class GateAccessibilityService : AccessibilityService() {
             if (receiverRegistered) unregisterReceiver(screenReceiver)
             receiverRegistered = false
             appScope.launch { usageTracker.closeOpenSpan() }
+            appScope.launch { grayscaleController.onServiceStopped() }
             scope.cancel()
         }
         super.onDestroy()

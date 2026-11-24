@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -15,7 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -97,6 +101,39 @@ fun PermissionsScreen(
                 action = stringResource(R.string.permission_allow),
                 onAction = onRequestBattery,
             )
+            GrayscaleItem(granted = state.grayscale, command = state.grayscaleCommand)
+        }
+    }
+}
+
+/** Can't be granted from the phone: show the ADB command to run once from a computer. */
+@Composable
+private fun GrayscaleItem(granted: Boolean, command: String) {
+    val clipboard = LocalClipboardManager.current
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) {
+        Text(text = stringResource(R.string.permission_grayscale), style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(if (granted) R.string.permission_granted else R.string.permission_missing),
+            style = MaterialTheme.typography.titleSmall,
+            color = if (granted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(R.string.permission_grayscale_why),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        if (!granted) {
+            SelectionContainer {
+                Text(
+                    text = command,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            OutlinedButton(onClick = { clipboard.setText(AnnotatedString(command)) }, modifier = Modifier.padding(top = 8.dp)) {
+                Text(stringResource(R.string.permission_copy_command))
+            }
         }
     }
 }

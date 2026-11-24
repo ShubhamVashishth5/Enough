@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.SettingsRow
+import app.minimise.display.domain.GrayscaleMode
 
 @Composable
 fun SettingsRoute(
@@ -33,6 +34,7 @@ fun SettingsRoute(
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
         onOpenDebugUsage = onOpenDebugUsage,
+        onGrayscaleTapped = viewModel::onGrayscaleTapped,
         onDebugShortLoosenDelayToggled = viewModel::onDebugShortLoosenDelayToggled,
     )
 }
@@ -48,6 +50,7 @@ fun SettingsScreen(
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenDebugUsage: () -> Unit,
+    onGrayscaleTapped: () -> Unit,
     onDebugShortLoosenDelayToggled: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title)) {
@@ -84,6 +87,21 @@ fun SettingsScreen(
                 pluralStringResource(R.plurals.settings_pending_count, state.pendingCount, state.pendingCount)
             },
             onClick = onOpenPendingChanges,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_grayscale),
+            summary = if (state.grayscaleAvailable) {
+                stringResource(
+                    when (state.grayscaleMode) {
+                        GrayscaleMode.OFF -> R.string.grayscale_off
+                        GrayscaleMode.VAULT_APPS -> R.string.grayscale_vault
+                        GrayscaleMode.ALWAYS -> R.string.grayscale_always
+                    },
+                )
+            } else {
+                stringResource(R.string.grayscale_needs_grant)
+            },
+            onClick = if (state.grayscaleAvailable) onGrayscaleTapped else onOpenPermissions,
         )
         SettingsRow(
             title = stringResource(R.string.settings_permissions),

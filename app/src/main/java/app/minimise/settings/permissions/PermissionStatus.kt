@@ -1,9 +1,11 @@
 package app.minimise.settings.permissions
 
+import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
@@ -29,6 +31,12 @@ class PermissionStatus @Inject constructor(
 
     fun isIgnoringBatteryOptimizations(): Boolean =
         context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
+
+    fun canWriteSecureSettings(): Boolean =
+        context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
+
+    /** Run once from a computer with USB debugging on. */
+    fun grayscaleGrantCommand(): String = "adb shell pm grant ${context.packageName} ${Manifest.permission.WRITE_SECURE_SETTINGS}"
 
     fun accessibilitySettingsIntent(): Intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
 
