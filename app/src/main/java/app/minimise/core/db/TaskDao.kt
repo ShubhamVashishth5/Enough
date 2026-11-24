@@ -25,6 +25,10 @@ interface TaskDao {
     @Query("DELETE FROM tasks WHERE id = :id")
     suspend fun delete(id: Long)
 
+    /** Tasks ticked off on days in [from, until). */
+    @Query("SELECT COUNT(*) FROM tasks WHERE done = 1 AND day >= :from AND day < :until")
+    suspend fun doneBetween(from: LocalDate, until: LocalDate): Int
+
     @Query("UPDATE tasks SET done = :done WHERE id = :id")
     suspend fun setDone(id: Long, done: Boolean)
 

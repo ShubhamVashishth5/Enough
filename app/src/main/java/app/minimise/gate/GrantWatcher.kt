@@ -17,6 +17,8 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import timber.log.Timber
 
 /**
@@ -64,7 +66,14 @@ class GrantWatcher @Inject constructor(
 
     private suspend fun timeUp(packageName: String, budgetUsed: Boolean) {
         grantStore.remove(packageName)
-        eventLog.log(Event(type = EventType.TIME_UP, startAt = timeSource.now(), packageName = packageName))
+        eventLog.log(
+            Event(
+                type = EventType.TIME_UP,
+                startAt = timeSource.now(),
+                packageName = packageName,
+                data = buildJsonObject { put("budgetUsed", budgetUsed) }.toString(),
+            ),
+        )
         interventions.showTimeUp(packageName, budgetUsed)
     }
 

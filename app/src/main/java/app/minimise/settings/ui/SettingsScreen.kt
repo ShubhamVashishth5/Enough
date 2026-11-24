@@ -1,6 +1,11 @@
 package app.minimise.settings.ui
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -24,6 +29,7 @@ fun SettingsRoute(
     onOpenDigest: () -> Unit,
     onOpenFeeds: () -> Unit,
     onOpenLock: () -> Unit,
+    onOpenStats: () -> Unit,
     onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -31,6 +37,17 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val exportFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        uri?.let { viewModel.onExport(it) }
+    }
+    LaunchedEffect(state.exported) {
+        state.exported?.let { count ->
+            val text = if (count >= 0) context.resources.getQuantityString(R.plurals.export_done, count, count) else context.getString(R.string.export_failed)
+            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+            viewModel.onExportShown()
+        }
+    }
     SettingsScreen(
         state = state,
         onOpenApps = onOpenApps,
@@ -43,6 +60,8 @@ fun SettingsRoute(
         onOpenDigest = onOpenDigest,
         onOpenFeeds = onOpenFeeds,
         onOpenLock = onOpenLock,
+        onOpenStats = onOpenStats,
+        onExport = { exportFile.launch(EXPORT_FILE_NAME) },
         onOpenFriendKey = onOpenFriendKey,
         onOpenPendingChanges = onOpenPendingChanges,
         onOpenPermissions = onOpenPermissions,
@@ -66,6 +85,7 @@ fun SettingsScreen(
     onOpenDigest: () -> Unit,
     onOpenFeeds: () -> Unit,
     onOpenLock: () -> Unit,
+    onOpenStats: () -> Unit,
     onOpenFriendKey: () -> Unit,
     onOpenPendingChanges: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -73,6 +93,7 @@ fun SettingsScreen(
     onGrayscaleTapped: () -> Unit,
     onDebugShortLoosenDelayToggled: () -> Unit,
     onDebugDumpScreen: () -> Unit,
+    onExport: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title)) {
         SettingsRow(
@@ -157,6 +178,16 @@ fun SettingsScreen(
             onClick = if (state.grayscaleAvailable) onGrayscaleTapped else onOpenPermissions,
         )
         SettingsRow(
+            title = stringResource(R.string.stats_title),
+            summary = stringResource(R.string.settings_stats_summary),
+            onClick = onOpenStats,
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_export),
+            summary = stringResource(R.string.settings_export_summary),
+            onClick = onExport,
+        )
+        SettingsRow(
             title = stringResource(R.string.settings_permissions),
             summary = stringResource(R.string.settings_permissions_summary),
             onClick = onOpenPermissions,
@@ -179,3 +210,5 @@ fun SettingsScreen(
         }
     }
 }
+
+private const val EXPORT_FILE_NAME = "enough-events.csv"
