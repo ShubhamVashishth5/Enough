@@ -6,6 +6,7 @@ import app.minimise.core.di.ApplicationScope
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.time.DebugClockOffset
 import app.minimise.digest.domain.DigestScheduler
+import app.minimise.stats.domain.WeeklyReportScheduler
 import app.minimise.focus.domain.FocusSessions
 import app.minimise.settings.domain.SettingsGuard
 import app.minimise.swaps.domain.SwapRepository
@@ -25,6 +26,7 @@ class MinimiseApp : Application() {
     @Inject lateinit var swapRepository: SwapRepository
     @Inject lateinit var focusSessions: FocusSessions
     @Inject lateinit var digestScheduler: DigestScheduler
+    @Inject lateinit var weeklyReportScheduler: WeeklyReportScheduler
     @Inject lateinit var autoVaultWatcher: AutoVaultWatcher
     @Inject @ApplicationScope lateinit var appScope: CoroutineScope
 
@@ -39,6 +41,7 @@ class MinimiseApp : Application() {
         appScope.launch { swapRepository.seedDefaultsOnce() }
         appScope.launch { focusSessions.finishIfDue() }
         digestScheduler.scheduleNext()
+        weeklyReportScheduler.scheduleNext()
         autoVaultWatcher.start()
     }
 

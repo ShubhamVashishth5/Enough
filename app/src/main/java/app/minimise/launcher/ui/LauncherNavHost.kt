@@ -36,6 +36,7 @@ import app.minimise.tasks.ui.TodayRoute
 import app.minimise.feeds.ui.FeedsRoute
 import app.minimise.settings.ui.ApplyNowRoute
 import app.minimise.settings.ui.LockRoute
+import app.minimise.stats.ui.StatsRoute
 import app.minimise.unlock.ui.FriendKeyRoute
 import app.minimise.core.ui.dateTimeText
 import android.widget.Toast
@@ -123,6 +124,7 @@ fun LauncherNavHost(
                 onOpenDigest = { navController.navigate(Destination.DigestSettings) },
                 onOpenFeeds = { navController.navigate(Destination.Feeds) },
                 onOpenLock = { navController.navigate(Destination.Lock) },
+                onOpenStats = { navController.navigate(Destination.Stats) },
                 onOpenFriendKey = { navController.navigate(Destination.FriendKey) },
                 onOpenPendingChanges = { navController.navigate(Destination.PendingChanges) },
                 onOpenPermissions = { navController.navigate(Destination.Permissions) },
@@ -167,6 +169,9 @@ fun LauncherNavHost(
         }
         composable<Destination.Feeds> {
             FeedsRoute()
+        }
+        composable<Destination.Stats> {
+            StatsRoute()
         }
         composable<Destination.Lock> {
             LockRoute()

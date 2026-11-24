@@ -1,5 +1,6 @@
 package app.minimise.core
 
+import java.time.DayOfWeek
 import java.time.LocalTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -82,6 +83,11 @@ object Defaults {
 
     /** How often the trusted clock reading is written to disk. */
     val CLOCK_ANCHOR_SAVE_INTERVAL: Duration = 1.minutes
+
+    /** The weekly report's notification: Sunday evening. The system may delay it by up to the window. */
+    val WEEKLY_REPORT_DAY: DayOfWeek = DayOfWeek.SUNDAY
+    val WEEKLY_REPORT_TIME: LocalTime = LocalTime.of(20, 0)
+    val WEEKLY_REPORT_WINDOW: Duration = 10.minutes
 
     /** The modes the app ships with. None has a schedule until the user gives it one. */
     val MODES: List<ModePreset> = listOf(

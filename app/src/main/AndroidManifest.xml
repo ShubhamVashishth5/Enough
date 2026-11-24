@@ -125,6 +125,18 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".stats.WeeklyReportAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".stats.WeeklyReportBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- The uninstall guard: an active admin can't be uninstalled. It asks for no policies. -->
         <receiver
             android:name=".guard.GuardAdminReceiver"

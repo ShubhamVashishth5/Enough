@@ -534,6 +534,37 @@
     <string name="honest_limits_battery">Some phones stop background apps to save battery. Allowing unrestricted battery on the next screen helps.</string>
     <string name="honest_limits_aim">The point is a pause between the urge and the app, not a cage.</string>
 
+    <!-- Stats -->
+    <string name="trigger_question">What pulled you in?</string>
+    <string name="trigger_notification">A notification</string>
+    <string name="trigger_boredom">Boredom</string>
+    <string name="trigger_stress">Stress</string>
+    <string name="trigger_app_hop">Hopped from another app</string>
+    <string name="trigger_skip">Skip</string>
+    <string name="stats_title">Weekly report</string>
+    <string name="settings_stats_summary">This week against last. Opens once a day.</string>
+    <string name="stats_tomorrow">Come back tomorrow. The report opens once a day, so checking it doesn\'t become a habit of its own.</string>
+    <string name="stats_this_week_vs_last">This week so far, with last week in brackets.</string>
+    <string name="stats_vault">Vault: %1$s (%2$s)</string>
+    <string name="stats_unlocks">Unlocks: %1$d (%2$d)</string>
+    <string name="stats_focus">Focus: %1$s (%2$s)</string>
+    <string name="stats_tasks">Tasks done: %1$d (%2$d)</string>
+    <string name="stats_top_sinks">Most time: %s</string>
+    <string name="stats_no_slips">No slips past the budget this week.</string>
+    <string name="stats_slips">Most slips %1$s–%2$s</string>
+    <string name="stats_trigger">Most often pulled in by %s</string>
+    <string name="stats_days_under">%1$d of %2$d days under budget this month</string>
+    <string name="report_channel">Weekly report</string>
+    <string name="report_ready">Your week</string>
+    <string name="report_ready_text">This week against last, on one screen.</string>
+    <string name="settings_export">Export data</string>
+    <string name="settings_export_summary">The whole event log as a CSV file, saved where you choose</string>
+    <plurals name="export_done">
+        <item quantity="one">Exported %d event</item>
+        <item quantity="other">Exported %d events</item>
+    </plurals>
+    <string name="export_failed">Couldn\'t write the file.</string>
+
     <!-- Durations -->
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
     <string name="duration_hours">%d h</string>

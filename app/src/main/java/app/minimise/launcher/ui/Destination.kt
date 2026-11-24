@@ -59,6 +59,9 @@ sealed interface Destination {
     data object Feeds : Destination
 
     @Serializable
+    data object Stats : Destination
+
+    @Serializable
     data object Lock : Destination
 
     @Serializable
