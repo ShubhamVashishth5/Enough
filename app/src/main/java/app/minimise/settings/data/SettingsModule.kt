@@ -1,5 +1,6 @@
 package app.minimise.settings.data
 
+import app.minimise.settings.domain.LockPeriod
 import app.minimise.settings.domain.LoosenDelay
 import app.minimise.settings.domain.PendingChangeStore
 import app.minimise.settings.domain.SettingsTarget
@@ -19,4 +20,7 @@ abstract class SettingsModule {
 
     @Binds
     abstract fun loosenDelay(impl: SettingsLoosenDelay): LoosenDelay
+
+    @Binds
+    abstract fun lockPeriod(impl: SettingsLockPeriod): LockPeriod
 }

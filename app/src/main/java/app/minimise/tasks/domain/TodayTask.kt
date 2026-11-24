@@ -24,4 +24,7 @@ interface TaskRepository {
     suspend fun replaceDay(day: LocalDate, texts: List<String>)
 
     suspend fun setDone(id: Long, done: Boolean)
+
+    /** Tasks ticked off on usage days in [from, until). */
+    suspend fun doneBetween(from: LocalDate, until: LocalDate): Int
 }

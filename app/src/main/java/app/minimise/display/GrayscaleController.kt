@@ -6,7 +6,10 @@ import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.prefs.current
 import app.minimise.display.domain.DisplayFilter
 import app.minimise.display.domain.GrayscaleMode
+import app.minimise.core.ui.ticker
 import app.minimise.focus.domain.FocusSessions
+import app.minimise.modes.domain.ActiveModeProvider
+import kotlin.time.Duration.Companion.minutes
 import app.minimise.monitor.domain.ForegroundAppSource
 import javax.inject.Inject
 import javax.inject.Provider
@@ -21,13 +24,17 @@ class GrayscaleController @Inject constructor(
     private val settingsStore: SettingsStore,
     private val filter: Provider<DisplayFilter>,
     private val focusSessions: FocusSessions,
+    private val activeMode: ActiveModeProvider,
 ) {
     suspend fun run() {
+        // Wind-down: the Sleep mode comes on by schedule, so look once a minute.
+        val sleeping = ticker(1.minutes).map { activeMode.active()?.isSleep == true }.distinctUntilChanged()
+        val quiet = combine(focusSessions.active.map { it != null }, sleeping) { focusing, asleep -> focusing || asleep }
         combine(
             foreground.current,
             appRepository.kinds,
             settingsStore.settings.map { it.grayscaleMode }.distinctUntilChanged(),
-            focusSessions.active.map { it != null },
+            quiet,
         ) { current, kinds, mode, focusing ->
             wanted(mode, inVaultApp = current?.packageName?.let { kinds[it] == AppKind.VAULT } == true, focusing = focusing)
         }
@@ -41,7 +48,7 @@ class GrayscaleController @Inject constructor(
     }
 
     companion object {
-        /** A focus session goes grayscale too, unless the feature is off. */
+        /** A focus session and wind-down go grayscale too, unless the feature is off. */
         fun wanted(mode: GrayscaleMode, inVaultApp: Boolean, focusing: Boolean = false): Boolean = when (mode) {
             GrayscaleMode.OFF -> false
             GrayscaleMode.VAULT_APPS -> inVaultApp || focusing

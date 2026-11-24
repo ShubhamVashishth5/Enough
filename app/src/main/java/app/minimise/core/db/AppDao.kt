@@ -13,6 +13,9 @@ interface AppDao {
     @Query("SELECT * FROM apps")
     fun observeAll(): Flow<List<AppEntity>>
 
+    @Query("SELECT * FROM apps WHERE packageName LIKE 'web:%' ORDER BY packageName")
+    fun observeWebTargets(): Flow<List<AppEntity>>
+
     @Query("SELECT * FROM apps WHERE packageName = :packageName")
     suspend fun get(packageName: String): AppEntity?
 

@@ -1,0 +1,21 @@
+{
+  "note": "Settings pages that could switch the app off, blocked only during a lock period. Unlike feed rules, every matcher of a screen must match. {app_label} and {service_label} are this app's names. Each phone brand's Settings differ: find IDs with Settings > Debug: dump screen (debug builds).",
+  "screens": [
+    { "id": "app_info", "package": "com.android.settings", "name": "App info",
+      "matchers": [{ "viewId": "com.android.settings:id/entity_header_title", "text": "{app_label}" }] },
+    { "id": "app_info_buttons", "package": "com.android.settings", "name": "App info",
+      "matchers": [{ "text": "{app_label}" }, { "viewId": "com.android.settings:id/button1" }] },
+    { "id": "app_info_miui", "package": "com.miui.securitycenter", "name": "App info",
+      "matchers": [{ "text": "{app_label}" }] },
+    { "id": "device_admin", "package": "com.android.settings", "name": "Device admin",
+      "matchers": [{ "viewId": "com.android.settings:id/admin_name", "text": "{app_label}" }] },
+    { "id": "accessibility", "package": "com.android.settings", "name": "Accessibility",
+      "matchers": [{ "text": "{service_label}" }, { "textContains": "Use {service_label}" }] },
+    { "id": "accessibility_stop", "package": "com.android.settings", "name": "Accessibility",
+      "matchers": [{ "textContains": "{service_label}?" }] },
+    { "id": "uninstall", "package": "com.google.android.packageinstaller", "name": "Uninstall",
+      "matchers": [{ "text": "{app_label}" }] },
+    { "id": "uninstall_aosp", "package": "com.android.packageinstaller", "name": "Uninstall",
+      "matchers": [{ "text": "{app_label}" }] }
+  ]
+}

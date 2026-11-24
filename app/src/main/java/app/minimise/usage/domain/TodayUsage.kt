@@ -1,8 +1,9 @@
 package app.minimise.usage.domain
 
-import app.minimise.core.time.durationBetween
 import java.time.Instant
+import app.minimise.usage.domain.BudgetDays.field
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 /** Today's numbers, all derived from the event log. */
 data class TodayUsage(
@@ -17,6 +18,8 @@ data class TodayUsage(
     val unlocks: Int = 0,
     /** The day's first screen unlock, if there has been one. */
     val firstUnlockAt: Instant? = null,
+    /** Minutes earned today by finishing tasks and focus sessions (earn-it). */
+    val bonus: Duration = Duration.ZERO,
 ) {
     companion object {
         /**
@@ -32,14 +35,7 @@ data class TodayUsage(
             openSpanId: Long?,
         ): TodayUsage {
             val countFrom: (Event) -> Boolean = { !it.startAt.isBefore(dayStart) && it.startAt.isBefore(dayEnd) }
-            val vaultTime = events
-                .filter { it.type == EventType.APP_SPAN && it.packageName in vaultPackages }
-                .fold(Duration.ZERO) { total, span ->
-                    val rawEnd = if (span.id == openSpanId) now else span.endAt ?: span.startAt
-                    val start = maxOf(span.startAt, dayStart)
-                    val end = minOf(rawEnd, dayEnd, now)
-                    if (end.isAfter(start)) total + durationBetween(start, end) else total
-                }
+            val vaultTime = SpanTime.total(events, dayStart, dayEnd, now, openSpanId) { it in vaultPackages }
             val unlocks = events.filter { it.type == EventType.SCREEN_UNLOCK && countFrom(it) }
             val proceeded = events.filter { it.type == EventType.GATE_PROCEEDED && countFrom(it) }
             return TodayUsage(
@@ -49,7 +45,12 @@ data class TodayUsage(
                 pausesShown = events.count { it.type == EventType.GATE_SHOWN && countFrom(it) },
                 unlocks = unlocks.size,
                 firstUnlockAt = unlocks.minOfOrNull { it.startAt },
+                bonus = events.filter { it.type == EventType.BUDGET_BONUS && countFrom(it) }
+                    .sumOf { it.bonusMinutes() }
+                    .minutes,
             )
         }
     }
 }
+
+private fun Event.bonusMinutes(): Long = field("minutes")?.toLongOrNull() ?: 0

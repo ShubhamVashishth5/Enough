@@ -21,5 +21,7 @@ class RoomTaskRepository @Inject constructor(
 
     override suspend fun setDone(id: Long, done: Boolean) = dao.setDone(id, done)
 
+    override suspend fun doneBetween(from: LocalDate, until: LocalDate): Int = dao.doneBetween(from, until)
+
     private fun TaskEntity.toDomain() = TodayTask(id = id, text = text, day = day, done = done, position = position)
 }

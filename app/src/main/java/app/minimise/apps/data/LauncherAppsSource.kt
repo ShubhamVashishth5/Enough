@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
+import app.minimise.apps.domain.PrivateSpaceApps
 
 /** A launchable app as the system reports it. */
 data class InstalledApp(val packageName: String, val label: String)
@@ -33,6 +35,7 @@ data class InstalledApp(val packageName: String, val label: String)
 class LauncherAppsSource @Inject constructor(
     @ApplicationContext private val context: Context,
     @ApplicationScope scope: CoroutineScope,
+    private val privateSpace: AndroidPrivateSpace,
 ) {
     private val launcherApps: LauncherApps = context.getSystemService(LauncherApps::class.java)
 
@@ -59,8 +62,13 @@ class LauncherAppsSource @Inject constructor(
             }
         }
         launcherApps.registerCallback(callback, Handler(Looper.getMainLooper()))
+        // Locking or unlocking Private space hides or shows its apps.
+        val profileChanges = launch { privateSpace.changes.collect { trySend(Unit) } }
         trySend(Unit)
-        awaitClose { launcherApps.unregisterCallback(callback) }
+        awaitClose {
+            profileChanges.cancel()
+            launcherApps.unregisterCallback(callback)
+        }
     }
         .conflate()
         .map { queryAll() }
@@ -80,9 +88,12 @@ class LauncherAppsSource @Inject constructor(
             .distinctBy { it.applicationInfo.packageName }
             .map { InstalledApp(packageName = it.applicationInfo.packageName, label = it.label.toString()) }
 
+    /** Every profile's apps, personal first. A locked Private space shows nothing. */
     private fun activitiesByProfile(): List<LauncherActivityInfo> {
         val me = Process.myUserHandle()
-        val profiles = launcherApps.profiles.sortedBy { if (it == me) 0 else 1 }
+        val profiles = launcherApps.profiles
+            .filter { PrivateSpaceApps.showsProfile(isPrivate = privateSpace.isPrivate(it), locked = privateSpace.isQuiet(it)) }
+            .sortedBy { if (it == me) 0 else 1 }
         return profiles.flatMap { user -> launcherApps.getActivityList(null, user) }
     }
 }

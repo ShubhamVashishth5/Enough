@@ -9,6 +9,11 @@ sealed interface GuardResult {
     /** Loosening: waits until [applyAt]. */
     data class Scheduled(val applyAt: Instant) : GuardResult
 
-    /** Not allowed at all (used by lock periods from Phase 3). */
-    data class Refused(val reason: String) : GuardResult
+    /** Not allowed at all: a lock period is on until [until]. */
+    data class Refused(val reason: String, val until: Instant? = null) : GuardResult
+
+    companion object {
+        /** [Refused.reason] during a lock period. */
+        const val LOCKED = "locked"
+    }
 }

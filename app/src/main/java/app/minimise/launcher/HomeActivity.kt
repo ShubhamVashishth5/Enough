@@ -51,6 +51,7 @@ class HomeActivity : ComponentActivity() {
         val destination = when (intent.getStringExtra(EXTRA_OPEN)) {
             OPEN_TODAY -> Destination.Today
             OPEN_DIGEST -> Destination.Digest
+            OPEN_STATS -> Destination.Stats
             else -> return
         }
         openRequests.tryEmit(destination)
@@ -60,12 +61,16 @@ class HomeActivity : ComponentActivity() {
         private const val EXTRA_OPEN = "open"
         private const val OPEN_TODAY = "today"
         private const val OPEN_DIGEST = "digest"
+        private const val OPEN_STATS = "stats"
 
         /** Opens the launcher on the Today screen. */
         fun todayIntent(context: Context): Intent = openIntent(context, OPEN_TODAY)
 
         /** Opens the launcher on the Digest screen. */
         fun digestIntent(context: Context): Intent = openIntent(context, OPEN_DIGEST)
+
+        /** Opens the launcher on the weekly report. */
+        fun statsIntent(context: Context): Intent = openIntent(context, OPEN_STATS)
 
         private fun openIntent(context: Context, screen: String): Intent =
             Intent(context, HomeActivity::class.java)

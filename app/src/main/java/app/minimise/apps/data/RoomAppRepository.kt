@@ -3,6 +3,7 @@ package app.minimise.apps.data
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
+import app.minimise.apps.domain.WebTarget
 import app.minimise.core.db.AppDao
 import app.minimise.core.db.AppEntity
 import app.minimise.core.di.ApplicationScope
@@ -49,10 +50,13 @@ class RoomAppRepository @Inject constructor(
         }
         .shareIn(scope, SharingStarted.WhileSubscribed(5_000), replay = 1)
 
+    override val webTargets: Flow<List<AppEntry>> = dao.observeWebTargets().map { rows -> rows.map { it.toWebEntry() } }
+
     override val kinds: Flow<Map<String, AppKind>> =
         dao.observeAll().map { rows -> rows.associate { it.packageName to it.kind } }
 
     override suspend fun entry(packageName: String): AppEntry? {
+        if (WebTarget.isWebTarget(packageName)) return dao.get(packageName)?.toWebEntry()
         val label = withContext(Dispatchers.IO) { source.activityFor(packageName)?.label?.toString() } ?: return null
         val row = dao.get(packageName)
         return AppEntry(packageName, label, kind = row?.kind ?: AppKind.TOOL, homeSlot = row?.homeSlot, openLimit = row?.openLimit)
@@ -75,4 +79,7 @@ class RoomAppRepository @Inject constructor(
     override suspend fun setHomeSlot(packageName: String, slot: Int) = dao.assignSlot(packageName, slot)
 
     override suspend fun clearHomeSlot(slot: Int) = dao.clearSlot(slot)
+
+    private fun AppEntity.toWebEntry() =
+        AppEntry(packageName = packageName, label = WebTarget.domainOf(packageName), kind = kind, homeSlot = null, openLimit = openLimit)
 }

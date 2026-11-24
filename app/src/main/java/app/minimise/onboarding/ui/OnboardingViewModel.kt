@@ -7,6 +7,7 @@ import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.apps.domain.CommonTimeSinks
+import app.minimise.apps.domain.WebTarget
 import app.minimise.core.Defaults
 import app.minimise.onboarding.domain.InitialSetup
 import app.minimise.settings.domain.SetAppKind
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class OnboardingStep { WELCOME, PERMISSIONS, HOME_APPS, VAULT, BUDGET }
+enum class OnboardingStep { WELCOME, HONEST_LIMITS, PERMISSIONS, HOME_APPS, VAULT, BUDGET }
 
 data class OnboardingUiState(
     val step: OnboardingStep = OnboardingStep.WELCOME,
@@ -36,7 +37,7 @@ data class OnboardingUiState(
     val vaultChoices: List<AppEntry> get() = apps.sortedBy { if (it.packageName in vaultPicks) 0 else 1 }
 }
 
-/** First run: welcome, permissions, home apps, Vault apps, budget. */
+/** First run: welcome, honest limits, permissions, home apps, Vault apps, budget. */
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val appRepository: AppRepository,
@@ -99,7 +100,7 @@ class OnboardingViewModel @Inject constructor(
                     initialSetup.setInitialBudget(state.budgetMinutes)
                     initialSetup.finish()
                 }
-                OnboardingStep.WELCOME, OnboardingStep.PERMISSIONS -> Unit
+                OnboardingStep.WELCOME, OnboardingStep.HONEST_LIMITS, OnboardingStep.PERMISSIONS -> Unit
             }
             _uiState.update {
                 val next = OnboardingStep.entries.getOrNull(it.step.ordinal + 1)
@@ -115,11 +116,14 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    /** Through the guard like any other change: ticking is tightening, so it applies at once. */
+    /** Through the guard like any other change: ticking is tightening, so it applies at once. Their websites go in too. */
     private suspend fun saveVaultPicks(apps: List<AppEntry>, picks: Set<String>) {
         apps.forEach { app ->
             val wanted = if (app.packageName in picks) AppKind.VAULT else if (app.kind == AppKind.VAULT) AppKind.TOOL else null
             if (wanted != null && wanted != app.kind) settingsGuard.request(SetAppKind(app.packageName, wanted))
+        }
+        picks.flatMap { CommonTimeSinks.websites[it].orEmpty() }.toSet().forEach { domain ->
+            settingsGuard.request(SetAppKind(WebTarget.idFor(domain), AppKind.VAULT))
         }
     }
 

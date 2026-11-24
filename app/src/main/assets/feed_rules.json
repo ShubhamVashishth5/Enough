@@ -1,0 +1,33 @@
+{
+  "note": "View IDs change when apps redesign. Find new ones with Settings > Debug: dump screen (debug builds), then edit this file. A rule matches when any matcher matches a visible node; every field set in a matcher must match.",
+  "feeds": [
+    {
+      "id": "youtube_shorts",
+      "package": "com.google.android.youtube",
+      "name": "YouTube Shorts",
+      "matchers": [
+        { "viewId": "com.google.android.youtube:id/reel_recycler" },
+        { "viewId": "com.google.android.youtube:id/reel_player_page_container" }
+      ],
+      "action": "BACK"
+    },
+    {
+      "id": "instagram_reels",
+      "package": "com.instagram.android",
+      "name": "Instagram Reels",
+      "matchers": [
+        { "viewId": "com.instagram.android:id/clips_viewer_view_pager" }
+      ],
+      "action": "BACK"
+    },
+    {
+      "id": "instagram_explore",
+      "package": "com.instagram.android",
+      "name": "Instagram Explore",
+      "matchers": [
+        { "viewId": "com.instagram.android:id/explore_action_bar" }
+      ],
+      "action": "BACK"
+    }
+  ]
+}

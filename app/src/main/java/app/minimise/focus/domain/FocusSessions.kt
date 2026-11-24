@@ -7,6 +7,7 @@ import app.minimise.core.prefs.current
 import app.minimise.core.time.TimeSource
 import app.minimise.core.time.durationBetween
 import app.minimise.core.time.plus
+import app.minimise.usage.domain.EarnIt
 import app.minimise.usage.domain.Event
 import app.minimise.usage.domain.EventLog
 import app.minimise.usage.domain.EventType
@@ -36,6 +37,7 @@ class FocusSessions @Inject constructor(
     private val doNotDisturb: DoNotDisturb,
     private val eventLog: EventLog,
     private val timeSource: TimeSource,
+    private val earnIt: EarnIt,
 ) {
     private val mutex = Mutex()
 
@@ -99,6 +101,7 @@ class FocusSessions @Inject constructor(
                 }.toString(),
             ),
         )
+        if (!early) earnIt.onFocusCompleted(session.startAt)
     }
 
     /** The chosen allowlist, or the Tool apps on the home screen until one is chosen. */

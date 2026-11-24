@@ -27,4 +27,22 @@ object CommonTimeSinks {
         "com.pubg.imobile", // BGMI
         "com.dts.freefireth",
     )
+
+    /** The websites of those apps, so the browser isn't a way round once the app is in the Vault. */
+    val websites: Map<String, List<String>> = mapOf(
+        "com.instagram.android" to listOf("instagram.com"),
+        "com.instagram.barcelona" to listOf("threads.net", "threads.com"),
+        "com.google.android.youtube" to listOf("youtube.com"),
+        "com.facebook.katana" to listOf("facebook.com"),
+        "com.facebook.lite" to listOf("facebook.com"),
+        "com.twitter.android" to listOf("x.com", "twitter.com"),
+        "com.reddit.frontpage" to listOf("reddit.com"),
+        "com.zhiliaoapp.musically" to listOf("tiktok.com"),
+        "com.ss.android.ugc.trill" to listOf("tiktok.com"),
+        "com.pinterest" to listOf("pinterest.com"),
+        "tv.twitch.android.app" to listOf("twitch.tv"),
+        "com.netflix.mediaclient" to listOf("netflix.com"),
+        "com.amazon.avod.thirdpartyclient" to listOf("primevideo.com"),
+        "in.startv.hotstar" to listOf("hotstar.com"),
+    )
 }

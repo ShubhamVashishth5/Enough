@@ -109,6 +109,7 @@ private fun BlockedRoute(requestId: String, onFinish: (PauseFinish) -> Unit, onS
     BackHandler { viewModel.onBack() }
     BlockedScreen(
         state = state,
+        onTriggerChosen = viewModel::onTriggerChosen,
         onOverrideChosen = viewModel::onOverrideChosen,
         onVerified = viewModel::onVerified,
         onTimeBoxChosen = viewModel::onTimeBoxChosen,
