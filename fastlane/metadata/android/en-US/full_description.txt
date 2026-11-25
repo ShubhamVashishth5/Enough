@@ -16,7 +16,7 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 <li>One shared daily budget across every Vault app, so hopping between them doesn't dodge it.</li>
 <li>Websites in the Vault get the same rules in Chrome, Firefox, Samsung Internet, Brave and others.</li>
 <li>Block just the endless parts: YouTube Shorts, Instagram Reels and Explore.</li>
-<li>Or make an app a Breathe app: it stays on home, and just pauses for a breath before every open.</li>
+<li>Or make an app a Breathe app: it stays on home, and just pauses for a breath before every open, as long as you set for that app.</li>
 </ul>
 
 <b>Commitment</b>
@@ -24,7 +24,7 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 <li>Tightening a rule is instant; loosening one waits 24 hours.</li>
 <li>Lock every setting for 7, 30 or 90 days.</li>
 <li>Skip a wait with a code a friend keeps, by typing a long passage, or with an NFC sticker or printed QR code you leave in another room.</li>
-<li>Schedules, a first-hour rule, focus sessions, modes, wind-down at bedtime and focus sessions from your calendar.</li>
+<li>Schedules, a first-hour rule, focus sessions, modes of your own that end when you said they would, wind-down at bedtime and focus sessions from your calendar.</li>
 </ul>
 
 <b>Stats that don't become a habit</b>

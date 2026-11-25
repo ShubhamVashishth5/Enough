@@ -23,8 +23,8 @@ rough location.
   aqi.in can read much higher, especially in Indian cities). A lock button by the clock, swipe down for notifications, and an option to
   hide the status bar on home. Settings → Home screen lists every tap and swipe and what it does.
 - **Breathe apps.** For apps you want to notice reaching for but not ration: they stay on home and in
-  search, and every open starts with a short breathing pause. No reason asked, no time box, nothing
-  taken from the budget.
+  search, and every open starts with a short breathing pause, from 5 seconds to 2 minutes, set per app.
+  No reason asked, no time box, nothing taken from the budget.
 - **The Vault.** A pause screen ("What are you here for?"), an escalating wait, a 2, 5 or 10 minute time
   box, and a shared daily budget. Answer *bored* or *habit* and it offers something from your Instead list
   first.
@@ -33,8 +33,9 @@ rough location.
 - **Feed blocking.** Block YouTube Shorts, Instagram Reels and Explore while search and messages keep
   working.
 - **Limits and schedules.** Open limits per app, bedtime and focus-hour schedules, a first-hour rule,
-  modes (Work, Study, Home, Sleep), wind-down at bedtime, focus sessions (including ones started by
-  calendar events with "focus" in the title), and a notification digest three times a day.
+  modes (Work, Study, Home, Sleep and your own, each turned on until a time you choose or on a schedule),
+  wind-down at bedtime, focus sessions (including ones started by calendar events with "focus" in the
+  title), and a notification digest three times a day.
 - **Commitment.** Lock every setting for 7, 30 or 90 days. Skip a 24-hour wait only with a code a friend
   keeps, by typing out a 300-character passage, or with an NFC sticker or printed QR code you leave in
   another room. An uninstall guard and a clock that ignores the phone's date being changed.
