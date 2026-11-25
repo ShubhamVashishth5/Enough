@@ -6,7 +6,7 @@ import java.util.Locale
 
 /**
  * @property autoLaunch set when exactly one Tool or Breathe app matches and nothing else does: open it at
- * once (a Breathe app still pauses first).
+ * once (a Breathe app still pauses first). Not while the text could still become a Vault app's name.
  */
 data class SearchResult(
     val matches: List<AppEntry>,
@@ -33,7 +33,10 @@ object AppSearch {
             }
         }.sortedBy { if (it.label.normalised().startsWith(needle)) 0 else 1 }
 
-        val autoLaunch = matches.singleOrNull()?.takeIf { it.kind in AppKind.VISIBLE }
+        // A Vault name is typed through its first letters ("dis" on the way to "discord"), and those can
+        // match a single Tool app ("District"). Opening that would cut the name off before it's whole.
+        val vaultAhead = apps.any { it.kind == AppKind.VAULT && it.label.normalised().startsWith(needle) }
+        val autoLaunch = matches.singleOrNull()?.takeIf { it.kind in AppKind.VISIBLE && !vaultAhead }
         return SearchResult(matches = matches, autoLaunch = autoLaunch)
     }
 

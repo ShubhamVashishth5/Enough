@@ -94,15 +94,24 @@ private fun describe(description: PendingDescription): String = when (descriptio
     is PendingDescription.OpenLimitChange -> description.limit
         ?.let { pluralStringResource(R.plurals.pending_open_limit, it, description.appLabel, it) }
         ?: stringResource(R.string.pending_open_limit_none, description.appLabel)
+    is PendingDescription.BreatheWaitChange -> description.seconds
+        ?.let { stringResource(R.string.pending_breathe_wait, description.appLabel, it) }
+        ?: stringResource(R.string.pending_breathe_wait_usual, description.appLabel)
     is PendingDescription.ScheduleChange ->
         stringResource(if (description.removed) R.string.pending_schedule_removed else R.string.pending_schedule_changed, description.name)
     is PendingDescription.FirstHourChange ->
         stringResource(if (description.enabled) R.string.pending_first_hour_on else R.string.pending_first_hour_off)
     is PendingDescription.KeyChange ->
         stringResource(if (description.removed) R.string.pending_key_removed else R.string.pending_key_added, description.label)
-    is PendingDescription.ModeSwitch ->
-        stringResource(R.string.pending_mode_switch, description.modeName ?: stringResource(R.string.modes_follow))
+    is PendingDescription.ModeSwitch -> {
+        val name = description.modeName ?: stringResource(R.string.modes_follow)
+        description.until
+            ?.let { stringResource(R.string.pending_mode_switch_until, name, dateTimeText(it)) }
+            ?: stringResource(R.string.pending_mode_switch, name)
+    }
     is PendingDescription.ModeEdit -> stringResource(R.string.pending_mode_edit, description.modeName)
+    is PendingDescription.ModeAdd -> stringResource(R.string.pending_mode_added, description.modeName)
+    is PendingDescription.ModeRemove -> stringResource(R.string.pending_mode_removed, description.modeName)
     PendingDescription.LockChange -> stringResource(R.string.lock_title)
     is PendingDescription.TaperChange -> description.floorMinutes
         ?.let { stringResource(R.string.pending_taper_floor, it) }

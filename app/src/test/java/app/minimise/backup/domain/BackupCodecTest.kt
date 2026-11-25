@@ -66,4 +66,15 @@ class BackupCodecTest {
         )
         assertEquals(BackupCodec.Decoded.Ok(withBreathe), BackupCodec.decode(BackupCodec.encode(withBreathe)))
     }
+
+    @Test
+    fun `breathe pauses, the user's own modes and a pick's end survive a round trip`() {
+        val withModes = backup.copy(
+            apps = listOf(Backup.App("com.whatsapp", AppKind.BREATHE, breatheWaitSeconds = 30)),
+            modes = listOf(Backup.Mode(Backup.CUSTOM, budgetMinutes = 10, waitStepsSeconds = listOf(30, 60), name = "Commute")),
+            manualMode = "custom:Commute",
+            manualModeUntilMillis = 1_000L,
+        )
+        assertEquals(BackupCodec.Decoded.Ok(withModes), BackupCodec.decode(BackupCodec.encode(withModes)))
+    }
 }

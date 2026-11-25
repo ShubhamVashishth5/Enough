@@ -30,6 +30,15 @@ interface AppRepository {
     /** Writes the open limit directly. Only SettingsGuard should call this. */
     suspend fun setOpenLimit(packageName: String, limit: Int?)
 
+    /** The stored Breathe pause in seconds, or null for the usual one. */
+    suspend fun breatheWaitOf(packageName: String): Int?
+
+    /** Every stored Breathe pause in seconds, by package, installed or not. */
+    suspend fun breatheWaits(): Map<String, Int>
+
+    /** Writes the Breathe pause directly. Only SettingsGuard should call this. */
+    suspend fun setBreatheWait(packageName: String, seconds: Int?)
+
     /** Puts [packageName] in [slot], moving out whichever app was there. */
     suspend fun setHomeSlot(packageName: String, slot: Int)
 

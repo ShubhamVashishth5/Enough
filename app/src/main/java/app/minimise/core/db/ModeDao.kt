@@ -20,6 +20,13 @@ interface ModeDao {
     @Insert
     suspend fun insertAll(modes: List<ModeEntity>)
 
+    @Insert
+    suspend fun insert(mode: ModeEntity): Long
+
+    /** Only the user's own modes ([ModeEntity.CUSTOM]); the shipped ones stay. */
+    @Query("DELETE FROM modes WHERE id = :id AND presetKey = 'custom'")
+    suspend fun deleteCustom(id: Long)
+
     @Update
     suspend fun update(mode: ModeEntity)
 }

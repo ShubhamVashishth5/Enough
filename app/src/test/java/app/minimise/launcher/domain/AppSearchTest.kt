@@ -66,6 +66,20 @@ class AppSearchTest {
     }
 
     @Test
+    fun `typing toward a vault app's name doesn't auto-launch a tool that matches on the way`() {
+        val district = app("District")
+        val discord = app("Discord", AppKind.VAULT)
+        val apps = listOf(district, discord)
+        listOf("d", "di", "dis", "disc", "disco").forEach { typed ->
+            val result = AppSearch.search(typed, apps)
+            assertEquals(listOf(district).takeIf { typed in "district" }.orEmpty(), result.matches)
+            assertNull(result.autoLaunch)
+        }
+        assertEquals(listOf(discord), AppSearch.search("discord", apps).matches)
+        assertEquals(district, AppSearch.search("dist", apps).autoLaunch)
+    }
+
+    @Test
     fun `a tool match alongside a vault match does not auto-launch`() {
         val lite = app("Instagram Lite")
         val result = AppSearch.search("instagram", listOf(instagram, lite))

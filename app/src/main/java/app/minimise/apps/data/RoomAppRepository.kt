@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 class RoomAppRepository @Inject constructor(
@@ -44,6 +45,7 @@ class RoomAppRepository @Inject constructor(
                         kind = row?.kind ?: AppKind.TOOL,
                         homeSlot = row?.homeSlot,
                         openLimit = row?.openLimit,
+                        breatheWait = row?.breatheWaitSeconds?.seconds,
                     )
                 }
                 .sortedWith { a, b -> collator.compare(a.label, b.label) }
@@ -59,7 +61,14 @@ class RoomAppRepository @Inject constructor(
         if (WebTarget.isWebTarget(packageName)) return dao.get(packageName)?.toWebEntry()
         val label = withContext(Dispatchers.IO) { source.activityFor(packageName)?.label?.toString() } ?: return null
         val row = dao.get(packageName)
-        return AppEntry(packageName, label, kind = row?.kind ?: AppKind.TOOL, homeSlot = row?.homeSlot, openLimit = row?.openLimit)
+        return AppEntry(
+            packageName,
+            label,
+            kind = row?.kind ?: AppKind.TOOL,
+            homeSlot = row?.homeSlot,
+            openLimit = row?.openLimit,
+            breatheWait = row?.breatheWaitSeconds?.seconds,
+        )
     }
 
     override suspend fun kindOf(packageName: String): AppKind = dao.get(packageName)?.kind ?: AppKind.TOOL
@@ -77,6 +86,16 @@ class RoomAppRepository @Inject constructor(
     override suspend fun setOpenLimit(packageName: String, limit: Int?) {
         dao.insertIfMissing(listOf(AppEntity(packageName, AppKind.TOOL, homeSlot = null)))
         dao.setOpenLimit(packageName, limit)
+    }
+
+    override suspend fun breatheWaitOf(packageName: String): Int? = dao.get(packageName)?.breatheWaitSeconds
+
+    override suspend fun breatheWaits(): Map<String, Int> =
+        dao.all().mapNotNull { row -> row.breatheWaitSeconds?.let { row.packageName to it } }.toMap()
+
+    override suspend fun setBreatheWait(packageName: String, seconds: Int?) {
+        dao.insertIfMissing(listOf(AppEntity(packageName, AppKind.TOOL, homeSlot = null)))
+        dao.setBreatheWait(packageName, seconds)
     }
 
     override suspend fun setHomeSlot(packageName: String, slot: Int) = dao.assignSlot(packageName, slot)

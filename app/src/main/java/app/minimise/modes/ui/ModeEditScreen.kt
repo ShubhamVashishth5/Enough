@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,7 +36,9 @@ import app.minimise.core.time.minuteOfDay
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.WindowFields
 import app.minimise.launcher.ui.Destination
+import app.minimise.modes.domain.Mode
 import app.minimise.modes.domain.ModeRepository
+import app.minimise.settings.domain.RemoveMode
 import app.minimise.settings.domain.GuardResult
 import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SettingsGuard
@@ -50,8 +53,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * @property custom one of the user's own modes, which can be renamed ([nameText]) and removed.
+ * @property removeScheduled removing it waits 24 hours, since it's on or has hours that tighten.
+ */
 data class ModeEditUiState(
     val name: String = "",
+    val custom: Boolean = false,
+    val nameText: String = "",
+    val nameTaken: Boolean = false,
+    val removeScheduled: Boolean = false,
     val budgetText: String = "",
     val schedule: WeeklyWindow? = null,
     /** Null keeps every app's usual kind. */
@@ -77,6 +88,8 @@ class ModeEditViewModel @Inject constructor(
             val mode = modeRepository.get(modeId) ?: return@launch
             _uiState.value = ModeEditUiState(
                 name = mode.name,
+                custom = mode.isCustom,
+                nameText = mode.name,
                 budgetText = mode.values.budget.inWholeMinutes.toString(),
                 schedule = mode.schedule,
                 allowlist = mode.values.allowlist,
@@ -85,6 +98,8 @@ class ModeEditViewModel @Inject constructor(
             )
         }
     }
+
+    fun onNameChange(text: String) = _uiState.update { it.copy(nameText = text.take(Mode.MAX_NAME_LENGTH), nameTaken = false, result = null) }
 
     fun onBudgetChange(text: String) = _uiState.update { it.copy(budgetText = text.filter(Char::isDigit).take(3), result = null) }
 
@@ -103,10 +118,17 @@ class ModeEditViewModel @Inject constructor(
         val state = _uiState.value
         val budget = state.budgetText.toIntOrNull() ?: return
         val schedule = state.schedule?.takeIf { it.days.isNotEmpty() }
+        val name = state.nameText.trim().takeIf { state.custom }
+        if (name != null && name.isEmpty()) return
         viewModelScope.launch {
+            if (name != null && modeRepository.all().any { it.id != modeId && it.name.equals(name, ignoreCase = true) }) {
+                _uiState.update { it.copy(nameTaken = true) }
+                return@launch
+            }
             val result = settingsGuard.request(
                 SaveMode(
                     id = modeId,
+                    name = name,
                     budgetMinutes = budget,
                     allowlist = state.allowlist?.sorted(),
                     scheduleDays = schedule?.daysMask() ?: 0,
@@ -115,6 +137,15 @@ class ModeEditViewModel @Inject constructor(
                 ),
             )
             _uiState.update { it.copy(result = result) }
+        }
+    }
+
+    /** One of the user's own modes. Gone at once if nothing loosens; otherwise it waits like any loosen. */
+    fun onRemove() {
+        if (!_uiState.value.custom) return
+        viewModelScope.launch {
+            val result = settingsGuard.request(RemoveMode(modeId))
+            _uiState.update { it.copy(result = result.takeIf { r -> r == GuardResult.AppliedNow }, removeScheduled = result is GuardResult.Scheduled) }
         }
     }
 
@@ -135,6 +166,21 @@ fun ModeEditRoute(onSaved: () -> Unit, viewModel: ModeEditViewModel = hiltViewMo
         if (!state.loaded) return@ScreenScaffold
         LazyColumn {
             item {
+                if (state.custom) {
+                    OutlinedTextField(
+                        value = state.nameText,
+                        onValueChange = viewModel::onNameChange,
+                        singleLine = true,
+                        isError = state.nameTaken,
+                        supportingText = if (state.nameTaken) {
+                            { Text(stringResource(R.string.mode_name_taken)) }
+                        } else {
+                            null
+                        },
+                        label = { Text(stringResource(R.string.mode_name_label)) },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    )
+                }
                 OutlinedTextField(
                     value = state.budgetText,
                     onValueChange = viewModel::onBudgetChange,
@@ -156,8 +202,18 @@ fun ModeEditRoute(onSaved: () -> Unit, viewModel: ModeEditViewModel = hiltViewMo
                 if (state.result is GuardResult.Scheduled) {
                     Text(stringResource(R.string.mode_saved_later), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 16.dp))
                 }
-                OutlinedButton(onClick = viewModel::onSave, enabled = state.budgetText.isNotEmpty(), modifier = Modifier.padding(vertical = 16.dp)) {
+                OutlinedButton(
+                    onClick = viewModel::onSave,
+                    enabled = state.budgetText.isNotEmpty() && (!state.custom || state.nameText.isNotBlank()),
+                    modifier = Modifier.padding(vertical = 16.dp),
+                ) {
                     Text(stringResource(R.string.swap_save))
+                }
+                if (state.custom) {
+                    TextButton(onClick = viewModel::onRemove) { Text(stringResource(R.string.mode_remove)) }
+                    if (state.removeScheduled) {
+                        Text(stringResource(R.string.mode_removed_later), style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
         }

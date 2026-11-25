@@ -6,6 +6,7 @@ import app.minimise.apps.domain.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Duration.Companion.seconds
 
 class FakeAppRepository(initial: List<AppEntry> = emptyList()) : AppRepository {
     val state = MutableStateFlow(initial)
@@ -31,6 +32,15 @@ class FakeAppRepository(initial: List<AppEntry> = emptyList()) : AppRepository {
 
     override suspend fun setOpenLimit(packageName: String, limit: Int?) {
         state.value = state.value.map { if (it.packageName == packageName) it.copy(openLimit = limit) else it }
+    }
+
+    override suspend fun breatheWaitOf(packageName: String): Int? = entry(packageName)?.breatheWait?.inWholeSeconds?.toInt()
+
+    override suspend fun breatheWaits(): Map<String, Int> =
+        state.value.mapNotNull { app -> app.breatheWait?.let { app.packageName to it.inWholeSeconds.toInt() } }.toMap()
+
+    override suspend fun setBreatheWait(packageName: String, seconds: Int?) {
+        state.value = state.value.map { if (it.packageName == packageName) it.copy(breatheWait = seconds?.seconds) else it }
     }
 
     override suspend fun setHomeSlot(packageName: String, slot: Int) {

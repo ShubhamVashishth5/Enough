@@ -36,6 +36,13 @@ data class SetOpenLimit(val packageName: String, val limit: Int?) : SettingChang
     override val key: String get() = "open_limit:$packageName"
 }
 
+/** A Breathe app's own pause in seconds; null goes back to the usual one. A longer pause is tightening. */
+@Serializable
+@SerialName("set_breathe_wait")
+data class SetBreatheWait(val packageName: String, val seconds: Int?) : SettingChange {
+    override val key: String get() = "breathe_wait:$packageName"
+}
+
 /** Adds (id 0) or edits a schedule. Times are minutes after midnight; days have Monday as bit 0. */
 @Serializable
 @SerialName("save_schedule")
@@ -69,16 +76,21 @@ data class RemoveKey(val id: Long) : SettingChange {
     override val key: String get() = "key:$id"
 }
 
-/** Picks a mode by hand; null goes back to following mode schedules. */
+/**
+ * Picks a mode by hand until [untilEpochMillis], when the schedules take over again; null goes back to
+ * following them now. An end is part of the choice: the app always asks for one, and only changes made
+ * before it existed (or restored from them) have none, which means the pick lasts until changed.
+ */
 @Serializable
 @SerialName("set_manual_mode")
-data class SetManualMode(val modeId: Long?) : SettingChange {
+data class SetManualMode(val modeId: Long?, val untilEpochMillis: Long? = null) : SettingChange {
     override val key: String get() = "manual_mode"
 }
 
 /**
- * Edits a mode. A null allowlist keeps every app's usual kind; scheduleDays 0 means no schedule.
- * [waitStepsSeconds] null keeps the mode's waits (only a restored backup sets them).
+ * Adds (id 0, with a [name]) or edits a mode. A null allowlist keeps every app's usual kind;
+ * scheduleDays 0 means no schedule. [waitStepsSeconds] null keeps the mode's waits (a new mode takes
+ * them from the mode it started from). [name] null keeps the name; only the user's own modes are renamed.
  */
 @Serializable
 @SerialName("save_mode")
@@ -90,7 +102,16 @@ data class SaveMode(
     val scheduleStartMinute: Int,
     val scheduleEndMinute: Int,
     val waitStepsSeconds: List<Long>? = null,
+    val name: String? = null,
 ) : SettingChange {
+    /** New modes are told apart by name, so adding two (from a backup) doesn't replace one with the other. */
+    override val key: String get() = if (id == 0L) "mode:new:${name.orEmpty()}" else "mode:$id"
+}
+
+/** Removes one of the user's own modes. Shares its key with [SaveMode], so it replaces a pending edit. */
+@Serializable
+@SerialName("remove_mode")
+data class RemoveMode(val id: Long) : SettingChange {
     override val key: String get() = "mode:$id"
 }
 
@@ -167,6 +188,17 @@ fun scheduleChangeDirection(old: WeeklyWindow?, oldName: String?, new: WeeklyWin
     old == new && oldName == newName -> null
     new.covers(old) -> Direction.TIGHTEN
     else -> Direction.LOOSEN
+}
+
+/**
+ * A longer Breathe pause is tightening; a shorter one is loosening. Null (the usual pause) counts as
+ * [usualSeconds]; going between it and the same number of seconds just records the choice.
+ */
+fun breatheWaitChangeDirection(from: Int?, to: Int?, usualSeconds: Int): Direction? {
+    if (from == to) return null
+    val before = from ?: usualSeconds
+    val after = to ?: usualSeconds
+    return if (after >= before) Direction.TIGHTEN else Direction.LOOSEN
 }
 
 /** Switching a rule on is tightening; off is loosening. */

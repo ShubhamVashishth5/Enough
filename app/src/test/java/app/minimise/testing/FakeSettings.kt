@@ -20,6 +20,9 @@ import app.minimise.settings.domain.SetCalendarFocus
 import app.minimise.settings.domain.LockPeriod
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetOpenLimit
+import app.minimise.settings.domain.RemoveMode
+import app.minimise.settings.domain.SetBreatheWait
+import app.minimise.settings.domain.breatheWaitChangeDirection
 import app.minimise.settings.domain.SettingChange
 import app.minimise.settings.domain.SettingsTarget
 import app.minimise.settings.domain.budgetChangeDirection
@@ -36,6 +39,7 @@ class FakeSettingsTarget : SettingsTarget {
     val kinds = mutableMapOf<String, AppKind>()
     var budgetMinutes = 45
     val openLimits = mutableMapOf<String, Int?>()
+    val breatheWaits = mutableMapOf<String, Int?>()
     val schedules = mutableMapOf<Long, SaveSchedule>()
     var firstHour = false
     val keys = mutableMapOf<Long, AddKey>()
@@ -50,6 +54,7 @@ class FakeSettingsTarget : SettingsTarget {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
         is SetBudget -> budgetChangeDirection(budgetMinutes, change.minutes)
         is SetOpenLimit -> openLimitChangeDirection(openLimits[change.packageName], change.limit)
+        is SetBreatheWait -> breatheWaitChangeDirection(breatheWaits[change.packageName], change.seconds, usualSeconds = 10)
         is SaveSchedule -> schedules[change.id].let { old ->
             scheduleChangeDirection(old?.window(), old?.name, change.window(), change.name)
         }
@@ -59,6 +64,7 @@ class FakeSettingsTarget : SettingsTarget {
         is RemoveKey -> if (change.id in keys) Direction.LOOSEN else null
         is SetManualMode -> if (change.modeId == manualModeId) null else Direction.TIGHTEN
         is SaveMode -> Direction.LOOSEN
+        is RemoveMode -> Direction.LOOSEN
         is SetFeedBlocked -> switchDirection(change.feedId in blockedFeeds, change.blocked)
         is SetTaper -> openLimitChangeDirection(taperFloor, change.floorMinutes)
         is SetEarnIt -> switchDirection(!earnIt, !change.enabled)
@@ -71,6 +77,7 @@ class FakeSettingsTarget : SettingsTarget {
             is SetAppKind -> kinds[change.packageName] = change.kind
             is SetBudget -> budgetMinutes = change.minutes
             is SetOpenLimit -> openLimits[change.packageName] = change.limit
+            is SetBreatheWait -> breatheWaits[change.packageName] = change.seconds
             is SaveSchedule -> schedules[change.id] = change
             is RemoveSchedule -> schedules.remove(change.id)
             is SetFirstHourRule -> firstHour = change.enabled
@@ -78,6 +85,7 @@ class FakeSettingsTarget : SettingsTarget {
             is RemoveKey -> keys.remove(change.id)
             is SetManualMode -> manualModeId = change.modeId
             is SaveMode -> Unit
+            is RemoveMode -> Unit
             is SetFeedBlocked -> if (change.blocked) blockedFeeds += change.feedId else blockedFeeds -= change.feedId
             is SetTaper -> taperFloor = change.floorMinutes
             is SetEarnIt -> earnIt = change.enabled

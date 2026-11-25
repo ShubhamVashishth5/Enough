@@ -3,7 +3,9 @@ package app.minimise.backup.domain
 import app.minimise.apps.domain.AppKind
 import app.minimise.settings.domain.AddKey
 import app.minimise.settings.domain.RemoveKey
+import app.minimise.settings.domain.RemoveMode
 import app.minimise.settings.domain.RemoveSchedule
+import app.minimise.settings.domain.SetBreatheWait
 import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
@@ -20,13 +22,14 @@ import app.minimise.settings.domain.StartLock
 
 /**
  * The settings on this phone now, in the same shape as a backup, plus the local ids that changes have
- * to name: modes by preset key, schedules by name, keys by secret hash.
+ * to name: shipped modes by preset key and the user's own by name, schedules by name, keys by secret hash.
  */
 data class LocalSettings(
     val settings: Backup,
     val modeIds: Map<String, Long>,
     val scheduleIds: List<Pair<Long, Backup.Schedule>>,
     val keyIds: Map<String, Long>,
+    val customModeIds: Map<String, Long> = emptyMap(),
 )
 
 /**
@@ -45,6 +48,7 @@ object BackupDiff {
             val current = localApps[app.packageName]
             if (app.kind != (current?.kind ?: AppKind.TOOL)) add(SetAppKind(app.packageName, app.kind))
             if (app.openLimit != current?.openLimit) add(SetOpenLimit(app.packageName, app.openLimit))
+            if (app.breatheWaitSeconds != current?.breatheWaitSeconds) add(SetBreatheWait(app.packageName, app.breatheWaitSeconds))
         }
         if (incoming.budgetMinutes != here.budgetMinutes) add(SetBudget(incoming.budgetMinutes))
         if (incoming.taperFloorMinutes != here.taperFloorMinutes) add(SetTaper(incoming.taperFloorMinutes))
@@ -55,7 +59,7 @@ object BackupDiff {
             val wanted = feed in incoming.blockedFeeds
             if (wanted != (feed in here.blockedFeeds)) add(SetFeedBlocked(feed, wanted))
         }
-        addModes(incoming, local)
+        addModes(incoming, local, nowMillis)
         addSchedules(incoming.schedules, local.scheduleIds)
         addKeys(incoming.keys, here.keys, local.keyIds)
         incoming.lockedUntilMillis
@@ -63,29 +67,49 @@ object BackupDiff {
             ?.let { add(StartLock(it)) }
     }
 
-    private fun MutableList<SettingChange>.addModes(incoming: Backup, local: LocalSettings) {
-        val localModes = local.settings.modes.associateBy { it.preset }
-        incoming.modes.forEach { mode ->
+    private fun MutableList<SettingChange>.addModes(incoming: Backup, local: LocalSettings, nowMillis: Long) {
+        val (incomingCustom, incomingPresets) = incoming.modes.partition { it.preset == Backup.CUSTOM }
+        val (localCustom, localPresets) = local.settings.modes.partition { it.preset == Backup.CUSTOM }
+        val presets = localPresets.associateBy { it.preset }
+        incomingPresets.forEach { mode ->
             val id = local.modeIds[mode.preset] ?: return@forEach
-            if (mode == localModes[mode.preset]) return@forEach
-            add(
-                SaveMode(
-                    id = id,
-                    budgetMinutes = mode.budgetMinutes,
-                    allowlist = mode.allowlist,
-                    scheduleDays = mode.scheduleDays,
-                    scheduleStartMinute = mode.scheduleStartMinute,
-                    scheduleEndMinute = mode.scheduleEndMinute,
-                    waitStepsSeconds = mode.waitStepsSeconds,
-                ),
-            )
+            if (mode == presets[mode.preset]) return@forEach
+            add(mode.toSaveMode(id, name = null))
         }
-        // After the modes, so switching compares against their restored values.
-        if (incoming.manualMode != local.settings.manualMode) {
-            val id = incoming.manualMode?.let { local.modeIds[it] }
-            if (incoming.manualMode == null || id != null) add(SetManualMode(id))
+        // The user's own, matched by name: new ones are added, changed ones edited, and ones the backup
+        // doesn't have removed.
+        val custom = localCustom.associateBy { it.name }
+        val wanted = incomingCustom.filter { !it.name.isNullOrBlank() }
+        wanted.forEach { mode ->
+            val id = local.customModeIds[mode.name]
+            if (id != null && mode == custom[mode.name]) return@forEach
+            add(mode.toSaveMode(id ?: 0, name = mode.name))
+        }
+        custom.keys.filter { name -> wanted.none { it.name == name } }
+            .forEach { name -> local.customModeIds[name]?.let { add(RemoveMode(it)) } }
+        // After the modes, so switching compares against their restored values. A pick that has ended
+        // since the backup was made is no pick.
+        val pick = incoming.manualMode?.takeIf { incoming.manualModeUntilMillis?.let { it > nowMillis } ?: true }
+        val until = incoming.manualModeUntilMillis.takeIf { pick != null }
+        if (pick != local.settings.manualMode || until != local.settings.manualModeUntilMillis) {
+            val id = pick?.let { key ->
+                if (key.startsWith(Backup.CUSTOM_PREFIX)) local.customModeIds[key.removePrefix(Backup.CUSTOM_PREFIX)] else local.modeIds[key]
+            }
+            // A mode of the user's own that's only now being added has no id yet: that pick is skipped.
+            if (pick == null || id != null) add(SetManualMode(id, until))
         }
     }
+
+    private fun Backup.Mode.toSaveMode(id: Long, name: String?) = SaveMode(
+        id = id,
+        budgetMinutes = budgetMinutes,
+        allowlist = allowlist,
+        scheduleDays = scheduleDays,
+        scheduleStartMinute = scheduleStartMinute,
+        scheduleEndMinute = scheduleEndMinute,
+        waitStepsSeconds = waitStepsSeconds,
+        name = name,
+    )
 
     /** Matched by name: new ones are added, changed ones edited, and ones the backup doesn't have removed. */
     private fun MutableList<SettingChange>.addSchedules(incoming: List<Backup.Schedule>, local: List<Pair<Long, Backup.Schedule>>) {

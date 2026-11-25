@@ -12,4 +12,6 @@ data class AppEntity(
     val homeSlot: Int?,
     /** Most proceeded opens a day, or null for no limit. */
     val openLimit: Int? = null,
+    /** A Breathe app's own pause in seconds, or null for the usual one. */
+    val breatheWaitSeconds: Int? = null,
 )

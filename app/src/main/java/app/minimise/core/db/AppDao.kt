@@ -32,6 +32,9 @@ interface AppDao {
     @Query("UPDATE apps SET openLimit = :limit WHERE packageName = :packageName")
     suspend fun setOpenLimit(packageName: String, limit: Int?)
 
+    @Query("UPDATE apps SET breatheWaitSeconds = :seconds WHERE packageName = :packageName")
+    suspend fun setBreatheWait(packageName: String, seconds: Int?)
+
     @Query("UPDATE apps SET homeSlot = NULL WHERE homeSlot = :slot")
     suspend fun clearSlot(slot: Int)
 

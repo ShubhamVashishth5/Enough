@@ -13,6 +13,8 @@ import app.minimise.keys.domain.KeyRepository
 import app.minimise.modes.domain.ModeRepository
 import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SetManualMode
+import app.minimise.settings.domain.RemoveMode
+import app.minimise.settings.domain.SetBreatheWait
 import app.minimise.schedules.domain.ScheduleRepository
 import app.minimise.settings.domain.AddKey
 import app.minimise.settings.domain.RemoveKey
@@ -29,6 +31,7 @@ import app.minimise.settings.domain.SetBudget
 import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -54,16 +57,23 @@ sealed interface PendingDescription {
     /** @property limit null when the limit is being removed. */
     data class OpenLimitChange(val appLabel: String, val limit: Int?) : PendingDescription
 
+    /** @property seconds null when the app goes back to the usual pause. */
+    data class BreatheWaitChange(val appLabel: String, val seconds: Int?) : PendingDescription
+
     data class ScheduleChange(val name: String, val removed: Boolean) : PendingDescription
 
     data class FirstHourChange(val enabled: Boolean) : PendingDescription
 
     data class KeyChange(val label: String, val removed: Boolean) : PendingDescription
 
-    /** @property modeName null for "follow schedules". */
-    data class ModeSwitch(val modeName: String?) : PendingDescription
+    /** @property modeName null for "follow schedules". @property until when the picked mode would end. */
+    data class ModeSwitch(val modeName: String?, val until: LocalDateTime? = null) : PendingDescription
 
     data class ModeEdit(val modeName: String) : PendingDescription
+
+    data class ModeAdd(val modeName: String) : PendingDescription
+
+    data class ModeRemove(val modeName: String) : PendingDescription
 
     data class FeedChange(val feedName: String, val blocked: Boolean) : PendingDescription
 
@@ -130,8 +140,21 @@ class PendingChangesViewModel @Inject constructor(
                     is SetFirstHourRule -> PendingDescription.FirstHourChange(change.enabled)
                     is AddKey -> PendingDescription.KeyChange(change.label, removed = false)
                     is RemoveKey -> PendingDescription.KeyChange(names.keys[change.id].orEmpty(), removed = true)
-                    is SetManualMode -> PendingDescription.ModeSwitch(change.modeId?.let { names.modes[it] })
-                    is SaveMode -> PendingDescription.ModeEdit(names.modes[change.id].orEmpty())
+                    is SetBreatheWait -> PendingDescription.BreatheWaitChange(
+                        appLabel = labels[change.packageName] ?: change.packageName,
+                        seconds = change.seconds,
+                    )
+                    is SetManualMode -> PendingDescription.ModeSwitch(
+                        modeName = change.modeId?.let { names.modes[it] },
+                        until = change.untilEpochMillis?.takeIf { change.modeId != null }
+                            ?.let { Instant.ofEpochMilli(it).atZone(timeSource.zone()).toLocalDateTime() },
+                    )
+                    is SaveMode -> if (change.id == 0L) {
+                        PendingDescription.ModeAdd(change.name.orEmpty())
+                    } else {
+                        PendingDescription.ModeEdit(names.modes[change.id].orEmpty())
+                    }
+                    is RemoveMode -> PendingDescription.ModeRemove(names.modes[change.id].orEmpty())
                     is StartLock -> PendingDescription.LockChange
                     is SetTaper -> PendingDescription.TaperChange(change.floorMinutes)
                     is SetEarnIt -> PendingDescription.EarnItChange(change.enabled)

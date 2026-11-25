@@ -41,20 +41,14 @@ class RoomModeRepository @Inject constructor(
 
     override suspend fun update(mode: Mode) {
         val row = dao.get(mode.id) ?: return
-        val schedule = mode.schedule
-        dao.update(
-            row.copy(
-                budgetMinutes = mode.values.budget.inWholeMinutes.toInt(),
-                waitStepsSeconds = mode.values.waitSteps.joinToString(",") { it.inWholeSeconds.toString() },
-                allowlist = mode.values.allowlist?.joinToString(","),
-                scheduleDays = schedule?.daysMask() ?: 0,
-                scheduleStartMinute = schedule?.start?.minuteOfDay ?: 0,
-                scheduleEndMinute = schedule?.end?.minuteOfDay ?: 0,
-            ),
-        )
+        dao.update(mode.toEntity(presetKey = row.presetKey).copy(id = row.id))
     }
 
-    /** The four modes ship with the app and can't be deleted, so an empty table means first use. */
+    override suspend fun add(mode: Mode): Long = dao.insert(mode.toEntity(presetKey = ModeEntity.CUSTOM))
+
+    override suspend fun delete(id: Long) = dao.deleteCustom(id)
+
+    /** The four shipped modes can't be deleted, so an empty table means first use. */
     private suspend fun seedIfEmpty() = seedLock.withLock {
         if (dao.all().isNotEmpty()) return@withLock
         dao.insertAll(
@@ -89,6 +83,20 @@ class RoomModeRepository @Inject constructor(
             allowlist = allowlist?.split(',')?.filter { it.isNotBlank() }?.toSet(),
         ),
         schedule = if (scheduleDays == 0) null else WeeklyWindow.fromStored(scheduleDays, scheduleStartMinute, scheduleEndMinute),
-        presetKey = presetKey,
+        presetKey = presetKey.takeIf { it != ModeEntity.CUSTOM },
     )
+
+    private fun Mode.toEntity(presetKey: String): ModeEntity {
+        val window = schedule
+        return ModeEntity(
+            presetKey = presetKey,
+            name = name,
+            budgetMinutes = values.budget.inWholeMinutes.toInt(),
+            waitStepsSeconds = values.waitSteps.joinToString(",") { it.inWholeSeconds.toString() },
+            allowlist = values.allowlist?.joinToString(","),
+            scheduleDays = window?.daysMask() ?: 0,
+            scheduleStartMinute = window?.start?.minuteOfDay ?: 0,
+            scheduleEndMinute = window?.end?.minuteOfDay ?: 0,
+        )
+    }
 }

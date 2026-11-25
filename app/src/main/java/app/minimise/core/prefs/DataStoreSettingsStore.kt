@@ -50,6 +50,7 @@ class DataStoreSettingsStore @Inject constructor(
             swapsSeeded = this[Keys.SWAPS_SEEDED] ?: defaults.swapsSeeded,
             firstHourRule = this[Keys.FIRST_HOUR_RULE] ?: defaults.firstHourRule,
             manualModeId = this[Keys.MANUAL_MODE_ID],
+            manualModeUntil = this[Keys.MANUAL_MODE_UNTIL_MILLIS]?.let(Instant::ofEpochMilli),
             focusAllowlist = this[Keys.FOCUS_ALLOWLIST],
             digestEnabled = this[Keys.DIGEST_ENABLED] ?: defaults.digestEnabled,
             digestExempt = this[Keys.DIGEST_EXEMPT] ?: defaults.digestExempt,
@@ -103,6 +104,7 @@ class DataStoreSettingsStore @Inject constructor(
         settings.calendarFocusStartedKey?.let { this[Keys.CALENDAR_FOCUS_STARTED] = it } ?: remove(Keys.CALENDAR_FOCUS_STARTED)
         settings.tightenAnsweredDay?.let { this[Keys.TIGHTEN_ANSWERED_EPOCH_DAY] = it.toEpochDay() } ?: remove(Keys.TIGHTEN_ANSWERED_EPOCH_DAY)
         settings.manualModeId?.let { this[Keys.MANUAL_MODE_ID] = it } ?: remove(Keys.MANUAL_MODE_ID)
+        settings.manualModeUntil?.let { this[Keys.MANUAL_MODE_UNTIL_MILLIS] = it.toEpochMilli() } ?: remove(Keys.MANUAL_MODE_UNTIL_MILLIS)
         settings.focusAllowlist?.let { this[Keys.FOCUS_ALLOWLIST] = it } ?: remove(Keys.FOCUS_ALLOWLIST)
         settings.savedColourCorrection?.let { this[Keys.SAVED_COLOUR_CORRECTION] = it.joinToString(",") }
             ?: remove(Keys.SAVED_COLOUR_CORRECTION)
@@ -129,6 +131,7 @@ class DataStoreSettingsStore @Inject constructor(
         val GRAYSCALE_MODE = stringPreferencesKey("grayscale_mode")
         val FOCUS_ALLOWLIST = stringSetPreferencesKey("focus_allowlist")
         val MANUAL_MODE_ID = longPreferencesKey("manual_mode_id")
+        val MANUAL_MODE_UNTIL_MILLIS = longPreferencesKey("manual_mode_until_millis")
         val DIGEST_ENABLED = booleanPreferencesKey("digest_enabled")
         val DIGEST_EXEMPT = stringSetPreferencesKey("digest_exempt")
         val BLOCKED_FEEDS = stringSetPreferencesKey("blocked_feeds")

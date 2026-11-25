@@ -13,8 +13,10 @@ import kotlinx.serialization.json.jsonPrimitive
  * file format: add fields with defaults, never rename one, and bump [BackupCodec.VERSION] when an old
  * app couldn't read the new file correctly.
  *
- * @property apps every app or website ever given a kind or a limit, installed or not.
- * @property manualMode the preset key ("work", "sleep") of the mode picked by hand, if any.
+ * @property apps every app or website ever given a kind, a limit or a Breathe pause, installed or not.
+ * @property manualMode the mode picked by hand, if any: a preset key ("work", "sleep"), or
+ * [CUSTOM_PREFIX] and the name for one of the user's own.
+ * @property manualModeUntilMillis when that pick ends; null for one that lasts until changed.
  */
 @Serializable
 data class Backup(
@@ -31,6 +33,7 @@ data class Backup(
     val blockedFeeds: List<String> = emptyList(),
     val modes: List<Mode> = emptyList(),
     val manualMode: String? = null,
+    val manualModeUntilMillis: Long? = null,
     val schedules: List<Schedule> = emptyList(),
     val keys: List<Key> = emptyList(),
     val friendCodeHashes: List<String> = emptyList(),
@@ -43,9 +46,13 @@ data class Backup(
     val home: Home? = null,
 ) {
     @Serializable
-    data class App(val packageName: String, val kind: AppKind, val openLimit: Int? = null)
+    data class App(val packageName: String, val kind: AppKind, val openLimit: Int? = null, val breatheWaitSeconds: Int? = null)
 
-    /** One of the shipped modes, matched by [preset] on import since ids differ between phones. */
+    /**
+     * A shipped mode, matched by [preset] on import since ids differ between phones, or one of the
+     * user's own ([preset] [CUSTOM], matched by [name]). An older app skips the user's own: it finds no
+     * preset by that key.
+     */
     @Serializable
     data class Mode(
         val preset: String,
@@ -55,6 +62,7 @@ data class Backup(
         val scheduleDays: Int = 0,
         val scheduleStartMinute: Int = 0,
         val scheduleEndMinute: Int = 0,
+        val name: String? = null,
     )
 
     /** Matched by [name] on import. Days have Monday as bit 0; times are minutes after midnight. */
@@ -82,6 +90,14 @@ data class Backup(
         /** TemperatureChoice by name. */
         val temperatureUnit: String = "AUTOMATIC",
     )
+
+    companion object {
+        /** [Mode.preset] of the user's own modes. */
+        const val CUSTOM = "custom"
+
+        /** Before a name in [manualMode], for one of the user's own modes. */
+        const val CUSTOM_PREFIX = "custom:"
+    }
 }
 
 object BackupCodec {

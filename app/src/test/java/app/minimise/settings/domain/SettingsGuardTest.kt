@@ -147,6 +147,17 @@ class SettingsGuardTest {
     }
 
     @Test
+    fun `a longer breathe pause is instant, a shorter one waits`() {
+        assertEquals(Direction.TIGHTEN, breatheWaitChangeDirection(from = null, to = 30, usualSeconds = 10))
+        assertEquals(Direction.LOOSEN, breatheWaitChangeDirection(from = null, to = 5, usualSeconds = 10))
+        assertEquals(Direction.LOOSEN, breatheWaitChangeDirection(from = 30, to = null, usualSeconds = 10))
+        assertEquals(Direction.TIGHTEN, breatheWaitChangeDirection(from = 5, to = null, usualSeconds = 10))
+        // The usual pause written out as its own number changes nothing, so it just applies.
+        assertEquals(Direction.TIGHTEN, breatheWaitChangeDirection(from = null, to = 10, usualSeconds = 10))
+        assertEquals(null, breatheWaitChangeDirection(from = 30, to = 30, usualSeconds = 10))
+    }
+
+    @Test
     fun `adding or lowering an open limit is instant, raising or removing one waits`() = runTest {
         assertEquals(GuardResult.AppliedNow, guard.request(SetOpenLimit("wa", 15)))
         assertEquals(GuardResult.AppliedNow, guard.request(SetOpenLimit("wa", 10)))

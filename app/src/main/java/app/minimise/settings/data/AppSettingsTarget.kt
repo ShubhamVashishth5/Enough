@@ -1,16 +1,24 @@
 package app.minimise.settings.data
 
 import app.minimise.apps.domain.AppRepository
+import app.minimise.core.Defaults
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.prefs.current
+import app.minimise.core.time.TimeSource
 import app.minimise.core.time.WeeklyWindow
 import app.minimise.keys.domain.KeyRepository
 import app.minimise.keys.domain.KeyType
 import app.minimise.modes.domain.ActiveModeProvider
+import app.minimise.modes.domain.ManualPick
+import app.minimise.modes.domain.Mode
 import app.minimise.modes.domain.ModeRepository
-import app.minimise.modes.domain.compare
+import app.minimise.modes.domain.ModeTimeline
+import app.minimise.modes.domain.ModeValues
+import app.minimise.modes.domain.manualPickAt
 import app.minimise.modes.domain.modeEditDirection
-import app.minimise.modes.domain.toDirection
+import app.minimise.settings.domain.RemoveMode
+import app.minimise.settings.domain.SetBreatheWait
+import app.minimise.settings.domain.breatheWaitChangeDirection
 import app.minimise.schedules.domain.Schedule
 import app.minimise.schedules.domain.ScheduleRepository
 import app.minimise.settings.domain.AddKey
@@ -50,6 +58,7 @@ class AppSettingsTarget @Inject constructor(
     private val modeRepository: ModeRepository,
     private val activeMode: ActiveModeProvider,
     private val dayBoundary: DayBoundary,
+    private val timeSource: TimeSource,
 ) : SettingsTarget {
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(from = appRepository.kindOf(change.packageName), to = change.kind)
@@ -58,6 +67,11 @@ class AppSettingsTarget @Inject constructor(
             toMinutes = change.minutes,
         )
         is SetOpenLimit -> openLimitChangeDirection(from = appRepository.openLimitOf(change.packageName), to = change.limit)
+        is SetBreatheWait -> breatheWaitChangeDirection(
+            from = appRepository.breatheWaitOf(change.packageName),
+            to = change.seconds,
+            usualSeconds = Defaults.WAIT_STEPS.first().inWholeSeconds.toInt(),
+        )
         is SaveSchedule -> {
             val old = scheduleRepository.get(change.id)
             scheduleChangeDirection(old?.window, old?.name, change.window(), change.name)
@@ -77,14 +91,32 @@ class AppSettingsTarget @Inject constructor(
         // As the plan has it: a key is what ends locked sessions, so adding one is tightening.
         is AddKey -> if (keyRepository.all().any { it.secretHash == change.secretHash }) null else Direction.TIGHTEN
         is RemoveKey -> if (keyRepository.get(change.id) != null) Direction.LOOSEN else null
-        is SetManualMode -> when {
-            change.modeId == settingsStore.current().manualModeId -> null
-            // Same values either way (say, picking the mode whose schedule is on now): just record the choice.
-            else -> compare(activeMode.values(), activeMode.valuesWith(change.modeId)).toDirection() ?: Direction.TIGHTEN
+        // Weighed over time, until both the old pick and the new one have handed back to the schedules.
+        // The same values throughout (say, picking the mode whose schedule is on now) just records it.
+        is SetManualMode -> {
+            val now = timeSource.now()
+            val to = change.modeId?.let { ManualPick(it, change.untilEpochMillis?.let(Instant::ofEpochMilli)) }
+            switchDirection(now, from = settingsStore.current().manualPickAt(now), to = to)
         }
-        is SaveMode -> modeRepository.get(change.id)?.let { old ->
-            val edited = change.applyTo(old)
-            modeEditDirection(activeMode.baseValues(), old, edited.values, edited.schedule)
+        is SaveMode -> if (change.id == NEW_MODE) {
+            // A new mode does nothing until it's picked or its hours come, so only its schedule counts.
+            val mode = change.newMode()
+            modeEditDirection(activeMode.baseValues(), mode.copy(schedule = null), mode.values, mode.schedule) ?: Direction.TIGHTEN
+        } else {
+            modeRepository.get(change.id)?.let { old ->
+                val edited = change.applyTo(old)
+                // A new name alone changes no rule.
+                modeEditDirection(activeMode.baseValues(), old, edited.values, edited.schedule)
+                    ?: Direction.TIGHTEN.takeIf { edited.name != old.name }
+            }
+        }
+        is RemoveMode -> modeRepository.get(change.id)?.takeIf { it.isCustom }?.let { mode ->
+            // Its hours go, and if it's the hand-picked mode the pick ends now.
+            val hours = modeEditDirection(activeMode.baseValues(), mode, mode.values, newSchedule = null)
+            val now = timeSource.now()
+            val pick = settingsStore.current().manualPickAt(now)
+            val pickEnds = if (pick?.modeId == mode.id) switchDirection(now, from = pick, to = null) else null
+            if (hours == Direction.LOOSEN || pickEnds == Direction.LOOSEN) Direction.LOOSEN else Direction.TIGHTEN
         }
     }
 
@@ -92,6 +124,7 @@ class AppSettingsTarget @Inject constructor(
         is SetAppKind -> appRepository.setKind(change.packageName, change.kind)
         is SetBudget -> settingsStore.update { it.copy(dailyBudget = change.minutes.minutes) }
         is SetOpenLimit -> appRepository.setOpenLimit(change.packageName, change.limit)
+        is SetBreatheWait -> appRepository.setBreatheWait(change.packageName, change.seconds)
         is SaveSchedule -> scheduleRepository.save(Schedule(change.id, change.name, change.window()))
         is RemoveSchedule -> scheduleRepository.delete(change.id)
         is SetFirstHourRule -> settingsStore.update { it.copy(firstHourRule = change.enabled) }
@@ -110,18 +143,57 @@ class AppSettingsTarget @Inject constructor(
         }
         is AddKey -> keyRepository.add(KeyType.valueOf(change.type), change.label, change.secretHash)
         is RemoveKey -> keyRepository.delete(change.id)
-        is SetManualMode -> settingsStore.update { it.copy(manualModeId = change.modeId) }
-        is SaveMode -> modeRepository.get(change.id)?.let { modeRepository.update(change.applyTo(it)) } ?: Unit
+        is SetManualMode -> {
+            // A switch that waited may name a mode removed since: then it's back to the schedules.
+            val pick = change.modeId?.takeIf { modeRepository.get(it) != null }
+            settingsStore.update {
+                it.copy(manualModeId = pick, manualModeUntil = change.untilEpochMillis?.takeIf { pick != null }?.let(Instant::ofEpochMilli))
+            }
+        }
+        is SaveMode -> if (change.id == NEW_MODE) {
+            modeRepository.add(change.newMode())
+            Unit
+        } else {
+            modeRepository.get(change.id)?.let { modeRepository.update(change.applyTo(it)) } ?: Unit
+        }
+        is RemoveMode -> {
+            modeRepository.delete(change.id)
+            settingsStore.update { if (it.manualModeId == change.id) it.copy(manualModeId = null, manualModeUntil = null) else it }
+        }
     }
 
-    private fun SaveMode.applyTo(mode: app.minimise.modes.domain.Mode) = mode.copy(
+    private suspend fun switchDirection(now: Instant, from: ManualPick?, to: ManualPick?): Direction? =
+        ModeTimeline.switchDirection(now, timeSource.zone(), modeRepository.all(), activeMode.baseValues(), from, to)
+
+    private fun SaveMode.applyTo(mode: Mode) = mode.copy(
+        // Only the user's own modes are renamed; the shipped ones keep their names.
+        name = name?.trim()?.takeIf { it.isNotEmpty() && mode.isCustom } ?: mode.name,
         values = mode.values.copy(
             budget = budgetMinutes.minutes,
             waitSteps = waitStepsSeconds?.takeIf { it.isNotEmpty() }?.map { it.seconds } ?: mode.values.waitSteps,
             allowlist = allowlist?.toSet(),
         ),
-        schedule = if (scheduleDays == 0) null else WeeklyWindow.fromStored(scheduleDays, scheduleStartMinute, scheduleEndMinute),
+        schedule = schedule(),
     )
 
+    private fun SaveMode.newMode() = Mode(
+        id = NEW_MODE,
+        name = name?.trim().orEmpty(),
+        values = ModeValues(
+            budget = budgetMinutes.minutes,
+            waitSteps = waitStepsSeconds?.takeIf { it.isNotEmpty() }?.map { it.seconds } ?: Defaults.WAIT_STEPS,
+            allowlist = allowlist?.toSet(),
+        ),
+        schedule = schedule(),
+    )
+
+    private fun SaveMode.schedule() =
+        if (scheduleDays == 0) null else WeeklyWindow.fromStored(scheduleDays, scheduleStartMinute, scheduleEndMinute)
+
     private fun SaveSchedule.window() = WeeklyWindow.fromStored(days, startMinute, endMinute)
+
+    private companion object {
+        /** [SaveMode] with this id adds a mode. */
+        const val NEW_MODE = 0L
+    }
 }

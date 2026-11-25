@@ -6,6 +6,8 @@ import app.minimise.settings.domain.AddKey
 import app.minimise.settings.domain.GuardResult
 import app.minimise.settings.domain.LoosenDelay
 import app.minimise.settings.domain.RemoveKey
+import app.minimise.settings.domain.RemoveMode
+import app.minimise.settings.domain.SetBreatheWait
 import app.minimise.settings.domain.RemoveSchedule
 import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
@@ -92,6 +94,40 @@ class BackupDiffTest {
             listOf(SaveMode(4, 0, listOf("pkg.kindle"), 0, 0, 0, waitStepsSeconds = listOf(60, 120, 300)), SetManualMode(4)),
             BackupDiff.changes(incoming, local(here), now),
         )
+    }
+
+    @Test
+    fun `the user's own modes match by name, and a running pick keeps its end`() {
+        val commute = Backup.Mode(Backup.CUSTOM, budgetMinutes = 10, waitStepsSeconds = listOf(30), name = "Commute")
+        val gym = Backup.Mode(Backup.CUSTOM, budgetMinutes = 0, waitStepsSeconds = listOf(60), name = "Gym")
+        val old = Backup.Mode(Backup.CUSTOM, budgetMinutes = 30, waitStepsSeconds = listOf(10), name = "Old")
+        val later = now + 3_600_000L
+        val incoming = fresh.copy(modes = listOf(commute.copy(budgetMinutes = 5), gym), manualMode = "custom:Commute", manualModeUntilMillis = later)
+        val here = LocalSettings(fresh.copy(modes = listOf(commute, old)), modeIds, emptyList(), emptyMap(), customModeIds = mapOf("Commute" to 7L, "Old" to 8L))
+        assertEquals(
+            listOf(
+                SaveMode(7, 5, null, 0, 0, 0, waitStepsSeconds = listOf(30), name = "Commute"),
+                SaveMode(0, 0, null, 0, 0, 0, waitStepsSeconds = listOf(60), name = "Gym"),
+                RemoveMode(8),
+                SetManualMode(7, untilEpochMillis = later),
+            ),
+            BackupDiff.changes(incoming, here, now),
+        )
+    }
+
+    @Test
+    fun `a pick that has ended since the backup was made is no pick`() {
+        val incoming = fresh.copy(manualMode = "work", manualModeUntilMillis = now - 1)
+        assertTrue(BackupDiff.changes(incoming, local(), now).isEmpty())
+        val running = local(fresh.copy(manualMode = "work", manualModeUntilMillis = now + 60_000L))
+        assertEquals(listOf(SetManualMode(null)), BackupDiff.changes(incoming, running, now))
+    }
+
+    @Test
+    fun `breathe pauses that differ become changes`() {
+        val incoming = fresh.copy(apps = listOf(Backup.App("pkg.whatsapp", AppKind.BREATHE, breatheWaitSeconds = 30)))
+        val here = fresh.copy(apps = listOf(Backup.App("pkg.whatsapp", AppKind.BREATHE)))
+        assertEquals(listOf(SetBreatheWait("pkg.whatsapp", 30)), BackupDiff.changes(incoming, local(here), now))
     }
 
     @Test

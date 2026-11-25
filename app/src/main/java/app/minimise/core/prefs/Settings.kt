@@ -19,6 +19,8 @@ data class Settings(
     val firstHourRule: Boolean = false,
     /** The mode picked by hand; null follows mode schedules. */
     val manualModeId: Long? = null,
+    /** When the hand-picked mode hands back to the schedules; null for a pick that lasts until changed. */
+    val manualModeUntil: Instant? = null,
     /** Apps that open during focus sessions; null means the Tool apps on the home screen. */
     val focusAllowlist: Set<String>? = null,
     /** Hold notifications for the digest. Off until the user turns it on. */

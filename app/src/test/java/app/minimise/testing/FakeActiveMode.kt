@@ -13,7 +13,5 @@ class FakeActiveMode(var mode: Mode? = null) : ActiveModeProvider {
 
     override suspend fun values(): ModeValues = mode?.values ?: base
 
-    override suspend fun valuesWith(manualModeId: Long?): ModeValues = values()
-
     override suspend fun baseValues(): ModeValues = base
 }

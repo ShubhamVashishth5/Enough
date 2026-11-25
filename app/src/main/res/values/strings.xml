@@ -205,6 +205,17 @@
     <string name="apps_open_limit_none">Open limit: none</string>
     <string name="apps_pending_limit">Limit changes to %1$d a day in %2$s</string>
     <string name="apps_pending_limit_none">Limit comes off in %s</string>
+    <string name="apps_breathe_wait">Breathe pause: %d s</string>
+    <string name="apps_breathe_wait_usual">Breathe pause: the usual (%d s)</string>
+    <string name="apps_pending_breathe_wait">Pause changes to %1$d s in %2$s</string>
+    <string name="apps_pending_breathe_wait_usual">Pause goes back to the usual in %s</string>
+    <string name="breathe_wait_title">Breathe pause for %s</string>
+    <string name="breathe_wait_explainer">How long it pauses before it opens. A longer pause applies at once; a shorter one waits 24 hours. A mode stricter than none can make it longer, never shorter.</string>
+    <string name="breathe_wait_usual">The usual (%d s)</string>
+    <plurals name="breathe_wait_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
     <string name="apps_websites">Websites</string>
     <string name="apps_websites_explainer">A website in the Vault gets the same pause, budget and rules in Chrome, Firefox, Samsung Internet, Brave and other browsers, so switching to the browser isn\'t a way round. Adding one applies at once; taking one out waits 24 hours.</string>
     <string name="apps_add_website">Add a website</string>
@@ -267,11 +278,29 @@
     <string name="mode_home">Home</string>
     <string name="mode_sleep">Sleep</string>
     <string name="modes_title">Modes</string>
-    <string name="modes_explainer">Each mode has its own budget and waits, and can let only chosen apps open. Turn one on here or give it a schedule. Switching to a stricter mode applies at once; a looser one waits 24 hours.</string>
+    <string name="modes_explainer">Each mode has its own budget and waits, and can let only chosen apps open. Turn one on here until a time you choose, or give it a schedule; either way it ends by itself. Switching to a stricter mode applies at once. Ending one early, or switching to a looser one, waits 24 hours.</string>
     <string name="modes_follow">Follow schedules</string>
     <string name="modes_follow_summary">Each mode turns on during its own hours</string>
     <string name="modes_now">%s · on now</string>
     <string name="modes_use">Use now</string>
+    <string name="modes_change_end">Change end</string>
+    <string name="modes_until">until %s</string>
+    <string name="mode_until_title">%s until when?</string>
+    <string name="mode_until_explainer">Then it ends by itself and the schedules take over. A later end applies at once; ending it sooner, or switching to a looser mode, waits 24 hours.</string>
+    <plurals name="mode_until_hours">
+        <item quantity="one">For %d hour</item>
+        <item quantity="other">For %d hours</item>
+    </plurals>
+    <string name="mode_until_reset">Until the day resets (%s)</string>
+    <string name="mode_until_time">Until a time…</string>
+    <string name="modes_add">Add a mode</string>
+    <string name="mode_add_title">New mode</string>
+    <string name="mode_name_label">Name</string>
+    <string name="mode_add_start_from">Start from</string>
+    <string name="mode_add_confirm">Add</string>
+    <string name="mode_name_taken">There\'s already a mode called that</string>
+    <string name="mode_remove">Remove this mode</string>
+    <string name="mode_removed_later">It\'s on now or has hours that make things stricter, so removing it waits 24 hours; see Pending changes.</string>
     <string name="modes_budget">%d min a day</string>
     <string name="modes_no_schedule">no schedule</string>
     <plurals name="modes_only_apps">
@@ -279,6 +308,8 @@
         <item quantity="other">only %d apps</item>
     </plurals>
     <string name="modes_switch_pending">Switching to %1$s in %2$s</string>
+    <string name="modes_switch_pending_until">Switching to %1$s in %2$s, until %3$s</string>
+    <string name="modes_switch_pending_too_late">Switching to %1$s waits %2$s, past the %3$s end you picked. Apply it sooner or cancel it in Pending changes.</string>
     <string name="mode_budget_label">Minutes a day across all Vault apps</string>
     <string name="mode_on_schedule">On a schedule</string>
     <string name="mode_only_apps">Only let chosen apps open</string>
@@ -440,7 +471,12 @@
     <string name="pending_key_added">Pair %s</string>
     <string name="pending_key_removed">Remove %s</string>
     <string name="pending_mode_switch">Mode → %s</string>
+    <string name="pending_mode_switch_until">Mode → %1$s until %2$s</string>
     <string name="pending_mode_edit">Changes to %s mode</string>
+    <string name="pending_mode_added">Add the %s mode</string>
+    <string name="pending_mode_removed">Remove the %s mode</string>
+    <string name="pending_breathe_wait">%1$s → %2$d s breathe pause</string>
+    <string name="pending_breathe_wait_usual">%s → the usual breathe pause</string>
 
     <!-- Feed blocking -->
     <string name="settings_feeds">Feed blocking</string>

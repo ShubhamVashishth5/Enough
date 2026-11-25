@@ -26,6 +26,12 @@ object Defaults {
     const val HOME_SLOT_COUNT: Int = 6
 
     /**
+     * A Breathe app's own pause can be any of these. Without one it pauses for the first wait step
+     * (10 seconds outside any mode).
+     */
+    val BREATHE_WAITS: List<Duration> = listOf(5, 10, 15, 20, 30, 45, 60, 90, 120).map { it.seconds }
+
+    /**
      * After going on to a Breathe app, coming back to it this soon after leaving (a link, the share
      * sheet, the screen going off for a moment) doesn't pause again.
      */

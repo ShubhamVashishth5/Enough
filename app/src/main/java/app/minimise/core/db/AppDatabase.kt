@@ -7,7 +7,7 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [EventEntity::class, AppEntity::class, PendingChangeEntity::class, GrantEntity::class, TaskEntity::class, SwapEntity::class, ScheduleEntity::class, KeyEntity::class, FocusSessionEntity::class, ModeEntity::class, BufferedNotificationEntity::class, NoteEntity::class, FriendCodeEntity::class],
-    version = 14,
+    version = 15,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
@@ -23,6 +23,7 @@ import androidx.room.TypeConverters
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
         AutoMigration(from = 13, to = 14),
+        AutoMigration(from = 14, to = 15),
     ],
 )
 @TypeConverters(Converters::class)

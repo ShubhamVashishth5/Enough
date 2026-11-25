@@ -2,6 +2,9 @@ package app.minimise.launcher.ui
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -82,22 +87,24 @@ fun LauncherNavHost(
         }
     }
 
+    // Opening a screen is instant. Going back slides the screen off to the right, over the one beneath,
+    // which stays still: with the Back gesture it follows the finger.
     NavHost(
         navController = navController,
         startDestination = startDestination,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
-        popExitTransition = { ExitTransition.None },
+        popExitTransition = { slideOutHorizontally(targetOffsetX = { width -> width }) },
     ) {
-        composable<Destination.Onboarding> {
+        screen<Destination.Onboarding> {
             OnboardingRoute(
                 onFinished = {
                     navController.navigate(Destination.Home) { popUpTo<Destination.Onboarding> { inclusive = true } }
                 },
             )
         }
-        composable<Destination.Home> {
+        screen<Destination.Home> {
             HomeRoute(
                 homePresses = homePresses,
                 onOpenSearch = { navController.navigate(Destination.Search) { launchSingleTop = true } },
@@ -109,13 +116,13 @@ fun LauncherNavHost(
                 onOpenInbox = { navController.navigate(Destination.Inbox) { launchSingleTop = true } },
             )
         }
-        composable<Destination.Today> {
+        screen<Destination.Today> {
             TodayRoute(onClose = { navController.popBackStack(Destination.Home, inclusive = false) })
         }
-        composable<Destination.Search> {
+        screen<Destination.Search> {
             SearchRoute(onClose = { navController.popBackStack(Destination.Home, inclusive = false) })
         }
-        composable<Destination.Settings> {
+        screen<Destination.Settings> {
             SettingsRoute(
                 onOpenApps = { navController.navigate(Destination.Apps) },
                 onOpenHome = { navController.navigate(Destination.HomeSettings) },
@@ -137,77 +144,88 @@ fun LauncherNavHost(
                 onOpenDebugUsage = { navController.navigate(Destination.DebugUsage) },
             )
         }
-        composable<Destination.Apps> {
+        screen<Destination.Apps> {
             AppsRoute()
         }
-        composable<Destination.HomeSettings> {
+        screen<Destination.HomeSettings> {
             HomeSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })
         }
-        composable<Destination.Budget> {
+        screen<Destination.Budget> {
             BudgetRoute()
         }
-        composable<Destination.Swaps> {
+        screen<Destination.Swaps> {
             SwapsRoute()
         }
-        composable<Destination.Schedules> {
+        screen<Destination.Schedules> {
             SchedulesRoute()
         }
-        composable<Destination.Keys> {
+        screen<Destination.Keys> {
             KeysRoute()
         }
-        composable<Destination.Focus> {
+        screen<Destination.Focus> {
             FocusSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })
         }
-        composable<Destination.Modes> {
+        screen<Destination.Modes> {
             ModesRoute(onEdit = { navController.navigate(Destination.ModeEdit(it)) })
         }
-        composable<Destination.Digest> {
+        screen<Destination.Digest> {
             DigestRoute(extra = { InboxLink(onOpenInbox = { navController.navigate(Destination.Inbox) }) })
         }
-        composable<Destination.Capture> {
+        screen<Destination.Capture> {
             CaptureRoute(onDone = { navController.popBackStack(Destination.Home, inclusive = false) })
         }
-        composable<Destination.Inbox> {
+        screen<Destination.Inbox> {
             InboxRoute()
         }
-        composable<Destination.DigestSettings> {
+        screen<Destination.DigestSettings> {
             DigestSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })
         }
-        composable<Destination.ModeEdit> {
+        screen<Destination.ModeEdit> {
             ModeEditRoute(onSaved = { navController.popBackStack() })
         }
-        composable<Destination.Feeds> {
+        screen<Destination.Feeds> {
             FeedsRoute()
         }
-        composable<Destination.PrivateSpace> {
+        screen<Destination.PrivateSpace> {
             PrivateSpaceRoute()
         }
-        composable<Destination.WindDown> {
+        screen<Destination.WindDown> {
             WindDownRoute()
         }
-        composable<Destination.Stats> {
+        screen<Destination.Stats> {
             StatsRoute()
         }
-        composable<Destination.Lock> {
+        screen<Destination.Lock> {
             LockRoute()
         }
-        composable<Destination.FriendKey> {
+        screen<Destination.FriendKey> {
             FriendKeyRoute()
         }
-        composable<Destination.ApplyNow> {
+        screen<Destination.ApplyNow> {
             ApplyNowRoute(onDone = { navController.popBackStack() })
         }
-        composable<Destination.PendingChanges> {
+        screen<Destination.PendingChanges> {
             PendingChangesRoute(onApplyNow = { navController.navigate(Destination.ApplyNow(it)) })
         }
-        composable<Destination.Permissions> {
+        screen<Destination.Permissions> {
             PermissionsRoute()
         }
         // Debug screens aren't registered at all in release builds, so R8 strips them.
         if (BuildConfig.DEBUG) {
-            composable<Destination.DebugUsage> {
+            screen<Destination.DebugUsage> {
                 DebugUsageRoute()
             }
         }
+    }
+}
+
+/**
+ * A destination that paints its own background. Screens used to be see-through over the activity's,
+ * so while one was leaving (above all during the Back gesture) its text showed on top of the screen
+ * beneath it.
+ */
+private inline fun <reified T : Any> NavGraphBuilder.screen(noinline content: @Composable (NavBackStackEntry) -> Unit) {
+    composable<T> { entry ->
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { content(entry) }
     }
 }

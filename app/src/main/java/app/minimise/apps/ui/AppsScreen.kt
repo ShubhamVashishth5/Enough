@@ -27,9 +27,11 @@ import app.minimise.R
 import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.WebTarget
+import app.minimise.core.Defaults
 import app.minimise.core.ui.AppActionsDialog
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.durationText
+import kotlin.time.Duration
 
 @Composable
 fun AppsRoute(viewModel: AppsViewModel = hiltViewModel()) {
@@ -40,6 +42,9 @@ fun AppsRoute(viewModel: AppsViewModel = hiltViewModel()) {
         onEditLimit = viewModel::onEditLimit,
         onLimitChosen = viewModel::onLimitChosen,
         onLimitDismissed = viewModel::onLimitDismissed,
+        onEditBreatheWait = viewModel::onEditBreatheWait,
+        onBreatheWaitChosen = viewModel::onBreatheWaitChosen,
+        onBreatheWaitDismissed = viewModel::onBreatheWaitDismissed,
         onAddWebsite = viewModel::onAddWebsite,
         onWebsiteEntered = viewModel::onWebsiteEntered,
         onWebsiteDismissed = viewModel::onWebsiteDismissed,
@@ -64,6 +69,9 @@ fun AppsScreen(
     onAppInfo: () -> Unit = {},
     onUninstall: () -> Unit = {},
     onActionsDismissed: () -> Unit = {},
+    onEditBreatheWait: (AppEntry) -> Unit = {},
+    onBreatheWaitChosen: (Duration?) -> Unit = {},
+    onBreatheWaitDismissed: () -> Unit = {},
 ) {
     ScreenScaffold(title = stringResource(R.string.apps_title)) {
         Text(
@@ -108,6 +116,7 @@ fun AppsScreen(
                     row = row,
                     onKindChosen = { onKindChosen(row.app, it) },
                     onEditLimit = { onEditLimit(row.app) },
+                    onEditBreatheWait = { onEditBreatheWait(row.app) },
                     onLongPress = { onAppLongPressed(row.app) },
                 )
             }
@@ -115,6 +124,9 @@ fun AppsScreen(
     }
     state.editingLimit?.let { app ->
         OpenLimitDialog(app = app, onChosen = onLimitChosen, onDismiss = onLimitDismissed)
+    }
+    state.editingBreatheWait?.let { app ->
+        BreatheWaitDialog(app = app, onChosen = onBreatheWaitChosen, onDismiss = onBreatheWaitDismissed)
     }
     if (state.addingWebsite) {
         AddWebsiteDialog(invalid = state.websiteInvalid, onEntered = onWebsiteEntered, onDismiss = onWebsiteDismissed)
@@ -138,6 +150,7 @@ private fun AppKindRow(
     row: AppRow,
     onKindChosen: (AppKind) -> Unit,
     onEditLimit: () -> Unit,
+    onEditBreatheWait: () -> Unit = {},
     kinds: List<AppKind> = APP_KINDS,
     onLongPress: (() -> Unit)? = null,
 ) {
@@ -187,6 +200,24 @@ private fun AppKindRow(
                 text = pending.limit
                     ?.let { stringResource(R.string.apps_pending_limit, it, durationText(pending.remaining)) }
                     ?: stringResource(R.string.apps_pending_limit_none, durationText(pending.remaining)),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (app.kind == AppKind.BREATHE && !isWebsite) {
+            Text(
+                text = app.breatheWait?.let { stringResource(R.string.apps_breathe_wait, it.inWholeSeconds) }
+                    ?: stringResource(R.string.apps_breathe_wait_usual, Defaults.WAIT_STEPS.first().inWholeSeconds),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable(onClick = onEditBreatheWait).padding(vertical = 6.dp),
+            )
+        }
+        row.pendingBreatheWait?.let { pending ->
+            Text(
+                text = pending.seconds
+                    ?.let { stringResource(R.string.apps_pending_breathe_wait, it, durationText(pending.remaining)) }
+                    ?: stringResource(R.string.apps_pending_breathe_wait_usual, durationText(pending.remaining)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

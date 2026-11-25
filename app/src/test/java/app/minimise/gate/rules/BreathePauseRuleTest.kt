@@ -34,6 +34,21 @@ class BreathePauseRuleTest {
     }
 
     @Test
+    fun `an app's own pause replaces the usual one, shorter or longer`() {
+        assertEquals(Decision.Pause(5.seconds, breatheOnly = true), BreathePauseRule.evaluate(ctx(whatsapp.copy(breatheWait = 5.seconds)), steps))
+        assertEquals(Decision.Pause(30.seconds, breatheOnly = true), BreathePauseRule.evaluate(ctx(whatsapp.copy(breatheWait = 30.seconds)), steps))
+    }
+
+    @Test
+    fun `a mode stricter than none lengthens an app's own pause but never shortens it`() {
+        val sleepSteps = listOf(60.seconds, 120.seconds)
+        assertEquals(Decision.Pause(60.seconds, breatheOnly = true), BreathePauseRule.evaluate(ctx(whatsapp.copy(breatheWait = 5.seconds)), sleepSteps))
+        assertEquals(Decision.Pause(90.seconds, breatheOnly = true), BreathePauseRule.evaluate(ctx(whatsapp.copy(breatheWait = 90.seconds)), sleepSteps))
+        // A mode with the usual first wait (Home) leaves a short pause alone.
+        assertEquals(Decision.Pause(5.seconds, breatheOnly = true), BreathePauseRule.evaluate(ctx(whatsapp.copy(breatheWait = 5.seconds)), Defaults.WAIT_STEPS))
+    }
+
+    @Test
     fun `tool and vault apps are left to the other rules`() {
         assertEquals(Decision.Allow, BreathePauseRule.evaluate(ctx(maps), steps))
         assertEquals(Decision.Allow, BreathePauseRule.evaluate(ctx(instagram), steps))
