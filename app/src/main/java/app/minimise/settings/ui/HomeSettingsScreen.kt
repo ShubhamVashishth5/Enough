@@ -30,7 +30,7 @@ import app.minimise.widgets.domain.TemperatureUnit
 import timber.log.Timber
 
 @Composable
-fun HomeSettingsRoute(onOpenPermissions: () -> Unit, viewModel: HomeSettingsViewModel = hiltViewModel()) {
+fun HomeSettingsRoute(onOpenPermissions: () -> Unit, onOpenShortcuts: () -> Unit, viewModel: HomeSettingsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locationRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.onResume() }
@@ -51,6 +51,7 @@ fun HomeSettingsRoute(onOpenPermissions: () -> Unit, viewModel: HomeSettingsView
                 .onFailure { Timber.w(it, "No notification access screen") }
         },
         onOpenPermissions = onOpenPermissions,
+        onOpenShortcuts = onOpenShortcuts,
     )
 }
 
@@ -61,6 +62,7 @@ fun HomeSettingsScreen(
     onAllowLocation: () -> Unit,
     onAllowNotificationAccess: () -> Unit,
     onOpenPermissions: () -> Unit,
+    onOpenShortcuts: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.home_settings_title), scrollable = true) {
         Text(
@@ -71,6 +73,13 @@ fun HomeSettingsScreen(
         )
         val options = state.options ?: return@ScreenScaffold
         val grants = state.grants
+
+        SettingsRow(
+            icon = R.drawable.ic_glyph_star,
+            title = stringResource(R.string.shortcuts_title),
+            summary = stringResource(R.string.home_option_shortcuts_summary),
+            onClick = onOpenShortcuts,
+        )
 
         ToggleRow(
             title = stringResource(R.string.home_option_lock),
@@ -166,6 +175,8 @@ fun HomeSettingsScreen(
         )
         Gesture(R.string.gesture_tap_app, R.string.gesture_tap_app_does)
         Gesture(R.string.gesture_long_press_app, R.string.gesture_long_press_app_does)
+        Gesture(R.string.gesture_tap_icon, R.string.gesture_tap_icon_does)
+        Gesture(R.string.gesture_long_press_icon, R.string.gesture_long_press_icon_does)
         Gesture(R.string.gesture_tap_task, R.string.gesture_tap_task_does)
         Gesture(R.string.gesture_long_press_task, R.string.gesture_long_press_task_does)
         Gesture(R.string.gesture_swipe_up, R.string.gesture_swipe_up_does)

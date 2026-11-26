@@ -79,6 +79,16 @@ class LocalSettingsReader @Inject constructor(
                     temperatureUnit = it.temperatureUnit.name,
                 )
             },
+            shortcuts = settings.shortcuts.map { Backup.Shortcut(it.icon.name, it.packageName) },
+            appearance = settings.appearance.let {
+                Backup.Appearance(
+                    font = it.font.name,
+                    textSize = it.textSize.name,
+                    clockSize = it.clockSize.name,
+                    appNameSize = it.appNameSize.name,
+                    iconSize = it.iconSize.name,
+                )
+            },
         )
         return LocalSettings(
             settings = backup,

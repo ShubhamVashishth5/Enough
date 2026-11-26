@@ -26,6 +26,13 @@ sealed interface Destination {
     data object HomeSettings : Destination
 
     @Serializable
+    data object Appearance : Destination
+
+    /** Home's icons. */
+    @Serializable
+    data object Shortcuts : Destination
+
+    @Serializable
     data object Budget : Destination
 
     @Serializable

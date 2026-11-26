@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Icons (outlined Apps), Apache License 2.0. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M4,8h4L8,4L4,4v4ZM10,20h4v-4h-4v4ZM4,20h4v-4L4,16v4ZM4,14h4v-4L4,10v4ZM10,14h4v-4h-4v4ZM16,4v4h4L20,4h-4ZM10,8h4L14,4h-4v4ZM16,14h4v-4h-4v4ZM16,20h4v-4h-4v4Z" />
+</vector>

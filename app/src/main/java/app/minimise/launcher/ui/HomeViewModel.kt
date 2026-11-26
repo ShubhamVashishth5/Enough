@@ -15,6 +15,9 @@ import app.minimise.core.time.TimeSource
 import app.minimise.launcher.AppOpener
 import app.minimise.launcher.HomeRole
 import app.minimise.launcher.NotificationShade
+import app.minimise.launcher.data.ShortcutDefaults
+import app.minimise.launcher.domain.DefaultApp
+import app.minimise.launcher.domain.Shortcut
 import app.minimise.monitor.AccessibilityActions
 import app.minimise.protection.ProtectionStatus
 import app.minimise.protection.domain.ProtectionLevel
@@ -36,6 +39,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -58,12 +62,17 @@ class HomeViewModel @Inject constructor(
     private val accessibilityActions: AccessibilityActions,
     private val notificationShade: NotificationShade,
     private val earnIt: EarnIt,
-    settingsStore: SettingsStore,
+    private val shortcutDefaults: ShortcutDefaults,
+    private val settingsStore: SettingsStore,
     dayBoundary: DayBoundary,
     todayUsage: TodayUsageProvider,
     homeSlotsInitializer: HomeSlotsInitializer,
 ) : ViewModel() {
     private val editingSlot = MutableStateFlow<Int?>(null)
+    private val editingShortcut = MutableStateFlow<Int?>(null)
+
+    /** The phone's own app for each icon, looked up again on every return to home. */
+    private val defaultApps = MutableStateFlow<Map<DefaultApp, String>>(emptyMap())
     private val permissions = MutableStateFlow(Permissions())
     private val promptToday = MutableStateFlow(false)
 
@@ -82,8 +91,23 @@ class HomeViewModel @Inject constructor(
 
     private val options = settingsStore.settings.map { it.home }.distinctUntilChanged()
 
-    private val status = combine(editingSlot, permissions, promptToday, options) { editing, permissions, prompt, options ->
-        Status(editing, permissions, prompt, options)
+    private val shortcutList = settingsStore.settings.map { it.shortcuts }.distinctUntilChanged()
+
+    private val shortcuts: Flow<Shortcuts> = combine(shortcutList, appRepository.apps, defaultApps, editingShortcut) { list, apps, defaults, editing ->
+        // Like the app slots: an icon never opens a Vault or Hidden app, so one bound to such an app is left out.
+        val visible = apps.filter { it.kind in AppKind.VISIBLE }
+        fun appFor(packageName: String?) = packageName?.let { name -> visible.firstOrNull { it.packageName == name } }
+        val shown = list.mapIndexedNotNull { index, shortcut ->
+            appFor(shortcut.packageName ?: shortcut.icon.default?.let(defaults::get))?.let { HomeShortcut(index, shortcut.icon, it) }
+        }
+        val picker = editing?.let { index ->
+            list.getOrNull(index)?.let { ShortcutPicker(index, it.icon, appFor(it.icon.default?.let(defaults::get)), visible) }
+        }
+        Shortcuts(shown, picker)
+    }
+
+    private val status = combine(editingSlot, permissions, promptToday, options, shortcuts) { editing, permissions, prompt, options, shortcuts ->
+        Status(editing, permissions, prompt, options, shortcuts)
     }
 
     val uiState: StateFlow<HomeUiState> = combine(appRepository.apps, ticks, tasks, numbers, status) { apps, now, tasks, numbers, status ->
@@ -97,11 +121,14 @@ class HomeViewModel @Inject constructor(
             slotPicker = status.editingSlot?.let { SlotPicker(slot = it, choices = apps.filter { app -> app.kind in AppKind.VISIBLE }) },
             promptToday = status.promptToday,
             options = status.options,
+            shortcuts = status.shortcuts.shown,
+            shortcutPicker = status.shortcuts.picker,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     init {
         viewModelScope.launch { homeSlotsInitializer.initialiseIfNeeded() }
+        viewModelScope.launch { shortcutList.collect { refreshDefaultApps(it) } }
     }
 
     fun onResume() {
@@ -111,6 +138,10 @@ class HomeViewModel @Inject constructor(
             protection = protectionStatus.current(),
         )
         resumes.value++
+        viewModelScope.launch {
+            // The user may have picked another default phone or messages app meanwhile.
+            refreshDefaultApps(settingsStore.settings.first().shortcuts)
+        }
         viewModelScope.launch {
             settingsGuard.applyDue()
             if (todayPrompt.claim()) promptToday.value = true
@@ -155,6 +186,46 @@ class HomeViewModel @Inject constructor(
         editingSlot.value = null
     }
 
+    fun onShortcutTapped(shortcut: HomeShortcut) {
+        viewModelScope.launch { appOpener.open(shortcut.app) }
+    }
+
+    fun onShortcutLongPressed(shortcut: HomeShortcut) {
+        editingShortcut.value = shortcut.index
+    }
+
+    /** [packageName] null: back to the phone's own app for the icon. */
+    fun onShortcutAppPicked(packageName: String?) {
+        val index = editingShortcut.value ?: return
+        editingShortcut.value = null
+        viewModelScope.launch {
+            settingsStore.update { settings ->
+                val list = settings.shortcuts.toMutableList()
+                if (index in list.indices) list[index] = list[index].copy(packageName = packageName)
+                settings.copy(shortcuts = list)
+            }
+        }
+    }
+
+    fun onShortcutRemoved() {
+        val index = editingShortcut.value ?: return
+        editingShortcut.value = null
+        viewModelScope.launch {
+            settingsStore.update { settings ->
+                settings.copy(shortcuts = settings.shortcuts.filterIndexed { i, _ -> i != index })
+            }
+        }
+    }
+
+    fun onShortcutPickerDismissed() {
+        editingShortcut.value = null
+    }
+
+    /** Every icon's, not only those on Automatic: the picker offers Automatic with its app's name. */
+    private suspend fun refreshDefaultApps(list: List<Shortcut>) {
+        defaultApps.value = shortcutDefaults.resolve(list.mapNotNull { it.icon.default })
+    }
+
     /** Double-tap or the lock icon locks the screen, through the accessibility service. False when it's off. */
     fun onLock(): Boolean = accessibilityActions.lockScreen()
 
@@ -164,6 +235,7 @@ class HomeViewModel @Inject constructor(
     /** Called when the Home button is pressed while home is already showing. */
     fun onHomePressed() {
         editingSlot.value = null
+        editingShortcut.value = null
     }
 
     private fun homeSlots(apps: List<AppEntry>): List<HomeSlot> =
@@ -188,7 +260,10 @@ class HomeViewModel @Inject constructor(
         val permissions: Permissions,
         val promptToday: Boolean,
         val options: HomeOptions,
+        val shortcuts: Shortcuts,
     )
+
+    private data class Shortcuts(val shown: List<HomeShortcut>, val picker: ShortcutPicker?)
 
     private companion object {
         const val MILLIS_PER_MINUTE = 60_000L

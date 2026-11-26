@@ -15,6 +15,11 @@ import app.minimise.R
 import app.minimise.backup.data.BackupImporter
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.SettingsRow
+import app.minimise.core.ui.SettingsSection
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import app.minimise.core.ui.dateTimeText
 import app.minimise.display.domain.GrayscaleMode
 
@@ -22,6 +27,7 @@ import app.minimise.display.domain.GrayscaleMode
 fun SettingsRoute(
     onOpenApps: () -> Unit,
     onOpenHome: () -> Unit,
+    onOpenAppearance: () -> Unit,
     onOpenBudget: () -> Unit,
     onOpenSwaps: () -> Unit,
     onOpenSchedules: () -> Unit,
@@ -68,6 +74,7 @@ fun SettingsRoute(
         state = state,
         onOpenApps = onOpenApps,
         onOpenHome = onOpenHome,
+        onOpenAppearance = onOpenAppearance,
         onOpenBudget = onOpenBudget,
         onOpenSwaps = onOpenSwaps,
         onOpenSchedules = onOpenSchedules,
@@ -98,6 +105,7 @@ fun SettingsScreen(
     state: SettingsUiState,
     onOpenApps: () -> Unit,
     onOpenHome: () -> Unit,
+    onOpenAppearance: () -> Unit,
     onOpenBudget: () -> Unit,
     onOpenSwaps: () -> Unit,
     onOpenSchedules: () -> Unit,
@@ -122,78 +130,97 @@ fun SettingsScreen(
     onRestore: () -> Unit,
 ) {
     ScreenScaffold(title = stringResource(R.string.settings_title), scrollable = true) {
+        SettingsSection(stringResource(R.string.settings_section_phone), first = true)
         SettingsRow(
+            icon = R.drawable.ic_set_apps,
             title = stringResource(R.string.settings_apps),
             summary = stringResource(R.string.settings_apps_summary),
             onClick = onOpenApps,
         )
         SettingsRow(
+            icon = R.drawable.ic_glyph_home,
             title = stringResource(R.string.home_settings_title),
             summary = stringResource(R.string.settings_home_summary),
             onClick = onOpenHome,
         )
+        SettingsRow(
+            icon = R.drawable.ic_set_appearance,
+            title = stringResource(R.string.appearance_title),
+            summary = stringResource(R.string.settings_appearance_summary),
+            onClick = onOpenAppearance,
+        )
         // Hidden below Android 15 and when no Private space is set up.
         if (state.privateSpace != null) {
             SettingsRow(
+                icon = R.drawable.ic_set_private,
                 title = stringResource(R.string.private_space_title),
                 summary = stringResource(if (state.privateSpace) R.string.private_space_locked else R.string.private_space_unlocked),
                 onClick = onOpenPrivateSpace,
             )
         }
+
+        SettingsSection(stringResource(R.string.settings_section_limits))
         SettingsRow(
+            icon = R.drawable.ic_set_budget,
             title = stringResource(R.string.settings_budget),
             summary = state.budgetMinutes?.let { stringResource(R.string.settings_budget_summary, it) },
             onClick = onOpenBudget,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_modes,
             title = stringResource(R.string.settings_modes),
             summary = state.activeModeName?.let { stringResource(R.string.settings_modes_now, it) }
                 ?: stringResource(R.string.settings_modes_none),
             onClick = onOpenModes,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_wind_down,
             title = stringResource(R.string.wind_down_title),
             summary = stringResource(R.string.settings_wind_down_summary),
             onClick = onOpenWindDown,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_schedules,
             title = stringResource(R.string.settings_schedules),
             summary = stringResource(R.string.settings_schedules_summary),
             onClick = onOpenSchedules,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_focus,
             title = stringResource(R.string.settings_focus),
             summary = stringResource(R.string.settings_focus_summary),
             onClick = onOpenFocus,
         )
         SettingsRow(
-            title = stringResource(R.string.settings_keys),
-            summary = stringResource(R.string.settings_keys_summary),
-            onClick = onOpenKeys,
-        )
-        SettingsRow(
+            icon = R.drawable.ic_set_feeds,
             title = stringResource(R.string.settings_feeds),
             summary = if (state.screensCovered) stringResource(R.string.settings_feeds_summary) else stringResource(R.string.needs_full_protection),
             onClick = onOpenFeeds,
         )
+
+        SettingsSection(stringResource(R.string.settings_section_commitment))
         val lockSummary = state.lockedUntil?.let { stringResource(R.string.lock_locked_until, dateTimeText(it)) }
             ?: stringResource(R.string.settings_lock_summary)
         SettingsRow(
+            icon = R.drawable.ic_lock,
             title = stringResource(R.string.lock_title),
             summary = if (state.screensCovered) lockSummary else lockSummary + "\n" + stringResource(R.string.lock_guard_needs_full_protection),
             onClick = onOpenLock,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_friend,
             title = stringResource(R.string.friend_key_title),
             summary = stringResource(R.string.settings_friend_key_summary),
             onClick = onOpenFriendKey,
         )
         SettingsRow(
-            title = stringResource(R.string.settings_swaps),
-            summary = stringResource(R.string.settings_swaps_summary),
-            onClick = onOpenSwaps,
+            icon = R.drawable.ic_set_keys,
+            title = stringResource(R.string.settings_keys),
+            summary = stringResource(R.string.settings_keys_summary),
+            onClick = onOpenKeys,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_pending,
             title = stringResource(R.string.settings_pending),
             summary = if (state.pendingCount == 0) {
                 stringResource(R.string.settings_pending_none)
@@ -202,12 +229,22 @@ fun SettingsScreen(
             },
             onClick = onOpenPendingChanges,
         )
+
+        SettingsSection(stringResource(R.string.settings_section_calm))
         SettingsRow(
+            icon = R.drawable.ic_set_swaps,
+            title = stringResource(R.string.settings_swaps),
+            summary = stringResource(R.string.settings_swaps_summary),
+            onClick = onOpenSwaps,
+        )
+        SettingsRow(
+            icon = R.drawable.ic_set_digest,
             title = stringResource(R.string.settings_digest),
             summary = stringResource(R.string.settings_digest_summary),
             onClick = onOpenDigest,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_grayscale,
             title = stringResource(R.string.settings_grayscale),
             summary = if (state.grayscaleAvailable) {
                 val mode = stringResource(
@@ -224,46 +261,58 @@ fun SettingsScreen(
             onClick = if (state.grayscaleAvailable) onGrayscaleTapped else onOpenPermissions,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_stats,
             title = stringResource(R.string.stats_title),
             summary = stringResource(R.string.settings_stats_summary),
             onClick = onOpenStats,
         )
+
+        SettingsSection(stringResource(R.string.settings_section_data))
         SettingsRow(
+            icon = R.drawable.ic_set_export,
             title = stringResource(R.string.settings_export),
             summary = stringResource(R.string.settings_export_summary),
             onClick = onExport,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_backup,
             title = stringResource(R.string.settings_backup),
             summary = stringResource(R.string.settings_backup_summary),
             onClick = onBackup,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_restore,
             title = stringResource(R.string.settings_restore),
             summary = stringResource(R.string.settings_restore_summary),
             onClick = onRestore,
         )
         SettingsRow(
+            icon = R.drawable.ic_set_permissions,
             title = stringResource(R.string.settings_permissions),
             summary = stringResource(R.string.settings_permissions_summary),
             onClick = onOpenPermissions,
         )
         if (state.showDebug) {
+            SettingsSection(stringResource(R.string.settings_section_debug))
             SettingsRow(
+                icon = R.drawable.ic_set_debug,
                 title = stringResource(R.string.debug_usage_title),
                 onClick = onOpenDebugUsage,
             )
             SettingsRow(
+                icon = R.drawable.ic_set_debug,
                 title = stringResource(R.string.debug_short_loosen_delay),
                 summary = stringResource(if (state.debugShortLoosenDelay) R.string.debug_on else R.string.debug_off),
                 onClick = onDebugShortLoosenDelayToggled,
             )
             SettingsRow(
+                icon = R.drawable.ic_set_debug,
                 title = stringResource(R.string.debug_dump_screen),
                 summary = stringResource(R.string.debug_dump_screen_summary),
                 onClick = onDebugDumpScreen,
             )
         }
+        Spacer(Modifier.height(16.dp))
     }
 }
 

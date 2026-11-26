@@ -44,6 +44,10 @@ data class Backup(
     val focusAllowlist: List<String>? = null,
     /** Missing from files made before version 2; a restore then leaves this phone's home screen alone. */
     val home: Home? = null,
+    /** Home's icons, in order. Missing from files made before 0.4, which leave this phone's alone. */
+    val shortcuts: List<Shortcut>? = null,
+    /** Typeface and text sizes. Missing from files made before 0.4, which leave this phone's alone. */
+    val appearance: Appearance? = null,
 ) {
     @Serializable
     data class App(val packageName: String, val kind: AppKind, val openLimit: Int? = null, val breatheWaitSeconds: Int? = null)
@@ -89,6 +93,20 @@ data class Backup(
         val airQuality: Boolean = false,
         /** TemperatureChoice by name. */
         val temperatureUnit: String = "AUTOMATIC",
+    )
+
+    /** One of home's icons: a ShortcutIcon by name, and the app chosen for it (null: the phone's default). */
+    @Serializable
+    data class Shortcut(val icon: String, val packageName: String? = null)
+
+    /** FontChoice, TextSize and HomeTextSize, by name. */
+    @Serializable
+    data class Appearance(
+        val font: String = "SYSTEM",
+        val textSize: String = "DEFAULT",
+        val clockSize: String = "MEDIUM",
+        val appNameSize: String = "MEDIUM",
+        val iconSize: String = "MEDIUM",
     )
 
     companion object {

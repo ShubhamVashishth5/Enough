@@ -1,10 +1,5 @@
 package app.minimise.launcher.ui
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.minimise.apps.ui.AppsRoute
+import app.minimise.appearance.ui.AppearanceRoute
+import app.minimise.appearance.ui.ShortcutsRoute
 import app.minimise.onboarding.ui.OnboardingRoute
 import app.minimise.settings.permissions.PermissionsRoute
 import app.minimise.settings.ui.BudgetRoute
@@ -87,15 +84,16 @@ fun LauncherNavHost(
         }
     }
 
-    // Opening a screen is instant. Going back slides the screen off to the right, over the one beneath,
-    // which stays still: with the Back gesture it follows the finger.
+    // See ScreenMotion: opening is instant, going back slides the screen off, following the Back gesture.
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None },
-        popEnterTransition = { EnterTransition.None },
-        popExitTransition = { slideOutHorizontally(targetOffsetX = { width -> width }) },
+        enterTransition = ScreenMotion.open,
+        exitTransition = ScreenMotion.covered,
+        popEnterTransition = ScreenMotion.backEnter,
+        popExitTransition = ScreenMotion.backExit,
+        predictivePopEnterTransition = ScreenMotion.gestureEnter,
+        predictivePopExitTransition = ScreenMotion.gestureExit,
     ) {
         screen<Destination.Onboarding> {
             OnboardingRoute(
@@ -126,6 +124,7 @@ fun LauncherNavHost(
             SettingsRoute(
                 onOpenApps = { navController.navigate(Destination.Apps) },
                 onOpenHome = { navController.navigate(Destination.HomeSettings) },
+                onOpenAppearance = { navController.navigate(Destination.Appearance) },
                 onOpenBudget = { navController.navigate(Destination.Budget) },
                 onOpenSwaps = { navController.navigate(Destination.Swaps) },
                 onOpenSchedules = { navController.navigate(Destination.Schedules) },
@@ -148,7 +147,16 @@ fun LauncherNavHost(
             AppsRoute()
         }
         screen<Destination.HomeSettings> {
-            HomeSettingsRoute(onOpenPermissions = { navController.navigate(Destination.Permissions) })
+            HomeSettingsRoute(
+                onOpenPermissions = { navController.navigate(Destination.Permissions) },
+                onOpenShortcuts = { navController.navigate(Destination.Shortcuts) },
+            )
+        }
+        screen<Destination.Appearance> {
+            AppearanceRoute(onOpenShortcuts = { navController.navigate(Destination.Shortcuts) })
+        }
+        screen<Destination.Shortcuts> {
+            ShortcutsRoute()
         }
         screen<Destination.Budget> {
             BudgetRoute()
@@ -219,13 +227,7 @@ fun LauncherNavHost(
     }
 }
 
-/**
- * A destination that paints its own background. Screens used to be see-through over the activity's,
- * so while one was leaving (above all during the Back gesture) its text showed on top of the screen
- * beneath it.
- */
+/** A destination that paints its own background (see [ScreenMotion.Surface]). */
 private inline fun <reified T : Any> NavGraphBuilder.screen(noinline content: @Composable (NavBackStackEntry) -> Unit) {
-    composable<T> { entry ->
-        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { content(entry) }
-    }
+    composable<T> { entry -> ScreenMotion.Surface { content(entry) } }
 }

@@ -5,7 +5,11 @@ import android.net.Uri
 import app.minimise.backup.domain.Backup
 import app.minimise.backup.domain.BackupCodec
 import app.minimise.backup.domain.BackupDiff
+import app.minimise.core.prefs.Appearance
 import app.minimise.core.prefs.HomeOptions
+import app.minimise.core.prefs.enumByName
+import app.minimise.launcher.domain.Shortcut
+import app.minimise.launcher.domain.ShortcutIcon
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.prefs.TemperatureChoice
 import app.minimise.core.time.TimeSource
@@ -40,7 +44,8 @@ class BackupExporter @Inject constructor(
  * Restores a backup file (ACTION_OPEN_DOCUMENT). Every rule setting that differs goes through
  * [SettingsGuard]: tighter applies now, looser waits 24 hours, and nothing loosens during a lock.
  * The few settings the app never guards (the Instead list, digest, grayscale, focus apps, friend
- * codes, the home screen's options) are written as they are, as their own screens do.
+ * codes, the home screen's options and icons, the app's look) are written as they are, as their own
+ * screens do.
  */
 class BackupImporter @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -110,6 +115,20 @@ class BackupImporter @Inject constructor(
                             ?: settings.home.temperatureUnit,
                     )
                 } ?: settings.home,
+                shortcuts = incoming.shortcuts?.let { list ->
+                    list.mapNotNull { item ->
+                        ShortcutIcon.entries.firstOrNull { it.name == item.icon }?.let { Shortcut(it, item.packageName) }
+                    }.take(Shortcut.MAX)
+                } ?: settings.shortcuts,
+                appearance = incoming.appearance?.let {
+                    Appearance(
+                        font = enumByName(it.font, settings.appearance.font),
+                        textSize = enumByName(it.textSize, settings.appearance.textSize),
+                        clockSize = enumByName(it.clockSize, settings.appearance.clockSize),
+                        appNameSize = enumByName(it.appNameSize, settings.appearance.appNameSize),
+                        iconSize = enumByName(it.iconSize, settings.appearance.iconSize),
+                    )
+                } ?: settings.appearance,
             )
         }
         if (incoming.swaps != here.swaps) {

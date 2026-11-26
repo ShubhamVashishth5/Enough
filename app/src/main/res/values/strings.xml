@@ -186,6 +186,12 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
+    <string name="settings_section_phone">Phone and home</string>
+    <string name="settings_section_limits">Limits</string>
+    <string name="settings_section_commitment">Commitment</string>
+    <string name="settings_section_calm">Habits</string>
+    <string name="settings_section_data">Your data</string>
+    <string name="settings_section_debug">Debug</string>
     <string name="settings_apps">Apps</string>
     <string name="settings_apps_summary">Choose which apps are tools, which pause to breathe first and which go in the Vault. Uninstall apps here too.</string>
     <string name="settings_home_summary">Lock button, battery, alarm, music, weather, the status bar, and what each tap and swipe does</string>
@@ -787,7 +793,7 @@
     <string name="home_settings_title">Home screen</string>
     <string name="home_settings_explainer">Switch parts of home on or off. Changes apply at once.</string>
     <string name="home_option_lock">Lock button</string>
-    <string name="home_option_lock_summary">A lock icon by the clock. Tap it to lock the phone. Double-tapping empty space on home does the same.</string>
+    <string name="home_option_lock_summary">A lock icon at the bottom right of home, within reach of your thumb. Tap it to lock the phone. Double-tapping empty space on home does the same.</string>
     <string name="home_option_needs_accessibility">Locking needs the accessibility service, which is off. Tap to turn it on.</string>
     <string name="home_option_shade">Swipe down for notifications</string>
     <string name="home_option_shade_summary">Swipe down anywhere on home to pull down the notification shade.</string>
@@ -811,11 +817,16 @@
     <string name="home_option_aqi_summary">An estimate of the US air quality index and PM2.5 where you are. It comes from a forecast model (CAMS, through Open-Meteo) that covers about 45 km and averages over 24 hours, so it can read well below sensor sites such as aqi.in, especially in Indian cities. Tap it on home to refresh.</string>
     <string name="home_option_needs_location">Weather and air quality need your location. Tap to allow it.</string>
     <string name="home_option_internet_note">Weather and air quality are the only parts of Enough that use the internet. They come from Open-Meteo, which is sent your rough location, rounded to about a kilometre, and nothing else. Both stay off until you switch them on.</string>
+    <string name="home_option_shortcuts_summary">Small white icons on the right, such as Phone, Messages and Camera, each for an app you choose</string>
     <string name="home_gestures_title">Taps and swipes on home</string>
     <string name="gesture_tap_app">Tap an app</string>
     <string name="gesture_tap_app_does">Opens it. Breathe and Vault apps pause first.</string>
     <string name="gesture_long_press_app">Long-press an app</string>
     <string name="gesture_long_press_app_does">Choose a different app for that row, or leave it empty.</string>
+    <string name="gesture_tap_icon">Tap an icon on the right</string>
+    <string name="gesture_tap_icon_does">Opens its app. A Breathe app pauses first.</string>
+    <string name="gesture_long_press_icon">Long-press an icon</string>
+    <string name="gesture_long_press_icon_does">Choose its app, go back to Automatic, or remove it.</string>
     <string name="gesture_tap_task">Tap a task</string>
     <string name="gesture_tap_task_does">Ticks it off. Tap it again to undo, or untick it on the Today screen once it has made way for the next one.</string>
     <string name="gesture_long_press_task">Long-press a task</string>
@@ -836,6 +847,83 @@
     <string name="gesture_long_press_space">Long-press empty space</string>
     <string name="gesture_long_press_space_does">Settings.</string>
 
+    <!-- Settings → Appearance -->
+    <string name="appearance_title">Appearance</string>
+    <string name="settings_appearance_summary">Font, text size, and the icons on home</string>
+    <string name="appearance_preview_description">Home as it looks with these choices</string>
+    <string name="appearance_font">Font</string>
+    <string name="appearance_font_system">System</string>
+    <string name="appearance_font_light">Light</string>
+    <string name="appearance_font_condensed">Condensed</string>
+    <string name="appearance_font_serif">Serif</string>
+    <string name="appearance_font_mono">Mono</string>
+    <string name="appearance_text_size">Text size</string>
+    <string name="appearance_text_smaller">Smaller</string>
+    <string name="appearance_text_default">Default</string>
+    <string name="appearance_text_larger">Larger</string>
+    <string name="appearance_text_largest">Largest</string>
+    <string name="appearance_text_size_note">All text in Enough, on top of the phone\'s own font size.</string>
+    <string name="appearance_clock_size">Clock on home</string>
+    <string name="appearance_app_name_size">App names on home</string>
+    <string name="appearance_icon_size">Icon size on home</string>
+    <string name="appearance_size_small">Small</string>
+    <string name="appearance_size_medium">Medium</string>
+    <string name="appearance_size_large">Large</string>
+    <string name="appearance_on_home">On home</string>
+
+    <!-- Home's icons (Settings → Appearance or Home screen → Icons on home) -->
+    <string name="shortcuts_title">Icons on home</string>
+    <string name="shortcuts_none">None</string>
+    <string name="shortcuts_explainer">Small white icons on the right of home, beside your apps, each standing for an app you choose. On Automatic, Phone, Messages, Camera and the like open the phone\'s own app for them, and follow it if you change it. Long-press an icon on home to change its app. Vault apps never go here.</string>
+    <string name="shortcuts_add">Add an icon</string>
+    <string name="shortcuts_full">Up to %d icons. Remove one to add another.</string>
+    <string name="shortcuts_choose_icon">Choose an icon</string>
+    <string name="shortcuts_cancel">Cancel</string>
+    <string name="shortcuts_choose_app">Not on home until you choose its app. Tap to choose.</string>
+    <string name="shortcuts_app_missing">Not on home: its app was uninstalled or moved to the Vault. Tap to choose another.</string>
+    <string name="shortcut_pick_title">App for %s</string>
+    <string name="shortcut_remove">Remove this icon</string>
+    <string name="shortcut_automatic_app">Automatic: %s</string>
+    <string name="shortcut_automatic_none">Automatic: this phone has no app for it</string>
+
+    <!-- Home's icons: what each of Enough's own icons stands for -->
+    <string name="shortcut_phone">Phone</string>
+    <string name="shortcut_messages">Messages</string>
+    <string name="shortcut_camera">Camera</string>
+    <string name="shortcut_browser">Browser</string>
+    <string name="shortcut_music">Music</string>
+    <string name="shortcut_maps">Maps</string>
+    <string name="shortcut_mail">Mail</string>
+    <string name="shortcut_calendar">Calendar</string>
+    <string name="shortcut_clock">Clock</string>
+    <string name="shortcut_photos">Photos</string>
+    <string name="shortcut_contacts">Contacts</string>
+    <string name="shortcut_calculator">Calculator</string>
+    <string name="shortcut_files">Files</string>
+    <string name="shortcut_settings">Settings</string>
+    <string name="shortcut_weather">Weather</string>
+    <string name="shortcut_fitness">Fitness</string>
+    <string name="shortcut_chat">Chat</string>
+    <string name="shortcut_notes">Notes</string>
+    <string name="shortcut_tasks">Tasks</string>
+    <string name="shortcut_podcasts">Podcasts</string>
+    <string name="shortcut_radio">Radio</string>
+    <string name="shortcut_video">Video</string>
+    <string name="shortcut_books">Books</string>
+    <string name="shortcut_news">News</string>
+    <string name="shortcut_recorder">Recorder</string>
+    <string name="shortcut_translate">Translate</string>
+    <string name="shortcut_wallet">Wallet</string>
+    <string name="shortcut_bank">Bank</string>
+    <string name="shortcut_shopping">Shopping</string>
+    <string name="shortcut_food">Food</string>
+    <string name="shortcut_rides">Rides</string>
+    <string name="shortcut_games">Games</string>
+    <string name="shortcut_cloud">Cloud storage</string>
+    <string name="shortcut_key">Passwords</string>
+    <string name="shortcut_home">Smart home</string>
+    <string name="shortcut_star">Star</string>
+
     <!-- Read out by TalkBack -->
     <string name="a11y_search_apps">Search apps</string>
     <string name="a11y_settings">Settings</string>
@@ -844,6 +932,10 @@
     <string name="a11y_lock_screen">Lock the screen</string>
     <string name="a11y_open_timer">open the timer</string>
     <string name="a11y_change_app">change app</string>
+    <string name="a11y_shortcut">%1$s: %2$s</string>
+    <string name="a11y_shortcut_up">Move %s up</string>
+    <string name="a11y_shortcut_down">Move %s down</string>
+    <string name="a11y_shortcut_remove">Remove %s</string>
     <string name="a11y_edit_tasks">edit today\'s tasks</string>
     <string name="a11y_notifications">Notifications</string>
     <string name="a11y_back">Back</string>

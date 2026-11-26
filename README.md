@@ -15,12 +15,18 @@ rough location.
 
 - **A quiet home screen.** Up to six apps as plain words, today's top three tasks (add as many as ten
   and put them in order; the next one moves up as you tick one off), the next calendar item, and two
-  numbers: Vault minutes and unlocks today. No icons, badges or app grid; you type to find an app, and
-  long-press a result to see its info or uninstall it.
+  numbers: Vault minutes and unlocks today. No app icons, badges or app grid; you type to find an app,
+  and long-press a result to see its info or uninstall it.
+- **A few small icons, if you want them.** On the right of home, beside your apps, up to five of Enough's
+  own small white icons (Phone, Messages and Camera to start; Browser, Music, Maps, Mail, Chat, Notes and 30 or so more).
+  Each opens the app you choose, or on Automatic, the phone's own phone, messages or camera app. Never a
+  Vault app.
+- **Your font and text size.** The phone's own font, a light one, condensed, serif or mono; text
+  smaller or larger than the phone's; and the size of the clock, the app names and the icons on home.
 - **Small lines under the clock, each one switchable.** Battery, the next alarm, what's playing (with
   previous, play/pause and next; tap the song to open the player), and the weather and US air quality
   index for where you are (an estimate from a forecast model, shown with PM2.5; sensor sites such as
-  aqi.in can read much higher, especially in Indian cities). A lock button by the clock, swipe down for notifications, and an option to
+  aqi.in can read much higher, especially in Indian cities). A lock button at the bottom right, swipe down for notifications, and an option to
   hide the status bar on home. Settings → Home screen lists every tap and swipe and what it does.
 - **Breathe apps.** For apps you want to notice reaching for but not ration: they stay on home and in
   search, and every open starts with a short breathing pause, from 5 seconds to 2 minutes, set per app.

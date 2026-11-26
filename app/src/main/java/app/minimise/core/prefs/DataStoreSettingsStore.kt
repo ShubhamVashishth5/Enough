@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import app.minimise.display.domain.GrayscaleMode
+import app.minimise.launcher.domain.ShortcutCodec
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
@@ -78,6 +79,15 @@ class DataStoreSettingsStore @Inject constructor(
                 temperatureUnit = this[Keys.HOME_TEMPERATURE_UNIT]?.let { name -> TemperatureChoice.entries.firstOrNull { it.name == name } }
                     ?: defaults.home.temperatureUnit,
             ),
+            // Never saved means the defaults; saved empty means the user removed every icon.
+            shortcuts = this[Keys.SHORTCUTS]?.let(ShortcutCodec::decode) ?: defaults.shortcuts,
+            appearance = Appearance(
+                font = enumByName(this[Keys.APPEARANCE_FONT], defaults.appearance.font),
+                textSize = enumByName(this[Keys.APPEARANCE_TEXT_SIZE], defaults.appearance.textSize),
+                clockSize = enumByName(this[Keys.APPEARANCE_CLOCK_SIZE], defaults.appearance.clockSize),
+                appNameSize = enumByName(this[Keys.APPEARANCE_APP_NAME_SIZE], defaults.appearance.appNameSize),
+                iconSize = enumByName(this[Keys.APPEARANCE_ICON_SIZE], defaults.appearance.iconSize),
+            ),
             debugTimeOffset = this[Keys.DEBUG_TIME_OFFSET_SECONDS]?.seconds ?: defaults.debugTimeOffset,
             debugShortLoosenDelay = this[Keys.DEBUG_SHORT_LOOSEN_DELAY] ?: defaults.debugShortLoosenDelay,
         )
@@ -117,6 +127,12 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.HOME_WEATHER] = settings.home.weather
         this[Keys.HOME_AIR_QUALITY] = settings.home.airQuality
         this[Keys.HOME_TEMPERATURE_UNIT] = settings.home.temperatureUnit.name
+        this[Keys.SHORTCUTS] = ShortcutCodec.encode(settings.shortcuts)
+        this[Keys.APPEARANCE_FONT] = settings.appearance.font.name
+        this[Keys.APPEARANCE_TEXT_SIZE] = settings.appearance.textSize.name
+        this[Keys.APPEARANCE_CLOCK_SIZE] = settings.appearance.clockSize.name
+        this[Keys.APPEARANCE_APP_NAME_SIZE] = settings.appearance.appNameSize.name
+        this[Keys.APPEARANCE_ICON_SIZE] = settings.appearance.iconSize.name
         this[Keys.DEBUG_TIME_OFFSET_SECONDS] = settings.debugTimeOffset.inWholeSeconds
         this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
@@ -153,6 +169,12 @@ class DataStoreSettingsStore @Inject constructor(
         val HOME_WEATHER = booleanPreferencesKey("home_weather")
         val HOME_AIR_QUALITY = booleanPreferencesKey("home_air_quality")
         val HOME_TEMPERATURE_UNIT = stringPreferencesKey("home_temperature_unit")
+        val SHORTCUTS = stringPreferencesKey("home_shortcuts")
+        val APPEARANCE_FONT = stringPreferencesKey("appearance_font")
+        val APPEARANCE_TEXT_SIZE = stringPreferencesKey("appearance_text_size")
+        val APPEARANCE_CLOCK_SIZE = stringPreferencesKey("appearance_clock_size")
+        val APPEARANCE_APP_NAME_SIZE = stringPreferencesKey("appearance_app_name_size")
+        val APPEARANCE_ICON_SIZE = stringPreferencesKey("appearance_icon_size")
         val DEBUG_TIME_OFFSET_SECONDS = longPreferencesKey("debug_time_offset_seconds")
         val DEBUG_SHORT_LOOSEN_DELAY = booleanPreferencesKey("debug_short_loosen_delay")
     }

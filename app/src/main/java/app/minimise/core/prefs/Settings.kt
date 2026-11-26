@@ -2,6 +2,7 @@ package app.minimise.core.prefs
 
 import app.minimise.core.Defaults
 import app.minimise.display.domain.GrayscaleMode
+import app.minimise.launcher.domain.Shortcut
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.time.Duration
@@ -52,6 +53,10 @@ data class Settings(
     val swapsSeeded: Boolean = false,
     /** What the home screen shows and which gestures it answers. Not rules: changes apply at once. */
     val home: HomeOptions = HomeOptions(),
+    /** The small icons on the right of home, top to bottom. Not rules either. */
+    val shortcuts: List<Shortcut> = Shortcut.DEFAULTS,
+    /** Typeface and text sizes, everywhere in the app. Not rules. */
+    val appearance: Appearance = Appearance(),
     /** Debug builds only: shifts the wall clock, for testing day resets. */
     val debugTimeOffset: Duration = Duration.ZERO,
     /** Debug builds only: loosening waits 1 minute instead of 24 hours. */

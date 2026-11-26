@@ -22,6 +22,8 @@ class BackupCodecTest {
         digestEnabled = true,
         digestExempt = listOf("com.whatsapp"),
         grayscaleMode = "VAULT_APPS",
+        shortcuts = listOf(Backup.Shortcut("PHONE"), Backup.Shortcut("CHAT", "org.thoughtcrime.securesms")),
+        appearance = Backup.Appearance(font = "SERIF", textSize = "LARGER", clockSize = "LARGE", appNameSize = "SMALL", iconSize = "LARGE"),
     )
 
     @Test
@@ -56,6 +58,14 @@ class BackupCodecTest {
         assertEquals(BackupCodec.Decoded.Ok(Backup(version = 1, exportedAtMillis = 5, budgetMinutes = 20)), decoded)
         // No home section: a restore leaves this phone's home screen as it is.
         assertNull((decoded as BackupCodec.Decoded.Ok).backup.home)
+    }
+
+    @Test
+    fun `a version 2 file from before icons and appearance leaves both alone`() {
+        val before = """{"format":"enough-settings","version":2,"exportedAtMillis":5,"budgetMinutes":20,"home":{}}"""
+        val decoded = (BackupCodec.decode(before) as BackupCodec.Decoded.Ok).backup
+        assertNull(decoded.shortcuts)
+        assertNull(decoded.appearance)
     }
 
     @Test
