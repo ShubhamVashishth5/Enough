@@ -4,10 +4,10 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 <ul>
 <li>Up to six apps as plain words. No app icons, badges or app grid.</li>
 <li>Beside them, up to five small white icons: Phone, Messages and Camera open the phone's own apps, or bind any icon to any app you choose.</li>
-<li>Today's top three tasks under the clock, plus your next calendar item. Add more and put them in order.</li>
+<li>Today's top three tasks under the clock, plus your next calendar item. Add more and put them in order, and see what was left undone yesterday.</li>
 <li>Battery, next alarm, what's playing, and the weather and air quality, as plain text. Each can be switched off.</li>
 <li>A lock button at the bottom right, swipe down for notifications, and an option to hide the status bar.</li>
-<li>Your font (the phone's own, light, condensed, serif or mono) and text size, and the size of the clock, app names and icons.</li>
+<li>Your font (mono to start, or the phone's own, light, condensed or serif) and text size, and the size of the clock, app names and icons.</li>
 <li>Type to find an app. Distracting apps never auto-launch. Long-press one to uninstall it.</li>
 </ul>
 
@@ -15,7 +15,7 @@ Enough is a home screen and app blocker in one, scored on how little you use you
 <ul>
 <li>Apps you mark as distracting leave home and search. Opening one starts a breathing pause that grows with each open, then asks what you're there for.</li>
 <li>Pick a time box of 2, 5 or 10 minutes. When it ends, you're sent home.</li>
-<li>One shared daily budget across every Vault app, so hopping between them doesn't dodge it.</li>
+<li>One shared daily budget across every Vault app, so hopping between them doesn't dodge it. Your day starts when you choose: 4 AM unless you change it.</li>
 <li>Websites in the Vault get the same rules in Chrome, Firefox, Samsung Internet, Brave and others.</li>
 <li>Block just the endless parts: YouTube Shorts, Instagram Reels and Explore.</li>
 <li>Or make an app a Breathe app: it stays on home, and just pauses for a breath before every open, as long as you set for that app.</li>

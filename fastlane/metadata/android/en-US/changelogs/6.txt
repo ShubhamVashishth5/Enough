@@ -1,0 +1,1 @@
+Choose when your new day starts, in Settings > Daily budget: the budget, today's tasks and the day's counts start fresh then. The Today screen shows what was left undone yesterday; tap one to carry it over. Long tasks wrap as you type, with smaller buttons beside them, and stay to one line on home. New installs start in Mono. Fixes the app freezing when the first-hour rule is on.
