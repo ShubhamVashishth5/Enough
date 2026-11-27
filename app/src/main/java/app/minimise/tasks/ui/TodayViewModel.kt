@@ -29,8 +29,26 @@ data class TodayUiState(
     val finished: Boolean = false,
     /** After three days over budget: a smaller budget on offer (minutes), until answered. */
     val tightenOffer: Int? = null,
+    /** Yesterday's tasks left undone, in their order. Only yesterday's: older ones are let go. */
+    val yesterday: List<String> = emptyList(),
 ) {
     val canAdd: Boolean get() = drafts.size < Defaults.MAX_TODAY_TASKS
+
+    /** What's left of [yesterday] once the ones already carried over (or typed again) are taken out. */
+    val leftovers: List<String> get() = yesterday.filter { text -> drafts.none { it.text.trim() == text } }
+
+    /** A carried task fills the first empty line, or a new one while there's room. */
+    val canCarryOver: Boolean get() = canAdd || drafts.any { it.text.isBlank() }
+
+    /** [text] brought into today as a new task, or this state unchanged when today is full. */
+    fun carriedOver(text: String): TodayUiState {
+        val blank = drafts.indexOfFirst { it.text.isBlank() }
+        return when {
+            blank >= 0 -> copy(drafts = drafts.toMutableList().also { it[blank] = TaskDraft(text) })
+            canAdd -> copy(drafts = drafts + TaskDraft(text))
+            else -> this
+        }
+    }
 }
 
 @HiltViewModel
@@ -47,10 +65,11 @@ class TodayViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val existing = taskRepository.tasksFor(day).map { TaskDraft(it.text, it.done) }
+            val leftUndone = taskRepository.tasksFor(day.minusDays(1)).filter { !it.done }.map { it.text }
             _uiState.update { state ->
                 // At least the three home shows, so a new day starts with three empty lines.
                 val count = maxOf(existing.size, Defaults.HOME_TASKS)
-                state.copy(drafts = List(count) { existing.getOrElse(it) { TaskDraft() } }, loaded = true)
+                state.copy(drafts = List(count) { existing.getOrElse(it) { TaskDraft() } }, yesterday = leftUndone, loaded = true)
             }
             val offer = autoTighten.offer()
             _uiState.update { it.copy(tightenOffer = offer) }
@@ -76,6 +95,14 @@ class TodayViewModel @Inject constructor(
 
     fun onAdd() {
         _uiState.update { state -> if (state.canAdd) state.copy(drafts = state.drafts + TaskDraft()) else state }
+    }
+
+    /**
+     * Brings one of yesterday's undone tasks into today, as a new task. Yesterday's stays as it was, so
+     * the day's record doesn't change.
+     */
+    fun onCarryOver(text: String) {
+        _uiState.update { it.carriedOver(text) }
     }
 
     /** Swaps a task with the one above it ([up]) or below it. */

@@ -25,6 +25,8 @@ data class Backup(
     val exportedAtMillis: Long,
     val apps: List<App> = emptyList(),
     val budgetMinutes: Int,
+    /** When a new day starts, in minutes after midnight. Missing from files made before 0.5, which leave this phone's alone. */
+    val dayStartMinute: Int? = null,
     val taperFloorMinutes: Int? = null,
     val firstHourRule: Boolean = false,
     val earnIt: Boolean = false,
@@ -61,6 +63,8 @@ data class Backup(
     data class Mode(
         val preset: String,
         val budgetMinutes: Int,
+    /** When a new day starts, in minutes after midnight. Missing from files made before 0.5, which leave this phone's alone. */
+    val dayStartMinute: Int? = null,
         val waitStepsSeconds: List<Long>,
         val allowlist: List<String>? = null,
         val scheduleDays: Int = 0,

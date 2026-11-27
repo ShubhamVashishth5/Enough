@@ -15,12 +15,17 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.tasks.domain.HomeTasks
 import app.minimise.tasks.domain.TodayTask
 
-/** Today's top tasks under the clock. Tap ticks one off; long-press edits them all. */
+/**
+ * Today's top tasks under the clock. Tap ticks one off; long-press edits them all. One line each, like
+ * the app names: home shows only the app rows that fit, so a task running onto more lines would push
+ * apps off the screen. The whole text is on the Today screen (and TalkBack reads it all here).
+ */
 @Composable
 fun TodayTaskList(
     tasks: List<TodayTask>,
@@ -44,6 +49,8 @@ fun TodayTaskList(
                 style = MaterialTheme.typography.titleMedium,
                 color = if (task.done) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
                 textDecoration = if (task.done) TextDecoration.LineThrough else null,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(

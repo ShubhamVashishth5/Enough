@@ -47,6 +47,7 @@ class LocalSettingsReader @Inject constructor(
                 .map { Backup.App(it, kinds[it] ?: AppKind.TOOL, limits[it], breatheWaits[it]) }
                 .filter { it.kind != AppKind.TOOL || it.openLimit != null || it.breatheWaitSeconds != null },
             budgetMinutes = settings.dailyBudget.inWholeMinutes.toInt(),
+            dayStartMinute = settings.dayStart.hour * 60 + settings.dayStart.minute,
             taperFloorMinutes = settings.taperFloorMinutes,
             firstHourRule = settings.firstHourRule,
             earnIt = settings.earnIt,

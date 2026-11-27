@@ -13,6 +13,7 @@ import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetDayStart
 import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.SetManualMode
 import app.minimise.settings.domain.SetOpenLimit
@@ -63,6 +64,15 @@ class BackupDiffTest {
             ),
             BackupDiff.changes(incoming, local(here), now),
         )
+    }
+
+    @Test
+    fun `a day start that differs becomes a change, and a file without one leaves this phone's alone`() {
+        val here = fresh.copy(dayStartMinute = 240)
+        assertEquals(listOf(SetDayStart(360)), BackupDiff.changes(fresh.copy(dayStartMinute = 360), local(here), now))
+        assertEquals(emptyList<Any>(), BackupDiff.changes(fresh.copy(dayStartMinute = 240), local(here), now))
+        assertEquals(emptyList<Any>(), BackupDiff.changes(fresh.copy(dayStartMinute = null), local(here), now))
+        assertEquals(emptyList<Any>(), BackupDiff.changes(fresh.copy(dayStartMinute = 24 * 60), local(here), now))
     }
 
     @Test

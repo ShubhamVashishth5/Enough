@@ -5,11 +5,17 @@ import app.minimise.display.domain.GrayscaleMode
 import app.minimise.launcher.domain.Shortcut
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.time.Duration
 
 /** Scalar settings kept in DataStore. Rule settings here change only through SettingsGuard. */
 data class Settings(
     val dailyBudget: Duration = Defaults.DAILY_BUDGET,
+    /**
+     * When a new day starts: the budget, today's tasks and the day's counts start fresh. A rule, since an
+     * earlier start brings a fresh budget sooner.
+     */
+    val dayStart: LocalTime = Defaults.DAY_RESET,
     /** First-run setup has been completed. */
     val onboardingDone: Boolean = false,
     /** Set once the home slots have been filled for the first time, so they aren't refilled. */

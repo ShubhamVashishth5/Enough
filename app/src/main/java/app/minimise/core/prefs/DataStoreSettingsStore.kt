@@ -15,6 +15,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
@@ -45,6 +46,8 @@ class DataStoreSettingsStore @Inject constructor(
         val defaults = Settings()
         return Settings(
             dailyBudget = this[Keys.DAILY_BUDGET_SECONDS]?.seconds ?: defaults.dailyBudget,
+            dayStart = this[Keys.DAY_START_MINUTE]?.takeIf { it in 0 until MINUTES_PER_DAY }
+                ?.let { LocalTime.of((it / 60).toInt(), (it % 60).toInt()) } ?: defaults.dayStart,
             onboardingDone = this[Keys.ONBOARDING_DONE] ?: defaults.onboardingDone,
             homeSlotsChosen = this[Keys.HOME_SLOTS_CHOSEN] ?: defaults.homeSlotsChosen,
             todayPromptedDay = this[Keys.TODAY_PROMPTED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
@@ -95,6 +98,7 @@ class DataStoreSettingsStore @Inject constructor(
 
     private fun MutablePreferences.write(settings: Settings) {
         this[Keys.DAILY_BUDGET_SECONDS] = settings.dailyBudget.inWholeSeconds
+        this[Keys.DAY_START_MINUTE] = (settings.dayStart.hour * 60 + settings.dayStart.minute).toLong()
         this[Keys.ONBOARDING_DONE] = settings.onboardingDone
         this[Keys.HOME_SLOTS_CHOSEN] = settings.homeSlotsChosen
         settings.todayPromptedDay?.let { this[Keys.TODAY_PROMPTED_EPOCH_DAY] = it.toEpochDay() }
@@ -137,8 +141,13 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.DEBUG_SHORT_LOOSEN_DELAY] = settings.debugShortLoosenDelay
     }
 
+    private companion object {
+        const val MINUTES_PER_DAY = 24 * 60L
+    }
+
     private object Keys {
         val DAILY_BUDGET_SECONDS = longPreferencesKey("daily_budget_seconds")
+        val DAY_START_MINUTE = longPreferencesKey("day_start_minute")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val HOME_SLOTS_CHOSEN = booleanPreferencesKey("home_slots_chosen")
         val TODAY_PROMPTED_EPOCH_DAY = longPreferencesKey("today_prompted_epoch_day")

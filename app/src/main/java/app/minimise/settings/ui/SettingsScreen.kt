@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.minimise.core.Defaults
 import app.minimise.core.ui.dateTimeText
+import app.minimise.core.ui.timeText
 import app.minimise.display.domain.GrayscaleMode
 
 @Composable
@@ -163,7 +165,7 @@ fun SettingsScreen(
         SettingsRow(
             icon = R.drawable.ic_set_budget,
             title = stringResource(R.string.settings_budget),
-            summary = state.budgetMinutes?.let { stringResource(R.string.settings_budget_summary, it) },
+            summary = state.budgetMinutes?.let { stringResource(R.string.settings_budget_summary, it, timeText(state.dayStart ?: Defaults.DAY_RESET)) },
             onClick = onOpenBudget,
         )
         SettingsRow(

@@ -1,6 +1,7 @@
 package app.minimise.settings.domain
 
 import app.minimise.apps.domain.AppKind
+import java.time.LocalTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -33,6 +34,15 @@ class SettingChangeJsonTest {
         assertEquals("mode:5", SaveMode(5, 20, null, 0, 0, 0).key)
         assertEquals("mode:5", RemoveMode(5).key)
         assertEquals(SetBreatheWait("pkg.whatsapp", 30), roundTrip(SetBreatheWait("pkg.whatsapp", 30)))
+    }
+
+    @Test
+    fun `a day start keeps its minute and its type name`() {
+        assertEquals(SetDayStart(90), roundTrip(SetDayStart(90)))
+        assertEquals(LocalTime.of(1, 30), SetDayStart(90).time)
+        assertEquals(SetDayStart(360), SetDayStart.of(LocalTime.of(6, 0)))
+        val json = Json.encodeToString(SettingChange.serializer(), SetDayStart(240))
+        assertEquals("""{"type":"set_day_start","minute":240}""", json)
     }
 
     @Test

@@ -2,6 +2,7 @@ package app.minimise.settings.domain
 
 import app.minimise.apps.domain.AppKind
 import app.minimise.core.time.WeeklyWindow
+import java.time.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,6 +28,23 @@ data class SetAppKind(val packageName: String, val kind: AppKind) : SettingChang
 @SerialName("set_budget")
 data class SetBudget(val minutes: Int) : SettingChange {
     override val key: String get() = "budget"
+}
+
+/**
+ * When a new day starts, in minutes after midnight. An earlier start brings a fresh budget sooner, so it
+ * is loosening; a later one is tightening.
+ */
+@Serializable
+@SerialName("set_day_start")
+data class SetDayStart(val minute: Int) : SettingChange {
+    override val key: String get() = "day_start"
+
+    /** A minute outside the day (only a damaged backup could hold one) wraps round into it. */
+    val time: LocalTime get() = minute.mod(24 * 60).let { LocalTime.of(it / 60, it % 60) }
+
+    companion object {
+        fun of(time: LocalTime) = SetDayStart(time.hour * 60 + time.minute)
+    }
 }
 
 /** A daily cap on opens of one app; null removes it. */
@@ -205,6 +223,16 @@ fun breatheWaitChangeDirection(from: Int?, to: Int?, usualSeconds: Int): Directi
 fun switchDirection(from: Boolean, to: Boolean): Direction? = when {
     from == to -> null
     to -> Direction.TIGHTEN
+    else -> Direction.LOOSEN
+}
+
+/**
+ * A later day start is tightening: the day in progress runs longer on the same budget. An earlier one is
+ * loosening. Null when nothing would change.
+ */
+fun dayStartChangeDirection(from: LocalTime, to: LocalTime): Direction? = when {
+    to == from -> null
+    to.isAfter(from) -> Direction.TIGHTEN
     else -> Direction.LOOSEN
 }
 

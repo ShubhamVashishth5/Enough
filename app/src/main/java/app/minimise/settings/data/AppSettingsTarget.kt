@@ -29,6 +29,8 @@ import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetDayStart
+import app.minimise.settings.domain.dayStartChangeDirection
 import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetTaper
@@ -66,6 +68,7 @@ class AppSettingsTarget @Inject constructor(
             fromMinutes = settingsStore.current().dailyBudget.inWholeMinutes.toInt(),
             toMinutes = change.minutes,
         )
+        is SetDayStart -> dayStartChangeDirection(from = settingsStore.current().dayStart, to = change.time)
         is SetOpenLimit -> openLimitChangeDirection(from = appRepository.openLimitOf(change.packageName), to = change.limit)
         is SetBreatheWait -> breatheWaitChangeDirection(
             from = appRepository.breatheWaitOf(change.packageName),
@@ -123,6 +126,7 @@ class AppSettingsTarget @Inject constructor(
     override suspend fun apply(change: SettingChange) = when (change) {
         is SetAppKind -> appRepository.setKind(change.packageName, change.kind)
         is SetBudget -> settingsStore.update { it.copy(dailyBudget = change.minutes.minutes) }
+        is SetDayStart -> settingsStore.update { it.copy(dayStart = change.time) }
         is SetOpenLimit -> appRepository.setOpenLimit(change.packageName, change.limit)
         is SetBreatheWait -> appRepository.setBreatheWait(change.packageName, change.seconds)
         is SaveSchedule -> scheduleRepository.save(Schedule(change.id, change.name, change.window()))

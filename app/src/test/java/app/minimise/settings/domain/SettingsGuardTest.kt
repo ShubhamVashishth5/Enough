@@ -8,6 +8,7 @@ import app.minimise.testing.FakeLockPeriod
 import app.minimise.testing.FakePendingChangeStore
 import app.minimise.testing.FakeSettingsTarget
 import app.minimise.usage.domain.EventType
+import java.time.LocalTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -118,6 +119,16 @@ class SettingsGuardTest {
         target.budgetMinutes = 45
         assertTrue(guard.request(SetBudget(50)) is GuardResult.Scheduled)
         assertEquals(45, target.budgetMinutes)
+    }
+
+    @Test
+    fun `a later day start applies at once, an earlier one waits`() = runTest {
+        target.dayStart = LocalTime.of(4, 0)
+        assertEquals(GuardResult.AppliedNow, guard.request(SetDayStart.of(LocalTime.of(6, 0))))
+        assertEquals(LocalTime.of(6, 0), target.dayStart)
+        assertEquals(GuardResult.Scheduled(clock.now + 24.hours), guard.request(SetDayStart.of(LocalTime.MIDNIGHT)))
+        assertEquals(LocalTime.of(6, 0), target.dayStart)
+        assertEquals(null, dayStartChangeDirection(LocalTime.of(6, 0), LocalTime.of(6, 0)))
     }
 
     @Test

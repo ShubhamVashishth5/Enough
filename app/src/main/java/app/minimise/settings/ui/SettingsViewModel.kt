@@ -13,6 +13,7 @@ import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import app.minimise.core.time.TimeSource
 import java.time.LocalDateTime
+import java.time.LocalTime
 import android.net.Uri
 import app.minimise.stats.data.CsvExporter
 import app.minimise.apps.domain.PrivateSpace
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiState(
     val budgetMinutes: Int? = null,
+    val dayStart: LocalTime? = null,
     val activeModeName: String? = null,
     val pendingCount: Int = 0,
     val grayscaleMode: GrayscaleMode = GrayscaleMode.OFF,
@@ -79,6 +81,7 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<SettingsUiState> = combine(settingsGuard.pending, settingsStore.settings, messages) { pending, settings, (exported, backup) ->
         SettingsUiState(
             budgetMinutes = settings.dailyBudget.inWholeMinutes.toInt(),
+            dayStart = settings.dayStart,
             activeModeName = activeMode.active()?.name,
             pendingCount = pending.size,
             grayscaleMode = settings.grayscaleMode,

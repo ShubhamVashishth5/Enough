@@ -28,11 +28,13 @@ import app.minimise.settings.domain.SetEarnIt
 import app.minimise.settings.domain.SetCalendarFocus
 import app.minimise.settings.domain.SetFirstHourRule
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetDayStart
 import app.minimise.settings.domain.SetOpenLimit
 import app.minimise.settings.domain.SettingsGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -53,6 +55,8 @@ sealed interface PendingDescription {
     data class AppKindChange(val appLabel: String, val kind: AppKind) : PendingDescription
 
     data class BudgetChange(val minutes: Int) : PendingDescription
+
+    data class DayStartChange(val time: LocalTime) : PendingDescription
 
     /** @property limit null when the limit is being removed. */
     data class OpenLimitChange(val appLabel: String, val limit: Int?) : PendingDescription
@@ -131,6 +135,7 @@ class PendingChangesViewModel @Inject constructor(
                         kind = change.kind,
                     )
                     is SetBudget -> PendingDescription.BudgetChange(change.minutes)
+                    is SetDayStart -> PendingDescription.DayStartChange(change.time)
                     is SetOpenLimit -> PendingDescription.OpenLimitChange(
                         appLabel = labels[change.packageName] ?: change.packageName,
                         limit = change.limit,

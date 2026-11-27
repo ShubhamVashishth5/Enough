@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.minimise.R
+import app.minimise.core.ui.dayStartText
 import app.minimise.core.ui.theme.MinimiseTheme
 import app.minimise.intervention.ActivityInterventionLauncher
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +30,7 @@ class TimeUpActivity : ComponentActivity() {
                     val budgetUsed = intent.getBooleanExtra(EXTRA_BUDGET_USED, false)
                     InterventionMessage(
                         title = stringResource(if (budgetUsed) R.string.blocked_budget_title else R.string.time_up_title),
-                        body = stringResource(if (budgetUsed) R.string.blocked_budget_body else R.string.time_up_body),
+                        body = if (budgetUsed) stringResource(R.string.blocked_budget_body, dayStartText()) else stringResource(R.string.time_up_body),
                         action = stringResource(R.string.time_up_go_home),
                         onAction = ::goHome,
                     )

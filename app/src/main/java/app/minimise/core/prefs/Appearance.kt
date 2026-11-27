@@ -5,7 +5,8 @@ package app.minimise.core.prefs
  * doesn't hold them. Every choice is stored by name, so never rename an entry.
  */
 data class Appearance(
-    val font: FontChoice = FontChoice.SYSTEM,
+    /** Mono until the user picks another. Phones that saved a choice before keep it. */
+    val font: FontChoice = FontChoice.MONO,
     /** Every piece of text in the app, on top of the phone's own font size. */
     val textSize: TextSize = TextSize.DEFAULT,
     /** Home's clock. */

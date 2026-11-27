@@ -1,6 +1,5 @@
 package app.minimise.core.time
 
-import app.minimise.core.Defaults
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -8,13 +7,15 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 /**
- * Turns instants into "usage days". A usage day starts at [Defaults.DAY_RESET] (04:00) local time,
- * so 01:30 on Tuesday still belongs to Monday.
+ * Turns instants into "usage days". A usage day starts at the time the user chose (04:00 unless they
+ * changed it), so with the default 01:30 on Tuesday still belongs to Monday. Budgets, tasks, the first
+ * hour, emergency passes and the weekly report all count days this way.
  */
 class DayBoundary @Inject constructor(
     private val timeSource: TimeSource,
+    private val dayStart: DayStartSource = FixedDayStart(),
 ) {
-    private val resetAt: LocalTime = Defaults.DAY_RESET
+    private val resetAt: LocalTime get() = dayStart.dayStart()
 
     fun dayOf(instant: Instant): LocalDate {
         val local = instant.atZone(timeSource.zone())
@@ -23,6 +24,9 @@ class DayBoundary @Inject constructor(
     }
 
     fun today(): LocalDate = dayOf(timeSource.now())
+
+    /** The day before [today]. */
+    fun yesterday(): LocalDate = today().minusDays(1)
 
     /** The first instant of [day]. */
     fun startOf(day: LocalDate): Instant = day.atTime(resetAt).atZone(timeSource.zone()).toInstant()

@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.minimise.R
 import app.minimise.core.ui.ChoiceText
+import app.minimise.core.ui.dayStartText
 import app.minimise.core.ui.announcedHeading
 import app.minimise.core.ui.durationSpoken
 import app.minimise.core.ui.durationText
@@ -150,7 +151,7 @@ private fun blockedTitle(reason: String): String = stringResource(
 
 @Composable
 private fun blockedBody(reason: String, appLabel: String): String = when (reason) {
-    BudgetRule.REASON -> stringResource(R.string.blocked_budget_body)
+    BudgetRule.REASON -> stringResource(R.string.blocked_budget_body, dayStartText())
     OpenLimitRule.REASON -> stringResource(R.string.blocked_open_limit_body, appLabel)
     ScheduleRule.REASON -> stringResource(R.string.blocked_schedule_body)
     FirstHourRule.REASON -> stringResource(R.string.blocked_first_hour_body)

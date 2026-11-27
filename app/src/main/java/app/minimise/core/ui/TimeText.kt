@@ -3,10 +3,13 @@ package app.minimise.core.ui
 import android.content.Context
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.minimise.R
+import app.minimise.core.time.SettingsDayStart
 import app.minimise.core.time.WeeklyWindow
 import java.time.DayOfWeek
 import java.time.LocalDateTime
@@ -21,6 +24,15 @@ fun timeText(time: LocalTime): String {
     val is24Hour = DateFormat.is24HourFormat(LocalContext.current)
     val format = remember(is24Hour) { DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm a") }
     return time.format(format)
+}
+
+/** When a new day starts ("04:00"), as the user set it. For screens without a view model of their own to ask. */
+@Composable
+fun dayStartText(): String {
+    val context = LocalContext.current
+    val source = remember(context) { SettingsDayStart.from(context) }
+    val start by source.changes.collectAsState(initial = remember(source) { source.dayStart() })
+    return timeText(start)
 }
 
 /** "Mon Tue Wed · 22:00–07:00", or "Every day · ..." */

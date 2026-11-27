@@ -10,6 +10,7 @@ import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetAppKind
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetDayStart
 import app.minimise.settings.domain.SetCalendarFocus
 import app.minimise.settings.domain.SetEarnIt
 import app.minimise.settings.domain.SetFeedBlocked
@@ -51,6 +52,9 @@ object BackupDiff {
             if (app.breatheWaitSeconds != current?.breatheWaitSeconds) add(SetBreatheWait(app.packageName, app.breatheWaitSeconds))
         }
         if (incoming.budgetMinutes != here.budgetMinutes) add(SetBudget(incoming.budgetMinutes))
+        incoming.dayStartMinute
+            ?.takeIf { it in 0 until 24 * 60 && it != here.dayStartMinute }
+            ?.let { add(SetDayStart(it)) }
         if (incoming.taperFloorMinutes != here.taperFloorMinutes) add(SetTaper(incoming.taperFloorMinutes))
         if (incoming.firstHourRule != here.firstHourRule) add(SetFirstHourRule(incoming.firstHourRule))
         if (incoming.earnIt != here.earnIt) add(SetEarnIt(incoming.earnIt))

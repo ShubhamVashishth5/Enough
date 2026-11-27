@@ -12,6 +12,8 @@ import app.minimise.settings.domain.SaveMode
 import app.minimise.settings.domain.SaveSchedule
 import app.minimise.settings.domain.SetManualMode
 import app.minimise.settings.domain.SetBudget
+import app.minimise.settings.domain.SetDayStart
+import app.minimise.settings.domain.dayStartChangeDirection
 import app.minimise.settings.domain.SetFeedBlocked
 import app.minimise.settings.domain.StartLock
 import app.minimise.settings.domain.SetTaper
@@ -32,12 +34,14 @@ import app.minimise.settings.domain.scheduleChangeDirection
 import app.minimise.settings.domain.switchDirection
 import app.minimise.core.time.WeeklyWindow
 import java.time.Instant
+import java.time.LocalTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeSettingsTarget : SettingsTarget {
     val kinds = mutableMapOf<String, AppKind>()
     var budgetMinutes = 45
+    var dayStart: LocalTime = LocalTime.of(4, 0)
     val openLimits = mutableMapOf<String, Int?>()
     val breatheWaits = mutableMapOf<String, Int?>()
     val schedules = mutableMapOf<Long, SaveSchedule>()
@@ -53,6 +57,7 @@ class FakeSettingsTarget : SettingsTarget {
     override suspend fun direction(change: SettingChange): Direction? = when (change) {
         is SetAppKind -> kindChangeDirection(kinds[change.packageName] ?: AppKind.TOOL, change.kind)
         is SetBudget -> budgetChangeDirection(budgetMinutes, change.minutes)
+        is SetDayStart -> dayStartChangeDirection(dayStart, change.time)
         is SetOpenLimit -> openLimitChangeDirection(openLimits[change.packageName], change.limit)
         is SetBreatheWait -> breatheWaitChangeDirection(breatheWaits[change.packageName], change.seconds, usualSeconds = 10)
         is SaveSchedule -> schedules[change.id].let { old ->
@@ -76,6 +81,7 @@ class FakeSettingsTarget : SettingsTarget {
         when (change) {
             is SetAppKind -> kinds[change.packageName] = change.kind
             is SetBudget -> budgetMinutes = change.minutes
+            is SetDayStart -> dayStart = change.time
             is SetOpenLimit -> openLimits[change.packageName] = change.limit
             is SetBreatheWait -> breatheWaits[change.packageName] = change.seconds
             is SaveSchedule -> schedules[change.id] = change

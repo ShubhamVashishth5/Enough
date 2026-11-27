@@ -2,6 +2,7 @@ package app.minimise.core.time
 
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -62,6 +63,33 @@ class DayBoundaryTest {
         assertEquals(day, boundary.dayOf(start))
         assertEquals(day, boundary.dayOf(end.minusMillis(1)))
         assertEquals(day.plusDays(1), boundary.dayOf(end))
+    }
+
+    @Test
+    fun `a day can start at midnight`() {
+        val midnight = DayBoundary(clock, FixedDayStart(LocalTime.MIDNIGHT))
+        assertEquals(LocalDate.of(2026, 3, 10), midnight.dayOf(local("2026-03-10T00:00:00")))
+        assertEquals(LocalDate.of(2026, 3, 9), midnight.dayOf(local("2026-03-09T23:59:59")))
+        assertEquals(local("2026-03-10T00:00:00"), midnight.startOf(LocalDate.of(2026, 3, 10)))
+    }
+
+    @Test
+    fun `a later start keeps the small hours in the day before`() {
+        val six = DayBoundary(clock, FixedDayStart(LocalTime.of(6, 0)))
+        assertEquals(LocalDate.of(2026, 3, 9), six.dayOf(local("2026-03-10T05:30:00")))
+        assertEquals(LocalDate.of(2026, 3, 10), six.dayOf(local("2026-03-10T06:00:00")))
+        assertEquals(local("2026-03-11T06:00:00"), six.endOf(LocalDate.of(2026, 3, 10)))
+    }
+
+    @Test
+    fun `a changed start applies to the next question asked`() {
+        var start = LocalTime.of(4, 0)
+        val moving = DayBoundary(clock) { start }
+        clock.now = local("2026-03-10T02:00:00")
+        assertEquals(LocalDate.of(2026, 3, 9), moving.today())
+        start = LocalTime.of(1, 0)
+        assertEquals(LocalDate.of(2026, 3, 10), moving.today())
+        assertEquals(LocalDate.of(2026, 3, 9), moving.yesterday())
     }
 
     @Test

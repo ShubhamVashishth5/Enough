@@ -15,12 +15,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.durationText
+import app.minimise.core.ui.timeText
 import app.minimise.settings.domain.GuardResult
 
 @Composable
@@ -34,6 +37,8 @@ fun BudgetRoute(viewModel: BudgetViewModel = hiltViewModel()) {
         onTaperSave = viewModel::onTaperSave,
         onTaperStop = viewModel::onTaperStop,
         onEarnItTapped = viewModel::onEarnItTapped,
+        onDayStartStep = viewModel::onDayStartStep,
+        onDayStartSave = viewModel::onDayStartSave,
     )
 }
 
@@ -46,6 +51,8 @@ fun BudgetScreen(
     onTaperSave: () -> Unit = {},
     onTaperStop: () -> Unit = {},
     onEarnItTapped: () -> Unit = {},
+    onDayStartStep: (Int) -> Unit = {},
+    onDayStartSave: () -> Unit = {},
 ) {
     ScreenScaffold(title = stringResource(R.string.budget_title), modifier = Modifier.verticalScroll(rememberScrollState())) {
         val muted = MaterialTheme.colorScheme.onSurfaceVariant
@@ -84,6 +91,7 @@ fun BudgetScreen(
             is GuardResult.Refused -> Text(stringResource(R.string.lock_refused_short), style = MaterialTheme.typography.bodyLarge)
             null -> Unit
         }
+        DayStart(state, onDayStartStep, onDayStartSave)
         Taper(state, onTaperStep, onTaperSave, onTaperStop)
         SettingsRow(
             title = stringResource(R.string.earn_it_title),
@@ -95,6 +103,47 @@ fun BudgetScreen(
             onClick = onEarnItTapped,
             modifier = Modifier.padding(top = 16.dp),
         )
+    }
+}
+
+/** When a new day starts: the budget, today's tasks and the day's counts start fresh. */
+@Composable
+private fun DayStart(state: BudgetUiState, onStep: (Int) -> Unit, onSave: () -> Unit) {
+    val muted = MaterialTheme.colorScheme.onSurfaceVariant
+    val draft = state.dayStartDraft ?: return
+    Text(
+        text = stringResource(R.string.day_start_title),
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(top = 32.dp),
+    )
+    Text(text = stringResource(R.string.day_start_explainer), style = MaterialTheme.typography.bodyMedium, color = muted)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(vertical = 12.dp),
+    ) {
+        val earlier = stringResource(R.string.a11y_day_start_earlier)
+        val later = stringResource(R.string.a11y_day_start_later)
+        OutlinedButton(onClick = { onStep(-1) }, enabled = draft.hour > 0, modifier = Modifier.semantics { contentDescription = earlier }) { Text("−") }
+        Text(text = timeText(draft), style = MaterialTheme.typography.titleLarge)
+        OutlinedButton(onClick = { onStep(1) }, enabled = draft.hour < 23, modifier = Modifier.semantics { contentDescription = later }) { Text("+") }
+    }
+    state.dayStart?.let {
+        Text(text = stringResource(R.string.day_start_current, timeText(it)), style = MaterialTheme.typography.bodyMedium, color = muted)
+    }
+    state.dayStartPending?.let { (start, left) ->
+        Text(text = stringResource(R.string.day_start_pending, timeText(start), durationText(left)), style = MaterialTheme.typography.bodyMedium)
+    }
+    OutlinedButton(
+        onClick = onSave,
+        enabled = draft != state.dayStart || state.dayStartPending != null,
+        modifier = Modifier.padding(top = 12.dp),
+    ) { Text(stringResource(R.string.budget_save)) }
+    when (state.dayStartResult) {
+        GuardResult.AppliedNow -> Text(stringResource(R.string.budget_applied), style = MaterialTheme.typography.bodyLarge)
+        is GuardResult.Scheduled -> Text(stringResource(R.string.day_start_scheduled), style = MaterialTheme.typography.bodyLarge)
+        is GuardResult.Refused -> Text(stringResource(R.string.lock_refused_short), style = MaterialTheme.typography.bodyLarge)
+        null -> Unit
     }
 }
 

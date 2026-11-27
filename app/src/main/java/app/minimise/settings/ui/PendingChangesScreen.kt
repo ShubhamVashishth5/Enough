@@ -23,6 +23,7 @@ import app.minimise.apps.ui.labelRes
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.dateTimeText
 import app.minimise.core.ui.durationText
+import app.minimise.core.ui.timeText
 import kotlin.time.Duration
 
 @Composable
@@ -91,6 +92,7 @@ private fun describe(description: PendingDescription): String = when (descriptio
     is PendingDescription.AppKindChange ->
         stringResource(R.string.pending_app_kind, description.appLabel, stringResource(description.kind.labelRes()))
     is PendingDescription.BudgetChange -> stringResource(R.string.pending_budget, description.minutes)
+    is PendingDescription.DayStartChange -> stringResource(R.string.pending_day_start, timeText(description.time))
     is PendingDescription.OpenLimitChange -> description.limit
         ?.let { pluralStringResource(R.plurals.pending_open_limit, it, description.appLabel, it) }
         ?: stringResource(R.string.pending_open_limit_none, description.appLabel)

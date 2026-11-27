@@ -20,6 +20,8 @@ import app.minimise.core.db.SwapDao
 import app.minimise.core.db.TaskDao
 import app.minimise.core.prefs.DataStoreSettingsStore
 import app.minimise.core.prefs.SettingsStore
+import app.minimise.core.time.DayStartSource
+import app.minimise.core.time.SettingsDayStart
 import app.minimise.core.time.TamperAwareTimeSource
 import app.minimise.core.time.TimeSource
 import app.minimise.usage.data.RoomEventLog
@@ -43,6 +45,9 @@ abstract class CoreBindings {
 
     @Binds
     abstract fun settingsStore(impl: DataStoreSettingsStore): SettingsStore
+
+    @Binds
+    abstract fun dayStart(impl: SettingsDayStart): DayStartSource
 
     @Binds
     abstract fun eventLog(impl: RoomEventLog): EventLog
