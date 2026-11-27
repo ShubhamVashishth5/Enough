@@ -2,6 +2,7 @@ package app.minimise.core.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -99,26 +100,33 @@ fun SearchableAppList(
 
 /**
  * The search box inside a LazyColumn: it scrolls up with whatever is above it, then stays at the top.
- * Tapping it brings it to the top, so the matches show under it, above the keyboard.
+ * Tapping it brings it to the top, so the matches show under it, above the keyboard. [below] (filters,
+ * say) stays at the top with it.
  */
 @OptIn(ExperimentalFoundationApi::class)
-fun LazyListScope.appFilterHeader(query: String, onQueryChange: (String) -> Unit, listState: LazyListState, hint: String? = null) {
+fun LazyListScope.appFilterHeader(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    listState: LazyListState,
+    hint: String? = null,
+    below: @Composable () -> Unit = {},
+) {
     stickyHeader(key = SEARCH_KEY) {
         val scope = rememberCoroutineScope()
-        AppFilterField(
-            query = query,
-            onQueryChange = onQueryChange,
-            hint = hint ?: stringResource(R.string.app_filter_hint),
-            modifier = Modifier
-                // Opaque, so rows scrolling up pass behind it.
-                .background(MaterialTheme.colorScheme.background)
-                .padding(vertical = 8.dp)
-                .onFocusChanged { focus ->
+        // Opaque, so rows scrolling up pass behind it.
+        Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).padding(vertical = 8.dp)) {
+            AppFilterField(
+                query = query,
+                onQueryChange = onQueryChange,
+                hint = hint ?: stringResource(R.string.app_filter_hint),
+                modifier = Modifier.onFocusChanged { focus ->
                     if (!focus.hasFocus) return@onFocusChanged
                     val index = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == SEARCH_KEY }?.index ?: return@onFocusChanged
                     scope.launch { listState.animateScrollToItem(index) }
                 },
-        )
+            )
+            below()
+        }
     }
 }
 

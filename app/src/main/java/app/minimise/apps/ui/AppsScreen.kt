@@ -1,8 +1,12 @@
 package app.minimise.apps.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
@@ -82,35 +91,42 @@ fun AppsScreen(
     onBreatheWaitDismissed: () -> Unit = {},
 ) {
     var query by rememberSaveable { mutableStateOf("") }
+    // Only apps of one kind, or every app when null.
+    var kind by rememberSaveable { mutableStateOf<AppKind?>(null) }
     val searching = query.isNotBlank()
-    val websites = remember(state.websites, query) { AppFilter.filter(state.websites, query) { it.app.label } }
-    val rows = remember(state.rows, query) { AppFilter.filter(state.rows, query) { it.app.label } }
+    val narrowed = searching || kind != null
+    val websites = remember(state.websites, query, kind) { AppFilter.filter(state.websites, query) { it.app.label }.ofKind(kind) }
+    val rows = remember(state.rows, query, kind) { AppFilter.filter(state.rows, query) { it.app.label }.ofKind(kind) }
+    val counts = remember(state.rows, state.websites) { (state.rows + state.websites).groupingBy { it.app.kind }.eachCount() }
+    val total = state.rows.size + state.websites.size
     val listState = rememberLazyListState()
     val searchHint = stringResource(R.string.app_filter_hint_websites)
     ScreenScaffold(title = stringResource(R.string.apps_title)) {
         LazyColumn(state = listState) {
-            // The explainer steps aside while searching, so matches sit right under the box.
-            if (!searching) item(key = "explainer") {
+            // The explainer steps aside while searching or filtering, so the list sits right under the box.
+            if (!narrowed) item(key = "explainer") {
                 Text(
                     text = stringResource(R.string.apps_explainer),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            appFilterHeader(query = query, onQueryChange = { query = it }, listState = listState, hint = searchHint)
-            // While searching, a section shows only if something in it matches.
-            if (!searching || websites.isNotEmpty()) item(key = "websites") {
+            appFilterHeader(query = query, onQueryChange = { query = it }, listState = listState, hint = searchHint) {
+                KindFilter(selected = kind, counts = counts, total = total, onSelect = { kind = it })
+            }
+            // While searching or filtering, a section shows only if something in it is left.
+            if (!narrowed || websites.isNotEmpty()) item(key = "websites") {
                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                     Text(text = stringResource(R.string.apps_websites), style = MaterialTheme.typography.titleLarge)
-                    // Just the title while searching, to keep the matches together.
-                    if (!searching) {
+                    // Just the title while searching or filtering, to keep the list together.
+                    if (!narrowed) {
                         Text(
                             text = stringResource(R.string.apps_websites_explainer),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    if (!searching && !state.websitesCovered) {
+                    if (!narrowed && !state.websitesCovered) {
                         Text(
                             text = stringResource(R.string.needs_full_protection),
                             style = MaterialTheme.typography.bodyMedium,
@@ -122,10 +138,10 @@ fun AppsScreen(
             items(websites, key = { it.app.packageName }) { row ->
                 AppKindRow(row = row, kinds = WEBSITE_KINDS, onKindChosen = { onKindChosen(row.app, it) }, onEditLimit = {})
             }
-            if (!searching) item(key = "add_website") {
+            if (!narrowed) item(key = "add_website") {
                 TextButton(onClick = onAddWebsite) { Text(stringResource(R.string.apps_add_website), style = MaterialTheme.typography.titleMedium) }
             }
-            if (!searching || rows.isNotEmpty()) item(key = "apps") {
+            if (!narrowed || rows.isNotEmpty()) item(key = "apps") {
                 Text(
                     text = stringResource(R.string.apps_title),
                     style = MaterialTheme.typography.titleLarge,
@@ -141,7 +157,20 @@ fun AppsScreen(
                     onLongPress = { onAppLongPressed(row.app) },
                 )
             }
-            if (searching && websites.isEmpty() && rows.isEmpty()) item(key = "none") { AppFilterEmpty(query) }
+            if (narrowed && websites.isEmpty() && rows.isEmpty()) {
+                item(key = "none") {
+                    if (searching) {
+                        AppFilterEmpty(query)
+                    } else {
+                        Text(
+                            text = stringResource(R.string.apps_filter_empty),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 16.dp),
+                        )
+                    }
+                }
+            }
         }
     }
     state.editingLimit?.let { app ->
@@ -160,6 +189,68 @@ fun AppsScreen(
 
 /** From least to most strict, as they read best left to right. */
 private val APP_KINDS = listOf(AppKind.TOOL, AppKind.BREATHE, AppKind.VAULT, AppKind.HIDDEN)
+
+private fun List<AppRow>.ofKind(kind: AppKind?): List<AppRow> = if (kind == null) this else filter { it.app.kind == kind }
+
+/** The filters' order: the kinds people look for most first, so they show without scrolling sideways. */
+private val FILTER_KINDS = listOf(AppKind.VAULT, AppKind.BREATHE, AppKind.TOOL, AppKind.HIDDEN)
+
+/**
+ * All, or just the Vault, Breathe, Tool or Hidden apps, each with how many there are. A row of small
+ * pills that scrolls sideways when the words don't fit; the chosen one is filled.
+ */
+@Composable
+private fun KindFilter(selected: AppKind?, counts: Map<AppKind, Int>, total: Int, onSelect: (AppKind?) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(top = 12.dp)
+            .selectableGroup(),
+    ) {
+        FilterPill(label = stringResource(R.string.apps_filter_all), count = total, chosen = selected == null, onClick = { onSelect(null) })
+        FILTER_KINDS.forEach { kind ->
+            FilterPill(
+                label = stringResource(kind.filterLabelRes()),
+                count = counts[kind] ?: 0,
+                chosen = selected == kind,
+                onClick = { onSelect(kind) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterPill(label: String, count: Int, chosen: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(50)
+    Box(
+        modifier = Modifier
+            .clip(shape)
+            .then(
+                if (chosen) {
+                    Modifier.background(MaterialTheme.colorScheme.onSurface)
+                } else {
+                    Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
+                },
+            )
+            .selectable(selected = chosen, role = Role.RadioButton, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.apps_filter_count, label, count),
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (chosen) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface,
+        )
+    }
+}
+
+private fun AppKind.filterLabelRes(): Int = when (this) {
+    AppKind.TOOL -> R.string.apps_filter_tool
+    AppKind.VAULT -> R.string.app_kind_vault
+    AppKind.HIDDEN -> R.string.app_kind_hidden
+    AppKind.BREATHE -> R.string.app_kind_breathe
+}
 
 /**
  * Hidden means nothing for a website, which never shows in the launcher anyway, and the browser rules

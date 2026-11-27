@@ -215,6 +215,11 @@
     <string name="app_kind_vault">Vault</string>
     <string name="app_kind_hidden">Hidden</string>
     <string name="app_kind_breathe">Breathe</string>
+    <!-- The Apps screen's filters: All, Vault, Breathe, Tools, Hidden, each followed by how many. -->
+    <string name="apps_filter_all">All</string>
+    <string name="apps_filter_tool">Tools</string>
+    <string name="apps_filter_count">%1$s %2$d</string>
+    <string name="apps_filter_empty">None yet.</string>
     <string name="app_actions_info">App info</string>
     <string name="app_actions_uninstall">Uninstall</string>
     <string name="app_actions_close">Close</string>
