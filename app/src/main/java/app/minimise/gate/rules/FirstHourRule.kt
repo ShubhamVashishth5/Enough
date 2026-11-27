@@ -18,8 +18,9 @@ class FirstHourRule @Inject constructor(
 ) : Rule {
     override val id: String = "first_hour"
 
+    // Qualified: a bare evaluate(ctx) resolves to this member, not the companion, and recurses forever.
     override suspend fun evaluate(ctx: GateContext): Decision =
-        if (settingsStore.current().firstHourRule) evaluate(ctx) else Decision.Allow
+        if (settingsStore.current().firstHourRule) Companion.evaluate(ctx) else Decision.Allow
 
     companion object {
         const val REASON = "first_hour"

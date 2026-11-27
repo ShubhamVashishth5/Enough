@@ -8,6 +8,8 @@ import app.minimise.gate.domain.GateContext
 import app.minimise.schedules.domain.Schedule
 import app.minimise.settings.domain.Direction
 import app.minimise.settings.domain.scheduleChangeDirection
+import app.minimise.core.prefs.Settings
+import app.minimise.testing.FakeSettingsStore
 import app.minimise.testing.app
 import app.minimise.usage.domain.TodayUsage
 import java.time.DayOfWeek
@@ -15,6 +17,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -44,6 +47,14 @@ class ScheduleRulesTest {
         assertEquals(Decision.Allow, FirstHourRule.evaluate(ctx(instagram, today, unlock + 60.minutes)))
         assertEquals(Decision.Allow, FirstHourRule.evaluate(ctx(maps, today, unlock)))
         assertEquals(Decision.Allow, FirstHourRule.evaluate(ctx(instagram, TodayUsage(), unlock)))
+    }
+
+    @Test
+    fun `the first-hour Rule the GateEngine calls gives the same answer, and nothing when off`() = runTest {
+        val unlock = Instant.parse("2026-11-24T07:00:00Z")
+        val inside = ctx(instagram, TodayUsage(firstUnlockAt = unlock), unlock + 10.minutes)
+        assertTrue(FirstHourRule(FakeSettingsStore(Settings(firstHourRule = true))).evaluate(inside) is Decision.Block)
+        assertEquals(Decision.Allow, FirstHourRule(FakeSettingsStore(Settings(firstHourRule = false))).evaluate(inside))
     }
 
     @Test
