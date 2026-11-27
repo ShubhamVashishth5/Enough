@@ -49,6 +49,7 @@ class DataStoreSettingsStore @Inject constructor(
             dayStart = this[Keys.DAY_START_MINUTE]?.takeIf { it in 0 until MINUTES_PER_DAY }
                 ?.let { LocalTime.of((it / 60).toInt(), (it % 60).toInt()) } ?: defaults.dayStart,
             onboardingDone = this[Keys.ONBOARDING_DONE] ?: defaults.onboardingDone,
+            onboardingStep = this[Keys.ONBOARDING_STEP],
             homeSlotsChosen = this[Keys.HOME_SLOTS_CHOSEN] ?: defaults.homeSlotsChosen,
             todayPromptedDay = this[Keys.TODAY_PROMPTED_EPOCH_DAY]?.let(LocalDate::ofEpochDay),
             swapsSeeded = this[Keys.SWAPS_SEEDED] ?: defaults.swapsSeeded,
@@ -100,6 +101,7 @@ class DataStoreSettingsStore @Inject constructor(
         this[Keys.DAILY_BUDGET_SECONDS] = settings.dailyBudget.inWholeSeconds
         this[Keys.DAY_START_MINUTE] = (settings.dayStart.hour * 60 + settings.dayStart.minute).toLong()
         this[Keys.ONBOARDING_DONE] = settings.onboardingDone
+        settings.onboardingStep?.let { this[Keys.ONBOARDING_STEP] = it } ?: remove(Keys.ONBOARDING_STEP)
         this[Keys.HOME_SLOTS_CHOSEN] = settings.homeSlotsChosen
         settings.todayPromptedDay?.let { this[Keys.TODAY_PROMPTED_EPOCH_DAY] = it.toEpochDay() }
             ?: remove(Keys.TODAY_PROMPTED_EPOCH_DAY)
@@ -149,6 +151,7 @@ class DataStoreSettingsStore @Inject constructor(
         val DAILY_BUDGET_SECONDS = longPreferencesKey("daily_budget_seconds")
         val DAY_START_MINUTE = longPreferencesKey("day_start_minute")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
+        val ONBOARDING_STEP = stringPreferencesKey("onboarding_step")
         val HOME_SLOTS_CHOSEN = booleanPreferencesKey("home_slots_chosen")
         val TODAY_PROMPTED_EPOCH_DAY = longPreferencesKey("today_prompted_epoch_day")
         val SWAPS_SEEDED = booleanPreferencesKey("swaps_seeded")

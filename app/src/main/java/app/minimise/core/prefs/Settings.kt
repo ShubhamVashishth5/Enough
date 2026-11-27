@@ -18,6 +18,11 @@ data class Settings(
     val dayStart: LocalTime = Defaults.DAY_RESET,
     /** First-run setup has been completed. */
     val onboardingDone: Boolean = false,
+    /**
+     * The onboarding step on screen, by name, while setup is under way. Android starts a fresh home screen
+     * when Enough becomes the default home app, and that one carries on from here.
+     */
+    val onboardingStep: String? = null,
     /** Set once the home slots have been filled for the first time, so they aren't refilled. */
     val homeSlotsChosen: Boolean = false,
     /** The usage day the Today screen last opened by itself, so it does so once a day. */

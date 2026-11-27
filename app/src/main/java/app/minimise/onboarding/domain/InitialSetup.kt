@@ -21,7 +21,15 @@ class InitialSetup @Inject constructor(
         return true
     }
 
+    /** The step onboarding was on, by name, if it's under way. */
+    suspend fun savedStep(): String? = settingsStore.current().onboardingStep
+
+    /** Remembers the step on screen, so a fresh start of the home screen carries on from it. */
+    suspend fun saveStep(step: String) {
+        settingsStore.update { it.copy(onboardingStep = step) }
+    }
+
     suspend fun finish() {
-        settingsStore.update { it.copy(onboardingDone = true, homeSlotsChosen = true) }
+        settingsStore.update { it.copy(onboardingDone = true, homeSlotsChosen = true, onboardingStep = null) }
     }
 }

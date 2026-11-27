@@ -21,10 +21,19 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class OnboardingStep { WELCOME, HONEST_LIMITS, PERMISSIONS, HOME_APPS, VAULT, BUDGET }
+enum class OnboardingStep {
+    WELCOME, HONEST_LIMITS, PERMISSIONS, HOME_APPS, VAULT, BUDGET;
+
+    companion object {
+        /** The step saved by name, or the first one when nothing (or a step this version doesn't have) was saved. */
+        fun fromSaved(name: String?): OnboardingStep = entries.firstOrNull { it.name == name } ?: WELCOME
+    }
+}
 
 data class OnboardingUiState(
     val step: OnboardingStep = OnboardingStep.WELCOME,
+    /** The saved step has been read. Until then nothing shows, so carrying on doesn't flash the first step. */
+    val restored: Boolean = false,
     val apps: List<AppEntry> = emptyList(),
     /** In slot order. */
     val homePicks: List<String> = emptyList(),
@@ -37,7 +46,11 @@ data class OnboardingUiState(
     val vaultChoices: List<AppEntry> get() = apps.sortedBy { if (it.packageName in vaultPicks) 0 else 1 }
 }
 
-/** First run: welcome, honest limits, permissions, home apps, Vault apps, budget. */
+/**
+ * First run: welcome, honest limits, permissions, home apps, Vault apps, budget. The step is saved as it
+ * changes: making Enough the default home app (step 3) has Android start a fresh home screen, which
+ * carries on from there rather than at the welcome.
+ */
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val appRepository: AppRepository,
@@ -50,14 +63,19 @@ class OnboardingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            val step = OnboardingStep.fromSaved(initialSetup.savedStep())
+            _uiState.update { it.copy(step = step, restored = true) }
             homeSlotsInitializer.initialiseIfNeeded()
             val apps = appRepository.apps.first()
+            // Past the Vault step its picks are saved, so they're what's in the Vault now. Before it, the
+            // usual time sinks come ticked.
+            val suggested = if (step > OnboardingStep.VAULT) emptySet() else CommonTimeSinks.packages
             _uiState.update { state ->
                 state.copy(
                     apps = apps,
                     homePicks = apps.filter { it.homeSlot != null }.sortedBy { it.homeSlot }.map { it.packageName },
                     vaultPicks = apps
-                        .filter { it.kind == AppKind.VAULT || it.packageName in CommonTimeSinks.packages }
+                        .filter { it.kind == AppKind.VAULT || it.packageName in suggested }
                         .map { it.packageName }
                         .toSet(),
                 )
@@ -83,9 +101,10 @@ class OnboardingViewModel @Inject constructor(
         it.copy(budgetMinutes = (it.budgetMinutes + deltaMinutes).coerceIn(0, MAX_BUDGET_MINUTES))
     }
 
-    fun onBack() = _uiState.update { state ->
-        val previous = OnboardingStep.entries.getOrNull(state.step.ordinal - 1) ?: return@update state
-        state.copy(step = previous)
+    fun onBack() {
+        val previous = OnboardingStep.entries.getOrNull(_uiState.value.step.ordinal - 1) ?: return
+        _uiState.update { it.copy(step = previous) }
+        viewModelScope.launch { initialSetup.saveStep(previous.name) }
     }
 
     fun onNext() {
@@ -102,8 +121,9 @@ class OnboardingViewModel @Inject constructor(
                 }
                 OnboardingStep.WELCOME, OnboardingStep.HONEST_LIMITS, OnboardingStep.PERMISSIONS -> Unit
             }
+            val next = OnboardingStep.entries.getOrNull(state.step.ordinal + 1)
+            if (next != null) initialSetup.saveStep(next.name)
             _uiState.update {
-                val next = OnboardingStep.entries.getOrNull(it.step.ordinal + 1)
                 if (next == null) it.copy(saving = false, finished = true) else it.copy(saving = false, step = next)
             }
         }

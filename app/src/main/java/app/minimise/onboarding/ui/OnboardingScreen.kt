@@ -43,6 +43,10 @@ fun OnboardingRoute(onFinished: () -> Unit, viewModel: OnboardingViewModel = hil
     LaunchedEffect(state.finished) { if (state.finished) onFinished() }
     // Back steps back through onboarding; on the first step it does nothing (this is the home screen).
     BackHandler { viewModel.onBack() }
+    if (!state.restored) {
+        Box(Modifier.fillMaxSize())
+        return
+    }
     OnboardingScreen(
         state = state,
         onNext = viewModel::onNext,
