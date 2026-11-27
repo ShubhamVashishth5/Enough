@@ -11,17 +11,49 @@ It's Android only and works offline. Nothing you do leaves the phone: the one th
 the optional weather and air quality line on home, which is off until you switch it on and sends only a
 rough location.
 
+> **Coming to Google Play.** I'm planning to publish Enough on Google Play as well. Until then, install it
+> from [Releases](../../releases).
+
+## Screenshots
+
+<table>
+  <tr>
+    <td><img src="Screenshots/01-home.jpg" width="200" alt="Home: the clock, weather and battery, what's playing, today's tasks, six apps as plain words and a column of small icons"></td>
+    <td><img src="Screenshots/02-pause.jpg" width="200" alt="The breathing pause before a Vault app opens, with how often it was opened today and the minutes left"></td>
+    <td><img src="Screenshots/03-today.jpg" width="200" alt="Today's tasks, in order, with one ticked off"></td>
+    <td><img src="Screenshots/04-appearance.jpg" width="200" alt="Appearance: a preview of home, the font, the text size and the clock size"></td>
+  </tr>
+  <tr>
+    <td align="center">Home</td>
+    <td align="center">The pause before a Vault app</td>
+    <td align="center">Today's tasks</td>
+    <td align="center">Appearance</td>
+  </tr>
+  <tr>
+    <td><img src="Screenshots/05-settings.jpg" width="200" alt="Settings: apps, home screen, appearance, daily budget, modes, wind-down and schedules"></td>
+    <td><img src="Screenshots/06-modes.jpg" width="200" alt="Modes: Work, Study, Home and Sleep, each with its own budget and schedule"></td>
+    <td><img src="Screenshots/07-commitment.jpg" width="200" alt="Settings: feed blocking, lock period, friend key, physical key, pending changes and habits"></td>
+    <td><img src="Screenshots/08-physical-key.jpg" width="200" alt="Physical key: pair an NFC sticker or make a code to print"></td>
+  </tr>
+  <tr>
+    <td align="center">Settings</td>
+    <td align="center">Modes</td>
+    <td align="center">Commitment</td>
+    <td align="center">Physical key</td>
+  </tr>
+</table>
+
 ## What it does
 
 - **A quiet home screen.** Up to six apps as plain words, today's top three tasks (add as many as ten
-  and put them in order; the next one moves up as you tick one off), the next calendar item, and two
-  numbers: Vault minutes and unlocks today. No app icons, badges or app grid; you type to find an app,
+  and put them in order; the next one moves up as you tick one off, and what was left undone yesterday
+  is a tap away), the next calendar item, and two numbers: Vault minutes and unlocks today. No app icons, badges or app grid; you type to find an app,
   and long-press a result to see its info or uninstall it.
 - **A few small icons, if you want them.** On the right of home, beside your apps, up to five of Enough's
   own small white icons (Phone, Messages and Camera to start; Browser, Music, Maps, Mail, Chat, Notes and 30 or so more).
   Each opens the app you choose, or on Automatic, the phone's own phone, messages or camera app. Never a
   Vault app.
-- **Your font and text size.** The phone's own font, a light one, condensed, serif or mono; text
+- **Your font and text size.** Mono to start, or the phone's own font, a light one, condensed or serif; text
   smaller or larger than the phone's; and the size of the clock, the app names and the icons on home.
 - **Small lines under the clock, each one switchable.** Battery, the next alarm, what's playing (with
   previous, play/pause and next; tap the song to open the player), and the weather and US air quality
@@ -33,7 +65,9 @@ rough location.
   No reason asked, no time box, nothing taken from the budget.
 - **The Vault.** A pause screen ("What are you here for?"), an escalating wait, a 2, 5 or 10 minute time
   box, and a shared daily budget. Answer *bored* or *habit* and it offers something from your Instead list
-  first.
+  first. A new day starts when you choose: 4 AM unless you change it.
+- **Every list of apps has a search box.** Settings → Apps also shows just the Vault, Breathe, Tool or
+  Hidden apps, with how many of each.
 - **Websites too.** A website in the Vault (instagram.com, youtube.com) gets the same pause, budget and
   rules in Chrome, Firefox, Samsung Internet, Brave, Edge and others.
 - **Feed blocking.** Block YouTube Shorts, Instagram Reels and Explore while search and messages keep
@@ -68,9 +102,9 @@ What comes next is in [Minimisation Machine — Beyond Plan.md](Minimisation%20M
 Download the APK from the [Releases](../../releases) page and open it on the phone. Then:
 
 1. Make Enough your default home app when it asks.
-2. Turn on its accessibility service. **Installed outside the Play Store on Android 13+?** The setting is
-   greyed out until you open Enough's App info, tap ⋮ and choose *Allow restricted settings*. The same goes
-   for notification access.
+2. Turn on its accessibility service. **On Android 13 and later** the setting is greyed out at first, as
+   for any app installed outside the Play Store: open Enough's App info, tap ⋮ and choose *Allow restricted
+   settings*. The same goes for notification access.
 3. Allow unrestricted battery use. On Xiaomi, Oppo, Vivo, Realme and Samsung phones also turn on autostart
    for the app; these brands stop background services more aggressively than stock Android.
 
@@ -225,35 +259,6 @@ or blocks an app is a `Rule` in `gate/rules/`; every way past a block (wait, key
 emergency pass) is an `UnlockMethod`; every setting change goes through `SettingsGuard`, which applies
 tightening at once and makes loosening wait. All stats are computed from one event log. Domain packages are
 plain Kotlin and carry the unit tests.
-
-## F-Droid
-
-The app uses no proprietary libraries and embeds no build timestamps or dependency metadata. Store-listing
-text lives in `fastlane/metadata/android/en-US`. A draft of the metadata file F-Droid needs is in
-`fdroid/app.minimise.yml`: once a release is tagged, fill in the release key's certificate fingerprint,
-copy it to `metadata/` in F-Droid's [fdroiddata](https://gitlab.com/fdroid/fdroiddata) repository and open a
-merge request. It asks for a reproducible build, so F-Droid ships the APK from the GitHub release with
-the developer's signature after checking it matches its own build.
-
-To check the build is reproducible, build the same tag twice from two clean checkouts in different
-folders and compare the unsigned APKs:
-
-```sh
-git clone --branch v0.1.0 <repo> a && git clone --branch v0.1.0 <repo> b
-(cd a && ./gradlew --no-build-cache assembleRelease) && (cd b && ./gradlew --no-build-cache assembleRelease)
-sha256sum {a,b}/app/build/outputs/apk/release/app-release-unsigned.apk
-```
-
-## Play Store
-
-Before the accessibility setting opens, the app shows a prominent disclosure (what is read, why, and that
-nothing leaves the phone) and continues only on *Agree*, as Google Play's
-[accessibility policy](https://support.google.com/googleplay/android-developer/answer/10964491) requires.
-Publishing there also needs the accessibility declaration filled in on Play Console, and, for personal
-developer accounts created after 13 November 2023, a closed test with 12 testers for 14 days first.
-Grayscale still needs the ADB grant on Play installs. In the data safety form, declare approximate
-location as collected and shared with a third party (Open-Meteo), optional, for app functionality, not
-stored by the app.
 
 ## Licence
 
