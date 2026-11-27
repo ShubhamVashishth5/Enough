@@ -1,0 +1,1 @@
+Setting Enough as your default home app during setup no longer sends you back to the first step: setup carries on where you were. Settings > Apps can now show just the Vault, Breathe, Tool or Hidden apps, with how many of each.

@@ -86,7 +86,16 @@ Builds:
     gradle:
       - yes
 
+  - versionName: 0.5.2
+    versionCode: 8
+    commit: v0.5.2
+    subdir: app
+    sudo:
+      - sdkmanager 'platforms;android-37.2' 'build-tools;37.0.0'
+    gradle:
+      - yes
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 0.5.1
-CurrentVersionCode: 7
+CurrentVersion: 0.5.2
+CurrentVersionCode: 8
