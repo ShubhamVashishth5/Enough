@@ -1,0 +1,1 @@
+Every list of apps has a search box now: choosing an app for home or its icons, Settings > Apps, focus apps, a mode's apps, the digest's always-through apps and setup. It matches any part of a name, ignoring capitals and accents, and the box moves to the top as you type so the matches stay above the keyboard.
