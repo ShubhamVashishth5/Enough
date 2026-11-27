@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +34,7 @@ import app.minimise.R
 import app.minimise.apps.domain.AppEntry
 import app.minimise.core.Defaults
 import app.minimise.core.ui.ScreenScaffold
+import app.minimise.core.ui.SearchableAppList
 import app.minimise.settings.permissions.PermissionsRoute
 
 @Composable
@@ -163,16 +162,20 @@ private fun PickStep(
     onToggle: (AppEntry) -> Unit,
 ) {
     ScreenScaffold(title = title) {
-        Text(
-            text = body,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        LazyColumn {
-            items(apps, key = { it.packageName }) { app ->
-                CheckRow(label = app.label, checked = isPicked(app), onToggle = { onToggle(app) })
-            }
+        SearchableAppList(
+            apps = apps,
+            header = {
+                item(key = "body") {
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                }
+            },
+        ) { app ->
+            CheckRow(label = app.label, checked = isPicked(app), onToggle = { onToggle(app) })
         }
     }
 }

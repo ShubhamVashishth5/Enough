@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -25,10 +30,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.minimise.R
 import app.minimise.apps.domain.AppEntry
+import app.minimise.apps.domain.AppFilter
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.WebTarget
 import app.minimise.core.Defaults
 import app.minimise.core.ui.AppActionsDialog
+import app.minimise.core.ui.AppFilterEmpty
+import app.minimise.core.ui.appFilterHeader
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.durationText
 import kotlin.time.Duration
@@ -73,23 +81,36 @@ fun AppsScreen(
     onBreatheWaitChosen: (Duration?) -> Unit = {},
     onBreatheWaitDismissed: () -> Unit = {},
 ) {
+    var query by rememberSaveable { mutableStateOf("") }
+    val searching = query.isNotBlank()
+    val websites = remember(state.websites, query) { AppFilter.filter(state.websites, query) { it.app.label } }
+    val rows = remember(state.rows, query) { AppFilter.filter(state.rows, query) { it.app.label } }
+    val listState = rememberLazyListState()
+    val searchHint = stringResource(R.string.app_filter_hint_websites)
     ScreenScaffold(title = stringResource(R.string.apps_title)) {
-        Text(
-            text = stringResource(R.string.apps_explainer),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        LazyColumn {
-            item(key = "websites") {
+        LazyColumn(state = listState) {
+            // The explainer steps aside while searching, so matches sit right under the box.
+            if (!searching) item(key = "explainer") {
+                Text(
+                    text = stringResource(R.string.apps_explainer),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            appFilterHeader(query = query, onQueryChange = { query = it }, listState = listState, hint = searchHint)
+            // While searching, a section shows only if something in it matches.
+            if (!searching || websites.isNotEmpty()) item(key = "websites") {
                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                     Text(text = stringResource(R.string.apps_websites), style = MaterialTheme.typography.titleLarge)
-                    Text(
-                        text = stringResource(R.string.apps_websites_explainer),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    if (!state.websitesCovered) {
+                    // Just the title while searching, to keep the matches together.
+                    if (!searching) {
+                        Text(
+                            text = stringResource(R.string.apps_websites_explainer),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (!searching && !state.websitesCovered) {
                         Text(
                             text = stringResource(R.string.needs_full_protection),
                             style = MaterialTheme.typography.bodyMedium,
@@ -98,20 +119,20 @@ fun AppsScreen(
                     }
                 }
             }
-            items(state.websites, key = { it.app.packageName }) { row ->
+            items(websites, key = { it.app.packageName }) { row ->
                 AppKindRow(row = row, kinds = WEBSITE_KINDS, onKindChosen = { onKindChosen(row.app, it) }, onEditLimit = {})
             }
-            item(key = "add_website") {
+            if (!searching) item(key = "add_website") {
                 TextButton(onClick = onAddWebsite) { Text(stringResource(R.string.apps_add_website), style = MaterialTheme.typography.titleMedium) }
             }
-            item(key = "apps") {
+            if (!searching || rows.isNotEmpty()) item(key = "apps") {
                 Text(
                     text = stringResource(R.string.apps_title),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
                 )
             }
-            items(state.rows, key = { it.app.packageName }) { row ->
+            items(rows, key = { it.app.packageName }) { row ->
                 AppKindRow(
                     row = row,
                     onKindChosen = { onKindChosen(row.app, it) },
@@ -120,6 +141,7 @@ fun AppsScreen(
                     onLongPress = { onAppLongPressed(row.app) },
                 )
             }
+            if (searching && websites.isEmpty() && rows.isEmpty()) item(key = "none") { AppFilterEmpty(query) }
         }
     }
     state.editingLimit?.let { app ->

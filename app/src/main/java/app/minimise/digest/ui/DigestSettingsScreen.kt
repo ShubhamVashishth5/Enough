@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +22,7 @@ import app.minimise.apps.domain.AppEntry
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.ui.ScreenScaffold
+import app.minimise.core.ui.SearchableAppList
 import app.minimise.core.ui.SettingsRow
 import app.minimise.digest.domain.DigestScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,26 +67,36 @@ class DigestSettingsViewModel @Inject constructor(
 fun DigestSettingsRoute(onOpenPermissions: () -> Unit, viewModel: DigestSettingsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     ScreenScaffold(title = stringResource(R.string.digest_settings_title)) {
-        Text(
-            text = stringResource(R.string.digest_settings_explainer),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        SettingsRow(
-            title = stringResource(R.string.digest_settings_enabled),
-            summary = stringResource(if (state.enabled) R.string.debug_on else R.string.debug_off),
-            onClick = viewModel::onEnabledToggled,
-        )
-        SettingsRow(
-            title = stringResource(R.string.settings_permissions),
-            summary = stringResource(R.string.digest_settings_permissions),
-            onClick = onOpenPermissions,
-        )
-        Text(stringResource(R.string.digest_settings_exempt), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
-        LazyColumn {
-            items(state.apps, key = { it.packageName }) { app ->
-                CheckRow(label = app.label, checked = app.packageName in state.exempt, onToggle = { viewModel.onExemptToggled(app) })
-            }
+        SearchableAppList(
+            apps = state.apps,
+            header = {
+                item(key = "explainer") {
+                    Text(
+                        text = stringResource(R.string.digest_settings_explainer),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                item(key = "enabled") {
+                    SettingsRow(
+                        title = stringResource(R.string.digest_settings_enabled),
+                        summary = stringResource(if (state.enabled) R.string.debug_on else R.string.debug_off),
+                        onClick = viewModel::onEnabledToggled,
+                    )
+                }
+                item(key = "permissions") {
+                    SettingsRow(
+                        title = stringResource(R.string.settings_permissions),
+                        summary = stringResource(R.string.digest_settings_permissions),
+                        onClick = onOpenPermissions,
+                    )
+                }
+                item(key = "exempt") {
+                    Text(stringResource(R.string.digest_settings_exempt), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+                }
+            },
+        ) { app ->
+            CheckRow(label = app.label, checked = app.packageName in state.exempt, onToggle = { viewModel.onExemptToggled(app) })
         }
     }
 }

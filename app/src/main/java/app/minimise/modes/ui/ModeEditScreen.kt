@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,10 +34,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import app.minimise.R
 import app.minimise.apps.domain.AppEntry
+import app.minimise.apps.domain.AppFilter
 import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.time.WeeklyWindow
 import app.minimise.core.time.minuteOfDay
+import app.minimise.core.ui.AppFilterEmpty
+import app.minimise.core.ui.appFilterHeader
 import app.minimise.core.ui.ScreenScaffold
 import app.minimise.core.ui.WindowFields
 import app.minimise.launcher.ui.Destination
@@ -162,10 +170,15 @@ class ModeEditViewModel @Inject constructor(
 fun ModeEditRoute(onSaved: () -> Unit, viewModel: ModeEditViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(state.result) { if (state.result == GuardResult.AppliedNow) onSaved() }
+    var query by rememberSaveable { mutableStateOf("") }
+    val apps = remember(state.apps, query) { AppFilter.filter(state.apps, query) { it.label } }
+    val searching = query.isNotBlank() && state.allowlist != null
+    val listState = rememberLazyListState()
     ScreenScaffold(title = state.name) {
         if (!state.loaded) return@ScreenScaffold
-        LazyColumn {
-            item {
+        LazyColumn(state = listState) {
+            // The rest of the form steps aside while searching, so matches sit right under the box.
+            if (!searching) item(key = "form") {
                 if (state.custom) {
                     OutlinedTextField(
                         value = state.nameText,
@@ -194,9 +207,11 @@ fun ModeEditRoute(onSaved: () -> Unit, viewModel: ModeEditViewModel = hiltViewMo
                 CheckRow(stringResource(R.string.mode_only_apps), state.allowlist != null, viewModel::onAllowlistToggled)
             }
             state.allowlist?.let { allowed ->
-                items(state.apps, key = { it.packageName }) { app ->
+                appFilterHeader(query = query, onQueryChange = { query = it }, listState = listState)
+                items(apps, key = { it.packageName }) { app ->
                     CheckRow(app.label, app.packageName in allowed, { viewModel.onAppToggled(app) }, indent = true)
                 }
+                if (apps.isEmpty() && query.isNotBlank()) item(key = "none") { AppFilterEmpty(query, modifier = Modifier.padding(start = 16.dp)) }
             }
             item {
                 if (state.result is GuardResult.Scheduled) {

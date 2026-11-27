@@ -1,8 +1,6 @@
 package app.minimise.focus.ui
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +19,7 @@ import app.minimise.apps.domain.AppKind
 import app.minimise.apps.domain.AppRepository
 import app.minimise.core.prefs.SettingsStore
 import app.minimise.core.ui.ScreenScaffold
+import app.minimise.core.ui.SearchableAppList
 import app.minimise.core.ui.SettingsRow
 import app.minimise.core.ui.durationText
 import app.minimise.calendar.domain.CalendarFocusScheduler
@@ -95,27 +94,33 @@ class FocusSettingsViewModel @Inject constructor(
 fun FocusSettingsRoute(onOpenPermissions: () -> Unit, viewModel: FocusSettingsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     ScreenScaffold(title = stringResource(R.string.focus_settings_title)) {
-        Text(
-            text = stringResource(R.string.focus_settings_explainer),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        val offIn = state.calendarOffIn
-        SettingsRow(
-            title = stringResource(R.string.calendar_focus_title),
-            summary = when {
-                !state.calendarAllowed -> stringResource(R.string.calendar_focus_needs_calendar)
-                offIn != null -> stringResource(R.string.calendar_focus_off_in, durationText(offIn))
-                state.calendarFocus -> stringResource(R.string.calendar_focus_on)
-                else -> stringResource(R.string.calendar_focus_off)
+        SearchableAppList(
+            apps = state.apps,
+            header = {
+                item(key = "explainer") {
+                    Text(
+                        text = stringResource(R.string.focus_settings_explainer),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                }
+                item(key = "calendar") {
+                    val offIn = state.calendarOffIn
+                    SettingsRow(
+                        title = stringResource(R.string.calendar_focus_title),
+                        summary = when {
+                            !state.calendarAllowed -> stringResource(R.string.calendar_focus_needs_calendar)
+                            offIn != null -> stringResource(R.string.calendar_focus_off_in, durationText(offIn))
+                            state.calendarFocus -> stringResource(R.string.calendar_focus_on)
+                            else -> stringResource(R.string.calendar_focus_off)
+                        },
+                        onClick = if (state.calendarAllowed) viewModel::onCalendarFocusTapped else onOpenPermissions,
+                    )
+                }
             },
-            onClick = if (state.calendarAllowed) viewModel::onCalendarFocusTapped else onOpenPermissions,
-        )
-        LazyColumn {
-            items(state.apps, key = { it.packageName }) { app ->
-                CheckRow(label = app.label, checked = app.packageName in state.allowed, onToggle = { viewModel.onToggled(app) })
-            }
+        ) { app ->
+            CheckRow(label = app.label, checked = app.packageName in state.allowed, onToggle = { viewModel.onToggled(app) })
         }
     }
 }

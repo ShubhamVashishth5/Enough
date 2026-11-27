@@ -88,6 +88,9 @@
 
     <!-- Search -->
     <string name="search_hint">Type an app name</string>
+    <string name="app_filter_hint">Search apps</string>
+    <string name="app_filter_hint_websites">Search apps and websites</string>
+    <string name="app_filter_none">Nothing matches “%s”.</string>
 
     <!-- Pause screen -->
     <plurals name="pause_open_count">
@@ -955,6 +958,7 @@
     <string name="a11y_task_down">Move %s down</string>
     <string name="a11y_task_remove">Remove %s</string>
     <string name="a11y_carry_over">carry it over to today</string>
+    <string name="a11y_app_filter_clear">Clear search</string>
     <string name="a11y_task_done">%s done</string>
     <string name="a11y_fewer_minutes">Fewer minutes</string>
     <string name="a11y_more_minutes">More minutes</string>
